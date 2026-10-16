@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEP Portal</title>
+    <!-- Tailwind CSS Engine -->
+    <script src="https://tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .apple-blur {
+            background-color: rgba(29, 29, 31, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .tab-active {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+    </style>
+</head>
+<body class="bg-[#f5f5f7] text-[#1d1d1f] min-h-screen flex flex-col tracking-tight">
+
+    <!-- Fixed Glassmorphic Apple-Style Navigation Top Bar -->
+    <nav class="fixed top-0 left-0 right-0 h-12 apple-blur border-b border-white/10 z-50 transition-all duration-300">
+        <div class="max-w-5xl mx-auto h-full px-6 flex justify-between items-center">
+            <span class="text-sm font-semibold tracking-tight text-[#f5f5f7] opacity-95 cursor-pointer" onclick="switchTab('form')">AEP Portal</span>
+            <div class="flex space-x-1 h-8 items-center">
+                <button onclick="switchTab('form')" id="btn-form" class="tab-btn tab-active text-xs font-medium text-[#f5f5f7]/60 hover:text-white px-3 py-1.5 rounded-full transition-all duration-200">Form Filling</button>
+                <button onclick="switchTab('avsec')" id="btn-avsec" class="tab-btn text-xs font-medium text-[#f5f5f7]/60 hover:text-white px-3 py-1.5 rounded-full transition-all duration-200">AVSEC</button>
+                <button onclick="switchTab('pvc')" id="btn-pvc" class="tab-btn text-xs font-medium text-[#f5f5f7]/60 hover:text-white px-3 py-1.5 rounded-full transition-all duration-200">PVC</button>
+                <button onclick="switchTab('passport')" id="btn-passport" class="tab-btn text-xs font-medium text-[#f5f5f7]/60 hover:text-white px-3 py-1.5 rounded-full transition-all duration-200">Passport</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content Workspace -->
+    <main class="flex-1 max-w-4xl w-full mx-auto px-6 pt-24 pb-16">
+        
+        <!-- SECTION: Form Filling Tab Workspace -->
+        <div id="form-view" class="tab-content transition-all duration-300">
+            <h2 class="text-4xl font-bold tracking-tight mb-2 text-[#1d1d1f]">Aerodrome Entry Permit</h2>
+            <p class="text-lg text-[#86868b] font-normal mb-8">Process structural credential parameters directly mapped to your entry clearance files.</p>
+            
+            <div class="bg-white p-12 rounded-2xl border border-[#e8e8ed] shadow-sm text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#f5f5f7] text-[#0066cc] mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Application Form Initialization Ready</h3>
+                <p class="text-sm text-[#86868b] max-w-md mx-auto">Your physical data field configurations will render fields cleanly into this workspace structure.</p>
+            </div>
+        </div>
+
+        <!-- SECTION: Search Terminal (Shared by AVSEC, PVC, Passport views) -->
+        <div id="search-view" class="tab-content hidden opacity-0 transition-all duration-300 transform translate-y-2">
+            <h2 id="search-title" class="text-4xl font-bold tracking-tight mb-2 text-[#1d1d1f]">Security Verification</h2>
+            <p class="text-lg text-[#86868b] font-normal mb-8">Query real-time infrastructure databases using an authenticated Identifier.</p>
+            
+            <div class="bg-white p-6 rounded-2xl border border-[#e8e8ed] shadow-sm mb-6">
+                <div class="flex space-x-3">
+                    <input type="text" id="empIdInput" placeholder="Employee ID (e.g., IGA72835)" class="flex-1 px-4 py-3 bg-[#f5f5f7] border border-[#d2d2d7] rounded-xl text-base text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-[#0066cc] focus:ring-1 focus:ring-[#0066cc] transition-all">
+                    <button onclick="executeSearch()" class="bg-[#0066cc] text-white font-medium px-6 py-3 rounded-xl hover:bg-[#0077ed] active:scale-[0.98] transition-all">Search</button>
+                </div>
+                <p id="error-msg" class="hidden text-xs text-[#ff3b30] mt-3 font-medium px-1"></p>
+            </div>
+
+            <!-- Apple Data Visualization Module Card -->
+            <div id="result-box" class="hidden bg-white rounded-2xl border border-[#e8e8ed] shadow-sm overflow-hidden transition-all duration-300">
+                <div class="bg-[#f5f5f7] px-8 py-4 border-b border-[#e8e8ed] flex justify-between items-center">
+                    <span class="text-xs font-bold tracking-wider text-[#86868b] uppercase">System Repository Profile</span>
+                    <span id="badge-status" class="text-xs font-bold bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full">ACTIVE</span>
+                </div>
+                <div class="p-8">
+                    <!-- Base Corporate Metadata Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm mb-8 pb-6 border-b border-[#e8e8ed]">
+                        <div class="space-y-1">
+                            <span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Full Name</span>
+                            <span id="res-name" class="text-xl font-bold text-[#1d1d1f]"></span>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Corporate ID & Designation</span>
+                            <span id="res-id-desc" class="text-base font-medium text-[#1d1d1f]"></span>
+                        </div>
+                    </div>
+                    <!-- Module Variable Custom Attribute Fields -->
+                    <div id="module-data" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+      <script>
+        let currentTab = 'form';
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // Re-render Tab Class selections UI states
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active', 'text-white'));
+            document.getElementById(`btn-${tabName}`).classList.add('tab-active');
+
+            const formView = document.getElementById('form-view');
+            const searchView = document.getElementById('search-view');
+
+            document.getElementById('result-box').classList.add('hidden');
+            document.getElementById('error-msg').classList.add('hidden');
+            document.getElementById('empIdInput').value = '';
+
+            if (tabName === 'form') {
+                searchView.classList.add('hidden', 'opacity-0', 'translate-y-2');
+                formView.classList.remove('hidden');
+            } else {
+                formView.classList.add('hidden');
+                searchView.classList.remove('hidden');
+                document.getElementById('search-title').innerText = `${tabName.toUpperCase()} Terminal`;
+                setTimeout(() => searchView.classList.remove('opacity-0', 'translate-y-2'), 30);
+            }
+        }
+
+        async function executeSearch() {
+            const empId = document.getElementById('empIdInput').value;
+            const resBox = document.getElementById('result-box');
+            const errorMsg = document.getElementById('error-msg');
+            const modDiv = document.getElementById('module-data');
+
+            resBox.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+
+            if (!empId.trim()) return;
+
+            try {
+                const response = await fetch(`/api/search?empId=${empId}&type=${currentTab}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    errorMsg.innerText = data.message;
+                    errorMsg.classList.remove('hidden');
+                    return;
+                }
+
+                // Inject Standard Corporate Header values
+                document.getElementById('res-name').innerText = data.name;
+                document.getElementById('res-id-desc').innerText = `${data.id} — ${data.designation} (${data.org})`;
+
+                let detailHtml = '';
+
+                if (currentTab === 'avsec') {
+                    detailHtml = `
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Training Type</span><span class="text-base text-[#1d1d1f] font-medium">${data.details.type}</span></div>
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Completion Date</span><span class="text-base text-[#1d1d1f] font-medium">${data.details.date}</span></div>
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Airport Location Station</span><span class="text-base text-[#1d1d1f] font-medium">${data.details.location}</span></div>
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Certified Instructor Code</span><span class="text-base text-[#1d1d1f] font-medium">${data.details.instructor}</span></div>
+                    `;
+                } else if (currentTab === 'pvc') {
+                    detailHtml = `
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Police Verification Flag</span><span class="text-base font-semibold text-[#34c759]">${data.details.status}</span></div>
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Certificate Tracking No</span><span class="text-base text-[#1d1d1f] font-medium">${data.details.certificateNo}</span></div>
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Court Case Checklist</span><span class="text-base text-[#1d1d1f] font-medium">${data.details.courtCase}</span></div>
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Registered Permanent Address</span><span class="text-sm text-[#1d1d1f] font-medium block leading-normal">${data.details.address}</span></div>
+                    `;
+                } else if (currentTab === 'passport') {
+                    detailHtml = `
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Verified Document Details</span><span class="text-base text-[#1d1d1f] font-medium">${data.details.number}</span></div>
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Nationality Class</span><span class="text-base text-[#1d1d1f] font-medium">${data.details.nationality}</span></div>
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Validity Expiry Date</span><span class="text-base text-[#1d1d1f] font-medium">${data.details.expiryDate}</span></div>
+                        <div class="space-y-1"><span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Corporate Identity Email</span><span class="text-base text-[#0066cc] font-medium">${data.details.email}</span></div>
+                    `;
+                }
+
+                modDiv.innerHTML = detailHtml;
+                resBox.classList.remove('hidden');
+
+            } catch (err) {
+                errorMsg.innerText = "Error establishing real-time cloud data pipeline mapping updates.";
+                errorMsg.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
+
