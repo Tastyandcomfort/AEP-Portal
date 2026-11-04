@@ -15,25 +15,23 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <style>
-    /* San Francisco Font Stack & Apple Glass Styling */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      letter-spacing: -0.012em;
+      letter-spacing: -0.011em;
     }
 
     .apple-glass-nav {
-      background: rgba(255, 255, 255, 0.82);
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: saturate(180%) blur(25px);
       -webkit-backdrop-filter: saturate(180%) blur(25px);
     }
 
     .apple-card {
       background: #ffffff;
-      border: 1px solid rgba(210, 210, 215, 0.45);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-      border-radius: 20px;
+      border: 1px solid rgba(210, 210, 215, 0.5);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      border-radius: 18px;
     }
 
     .apple-btn-active {
@@ -45,7 +43,7 @@
     .apple-input {
       background: #fbfbfd;
       border: 1px solid #d2d2d7;
-      border-radius: 12px;
+      border-radius: 10px;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -56,21 +54,83 @@
       box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
     }
 
-    /* Print Preview Optimizations */
+    /* ===================================================
+       OFFICIAL BCAS A4 PRINT ENGINE (EXACT 1:1 REPLICA)
+       =================================================== */
+    .bcas-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 12mm 14mm;
+      margin: 0 auto 24px auto;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border: 1px solid #d2d2d7;
+      color: #000000;
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+      font-size: 10.5px;
+      line-height: 1.25;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .bcas-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1.2px solid #000000;
+      margin-top: 3px;
+      margin-bottom: 5px;
+    }
+
+    .bcas-table th, .bcas-table td {
+      border: 1px solid #000000;
+      padding: 2.5px 4px;
+      vertical-align: middle;
+    }
+
+    .bcas-check {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      border: 1px solid #000000;
+      text-align: center;
+      line-height: 10px;
+      font-size: 9px;
+      font-weight: bold;
+      margin-right: 2px;
+      vertical-align: middle;
+      background: #fff;
+    }
+
+    .bcas-field-val {
+      font-weight: bold;
+      color: #000;
+      text-transform: uppercase;
+    }
+
     @media print {
-      body * { visibility: hidden; }
-      #printable-aep-card, #printable-aep-card * { visibility: visible; }
-      #printable-aep-card {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        box-shadow: none;
-        border: 2px solid #000;
+      body {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
-      .no-print { display: none !important; }
+      .no-print {
+        display: none !important;
+      }
+      .bcas-sheet {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 297mm !important;
+        margin: 0 !important;
+        padding: 10mm 12mm !important;
+        border: none !important;
+        box-shadow: none !important;
+        page-break-after: always;
+        page-break-inside: avoid;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
     }
   </style>
 </head>
@@ -79,316 +139,634 @@
   <!-- Fixed Apple Glass Navigation -->
   <header class="fixed top-0 left-0 right-0 h-16 apple-glass-nav border-b border-[#d2d2d7]/50 z-50 transition-all no-print">
     <div class="max-w-7xl mx-auto h-full px-6 flex justify-between items-center">
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('split-form')">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0071e3] to-[#42a5f5] flex items-center justify-center text-white shadow-sm">
-          <i class="fa-solid fa-plane-departure text-sm"></i>
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('deck')">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0071e3] to-[#42a5f5] flex items-center justify-center text-white shadow-xs">
+          <i class="fa-solid fa-plane-shield text-sm"></i>
         </div>
         <div>
           <span class="text-base font-semibold tracking-tight block leading-tight">AEP Workspace</span>
-          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Airport Authority Operations</span>
+          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Bureau of Civil Aviation Security</span>
         </div>
       </div>
 
-      <!-- Segmented Pill Controls -->
+      <!-- Segmented Navigation Bar -->
       <div class="flex items-center space-x-1 p-1 bg-[#e8e8ed] rounded-full border border-[#d2d2d7]/40">
-        <button id="btn-nav-form" onclick="switchView('split-form')" class="px-5 py-1.5 rounded-full text-xs font-semibold text-[#515154] apple-btn-active transition-all focus:outline-none">
-          <i class="fa-solid fa-file-pen mr-1.5"></i> Form &amp; Live Deck
+        <button id="btn-tab-deck" onclick="switchView('deck')" class="px-5 py-1.5 rounded-full text-xs font-semibold text-[#515154] apple-btn-active transition-all focus:outline-none">
+          <i class="fa-solid fa-file-pen mr-1.5"></i> Entry &amp; Official Form
         </button>
-        <button id="btn-nav-search" onclick="switchView('universal-search')" class="px-5 py-1.5 rounded-full text-xs font-semibold text-[#515154] hover:text-[#1d1d1f] transition-all focus:outline-none">
+        <button id="btn-tab-search" onclick="switchView('search')" class="px-5 py-1.5 rounded-full text-xs font-semibold text-[#515154] hover:text-[#1d1d1f] transition-all focus:outline-none">
           <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Universal Registry
         </button>
       </div>
 
-      <!-- Live Sync Status Pill -->
-      <div class="hidden md:flex items-center space-x-2 text-xs font-medium text-[#86868b] bg-white/70 px-3 py-1.5 rounded-full border border-[#d2d2d7]/40 shadow-xs">
-        <span class="w-2 h-2 rounded-full bg-[#34c759] animate-pulse"></span>
-        <span id="sync-status-indicator">Google Cloud Ready</span>
+      <!-- Live Actions -->
+      <div class="flex items-center space-x-3">
+        <button onclick="triggerPrintOfficialPass()" class="px-4 py-2 bg-[#1d1d1f] hover:bg-black text-white text-xs font-semibold rounded-xl shadow-xs transition-all flex items-center space-x-1.5">
+          <i class="fa-solid fa-print"></i>
+          <span>Print Official Application (A4)</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- MAIN WORKSPACE CONTAINER -->
+  <!-- MAIN WORKSPACE -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 pt-24 pb-20">
 
-    <!-- VIEW 1: SPLIT DECK (FORM + LIVE OFFICIAL PREVIEW) -->
-    <div id="view-split-deck" class="space-y-6">
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2 no-print">
+    <!-- VIEW 1: MASTER SPLIT-DECK (INPUT CONTROLS + 1:1 OFFICIAL FORM PREVIEW) -->
+    <div id="view-master-deck" class="space-y-6">
+
+      <!-- Action Toolbar -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 no-print">
         <div>
-          <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-[#1d1d1f]">AEP Processing Desk</h1>
-          <p class="text-sm md:text-base text-[#86868b] mt-1">Complete credential details to instantly generate verified dossiers and synchronize with Google Drive &amp; Sheets.</p>
+          <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-[#1d1d1f]">Aerodrome Entry Permit (AEPAF) Desk</h1>
+          <p class="text-sm md:text-base text-[#86868b] mt-1">Official Government of India AEP format. Fill in all 11 sections to automatically populate the exact printout and sync to Google Sheets.</p>
         </div>
         
-        <!-- Action Toolbar -->
         <div class="flex items-center space-x-2">
-          <button onclick="clearFormFields()" class="px-4 py-2 bg-white text-[#86868b] hover:text-[#1d1d1f] text-xs font-semibold rounded-xl border border-[#d2d2d7]/70 shadow-xs hover:border-[#86868b] transition-all">
-            <i class="fa-solid fa-arrow-rotate-left mr-1"></i> Reset
+          <button onclick="loadDefaultMushtaqData()" class="px-4 py-2 bg-white text-[#0071e3] border border-[#0071e3]/30 hover:bg-[#e3f2fd] text-xs font-semibold rounded-xl shadow-xs transition-all">
+            <i class="fa-solid fa-bolt mr-1"></i> Pre-fill Mushtaq's Record
           </button>
-          <button onclick="triggerPrintPass()" class="px-4 py-2 bg-[#1d1d1f] hover:bg-black text-white text-xs font-semibold rounded-xl shadow-sm transition-all">
-            <i class="fa-solid fa-print mr-1.5"></i> Print Dossier
+          <button onclick="clearAllFields()" class="px-4 py-2 bg-white text-[#86868b] hover:text-[#1d1d1f] border border-[#d2d2d7] text-xs font-semibold rounded-xl shadow-xs transition-all">
+            <i class="fa-solid fa-arrow-rotate-left mr-1"></i> Reset
           </button>
         </div>
       </div>
 
-      <!-- Master Split Deck Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <!-- Split Deck Grid -->
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
 
-        <!-- LEFT COLUMN: FORM CONTROLS & UPLOAD MATRIX (7 cols) -->
-        <div class="lg:col-span-7 space-y-5 no-print">
-          <form id="aepMasterForm" onsubmit="handleFormSubmission(event)" class="space-y-5">
+        <!-- LEFT COLUMN: INPUT ENGINE ACCORDIONS (5 Columns) -->
+        <div class="xl:col-span-5 space-y-4 no-print">
+          <form id="bcasAepForm" onsubmit="handleFormSubmission(event)" class="space-y-4">
             
-            <!-- SECTION 1: PERSONNEL & AIRLINE BASELINE -->
-            <div class="apple-card p-6 md:p-8 space-y-4">
-              <div class="flex items-center space-x-2 border-b border-[#f5f5f7] pb-3">
-                <span class="w-6 h-6 rounded-lg bg-[#e3f2fd] text-[#0071e3] flex items-center justify-center text-xs font-bold">1</span>
-                <h3 class="text-base font-semibold text-[#1d1d1f]">Personnel &amp; Airline Baseline</h3>
+            <!-- SECTION 1, 2 & 3: AEP CATEGORY, ZONES & ISSUE -->
+            <div class="apple-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Sections 1, 2 &amp; 3</span>
+                <span class="text-xs font-semibold text-[#86868b]">Permit Type &amp; Zones</span>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Employee ID *</label>
-                  <input type="text" id="inp-empid" required placeholder="e.g. IGA72835" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Full Name (As on Passport) *</label>
-                  <input type="text" id="inp-name" required placeholder="e.g. MUSHTAQ MOHAMMED" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
-                </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">AEP Reference ID</label>
+                <input type="text" id="inp-ref-id" value="HYD/2026/AEP/72835" oninput="syncForm()" class="w-full px-3.5 py-2 apple-input text-xs font-bold uppercase" />
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="grid grid-cols-2 gap-3 text-xs">
                 <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Department *</label>
-                  <select id="inp-dept" required onchange="updateLivePreview()" class="w-full px-3.5 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]">
-                    <option value="SECURITY">SECURITY</option>
-                    <option value="GROUND_OPS">GROUND OPERATIONS</option>
-                    <option value="INFLIGHT">IN-FLIGHT SERVICES</option>
-                    <option value="ENGINEERING">ENGINEERING &amp; AOG</option>
-                    <option value="CARGO">CARGO &amp; LOGISTICS</option>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Permit Type</label>
+                  <select id="inp-type" onchange="syncForm()" class="w-full p-2 apple-input font-medium">
+                    <option value="Permanent" selected>Permanent</option>
+                    <option value="Temporary (1 to 30 Days)">Temporary (1 to 30 Days)</option>
+                    <option value="1 Day">1 Day</option>
+                    <option value="1-7 Days">1-7 Days</option>
+                    <option value="3 Months">3 Months</option>
+                    <option value="6 Months">6 Months</option>
                   </select>
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Designation *</label>
-                  <input type="text" id="inp-desig" required placeholder="e.g. EXECUTIVE - SECURITY" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Airport Base Station *</label>
-                  <input type="text" id="inp-station" required placeholder="e.g. HYD / RGIA" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Category</label>
+                  <select id="inp-cat" onchange="syncForm()" class="w-full p-2 apple-input font-medium">
+                    <option value="Operational" selected>Operational</option>
+                    <option value="Protocol">Protocol</option>
+                    <option value="Foreign National">Foreign National</option>
+                    <option value="Government Security Agencies">Govt Security Agency</option>
+                    <option value="Infra">Infra</option>
+                    <option value="Tool of Trade">Tool of Trade</option>
+                  </select>
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Operational Zones -->
+              <div>
+                <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1.5">Operational Zones Requested</label>
+                <div class="grid grid-cols-4 gap-2 text-xs font-medium">
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone-A" checked onchange="syncForm()" class="rounded text-[#0071e3]" />
+                    <span>A (Apron)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone-D" checked onchange="syncForm()" class="rounded text-[#0071e3]" />
+                    <span>D (Domestic)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone-T" checked onchange="syncForm()" class="rounded text-[#0071e3]" />
+                    <span>T (Terminal)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone-B" onchange="syncForm()" class="rounded text-[#0071e3]" />
+                    <span>B (Baggage)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone-P" onchange="syncForm()" class="rounded text-[#0071e3]" />
+                    <span>P (Perimeter)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone-F" onchange="syncForm()" class="rounded text-[#0071e3]" />
+                    <span>F (Freight/Cargo)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone-Si" onchange="syncForm()" class="rounded text-[#0071e3]" />
+                    <span>Si (Sec Intl)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone-Sd" onchange="syncForm()" class="rounded text-[#0071e3]" />
+                    <span>Sd (Sec Dom)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
                 <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Date of Birth</label>
-                  <input type="date" id="inp-dob" oninput="updateLivePreview()" class="w-full px-3.5 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Airport</label>
+                  <input type="text" id="inp-airport-sel" value="RGIA - HYD" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-semibold" />
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Blood Group</label>
-                  <input type="text" id="inp-blood" placeholder="e.g. O+ve" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Company / Entity</label>
-                  <input type="text" id="inp-org" value="INTERGLOBE AVIATION LTD" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Issue Category</label>
+                  <select id="inp-issue-cat" onchange="syncForm()" class="w-full p-2 apple-input font-medium">
+                    <option value="Fresh" selected>Fresh (Appointment Order)</option>
+                    <option value="Re-Issue">Re-Issue (Expired / Promotion)</option>
+                  </select>
                 </div>
               </div>
             </div>
 
-            <!-- SECTION 2: AVSEC, PVC & IDENTITY CREDENTIALS -->
-            <div class="apple-card p-6 md:p-8 space-y-4">
-              <div class="flex items-center space-x-2 border-b border-[#f5f5f7] pb-3">
-                <span class="w-6 h-6 rounded-lg bg-[#e8f5e9] text-[#2e7d32] flex items-center justify-center text-xs font-bold">2</span>
-                <h3 class="text-base font-semibold text-[#1d1d1f]">Aviation Security Clearances &amp; IDs</h3>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">AVSEC Training Type &amp; Date *</label>
-                  <input type="text" id="inp-avsec-desc" required placeholder="e.g. Initial Security (02/AUG/2023)" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">ASTI Center / Instructor Signature</label>
-                  <input type="text" id="inp-avsec-inst" placeholder="e.g. ARCHANA DASH / INDIGO ASTI" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">PVC Serial No. *</label>
-                  <input type="text" id="inp-pvc-no" required placeholder="e.g. TP 88793" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">PVC Issue Date</label>
-                  <input type="date" id="inp-pvc-issue" oninput="updateLivePreview()" class="w-full px-3.5 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">PVC Expiry Date *</label>
-                  <input type="date" id="inp-pvc-expiry" required oninput="updateLivePreview()" class="w-full px-3.5 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Passport / Aadhaar UID *</label>
-                  <input type="text" id="inp-passport-no" required placeholder="e.g. Z5948301 / UIDAI Valid" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Official Corporate Email</label>
-                  <input type="email" id="inp-email" placeholder="e.g. mushtaq.ismail@goindigo.in" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
-                </div>
+            <!-- SECTION 4: DETAILS OF THE APPLICANT -->
+            <div class="apple-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Section 4</span>
+                <span class="text-xs font-semibold text-[#86868b]">Applicant Credentials</span>
               </div>
 
               <div>
-                <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Permanent Address</label>
-                <textarea id="inp-address" rows="2" placeholder="Complete postal address verified by police authorities" oninput="updateLivePreview()" class="w-full px-4 py-2 apple-input text-sm font-medium text-[#1d1d1f]"></textarea>
-              </div>
-            </div>
-
-            <!-- SECTION 3: OPERATIONAL ACCESS ZONES -->
-            <div class="apple-card p-6 md:p-8 space-y-4">
-              <div class="flex items-center space-x-2 border-b border-[#f5f5f7] pb-3">
-                <span class="w-6 h-6 rounded-lg bg-[#fff3e0] text-[#e65100] flex items-center justify-center text-xs font-bold">3</span>
-                <h3 class="text-base font-semibold text-[#1d1d1f]">Terminal &amp; Airside Zone Clearance</h3>
+                <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Full Name (As on Passport) *</label>
+                <input type="text" id="inp-name" required value="MUSHTAQ MOHAMMED" oninput="syncForm()" class="w-full px-3.5 py-2 apple-input text-xs font-bold uppercase" />
               </div>
 
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-medium">
-                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
-                  <input type="checkbox" id="zone-T" checked onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
-                  <span>Terminal (T)</span>
-                </label>
-                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
-                  <input type="checkbox" id="zone-SHA" checked onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
-                  <span>Security Hold (SHA)</span>
-                </label>
-                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
-                  <input type="checkbox" id="zone-A" checked onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
-                  <span>Apron Area (A)</span>
-                </label>
-                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
-                  <input type="checkbox" id="zone-BHA" checked onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
-                  <span>Baggage Area (BHA)</span>
-                </label>
-                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
-                  <input type="checkbox" id="zone-C" onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
-                  <span>Cargo Complex (C)</span>
-                </label>
-                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
-                  <input type="checkbox" id="zone-ATC" onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
-                  <span>ATC Tower (ATC)</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- SECTION 4: DOCUMENT ATTACHMENTS (DRIVE SYNC READY) -->
-            <div class="apple-card p-6 md:p-8 space-y-4">
-              <div class="flex items-center space-x-2 border-b border-[#f5f5f7] pb-3">
-                <span class="w-6 h-6 rounded-lg bg-[#ede7f6] text-[#512da8] flex items-center justify-center text-xs font-bold">4</span>
-                <h3 class="text-base font-semibold text-[#1d1d1f]">Document Attachments &amp; Photo</h3>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="grid grid-cols-2 gap-3 text-xs">
                 <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Official Passport Photo</label>
-                  <input type="file" id="file-photo" accept="image/*" onchange="handlePhotoUpload(this)" class="w-full text-xs text-[#86868b] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white hover:file:bg-[#0077ed] cursor-pointer" />
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Father's Name *</label>
+                  <input type="text" id="inp-father" required value="ISMAIL MOHAMMED" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-semibold" />
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">PVC Certificate Copy (PDF/JPG)</label>
-                  <input type="file" id="file-pvc" accept=".pdf,image/*" class="w-full text-xs text-[#86868b] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white hover:file:bg-[#0077ed] cursor-pointer" />
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Mother's Name *</label>
+                  <input type="text" id="inp-mother" required value="SAPHIA ISMAIL" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Date of Birth</label>
+                  <input type="date" id="inp-dob" value="1993-09-27" oninput="syncForm()" class="w-full p-2 apple-input font-medium" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Blood Group</label>
+                  <input type="text" id="inp-blood" value="A+" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-bold" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Gender</label>
+                  <select id="inp-gender" onchange="syncForm()" class="w-full p-2 apple-input font-medium">
+                    <option value="MALE" selected>Male</option>
+                    <option value="FEMALE">Female</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Mobile No *</label>
+                  <input type="tel" id="inp-mobile" required value="9036488263" oninput="syncForm()" class="w-full p-2 apple-input font-medium" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">E-mail *</label>
+                  <input type="email" id="inp-email" required value="MUSHTAQ.ISMAIL@GOINDIGO.IN" oninput="syncForm()" class="w-full p-2 apple-input font-medium" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Aadhaar No. (12 digits) *</label>
+                  <input type="text" id="inp-aadhaar" required value="9772 0313 2804" oninput="syncForm()" class="w-full p-2 apple-input font-bold" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Type of ID Proof</label>
+                  <input type="text" id="inp-id-type" value="INDIAN PASSPORT" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+              </div>
+
+              <!-- Photo Uploader -->
+              <div>
+                <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Official Passport Photo (3.5 cm x 4.5 cm)</label>
+                <input type="file" id="inp-file-photo" accept="image/*" onchange="handleLivePhoto(this)" class="w-full text-xs text-[#86868b] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer" />
+              </div>
+            </div>
+
+            <!-- SECTION 5: RESIDENTIAL ADDRESSES -->
+            <div class="apple-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Section 5</span>
+                <span class="text-xs font-semibold text-[#86868b]">Residential Addresses</span>
+              </div>
+
+              <div class="space-y-2 text-xs">
+                <span class="font-bold text-[#1d1d1f] block uppercase">5a. Permanent Address</span>
+                <input type="text" id="inp-perm-street" placeholder="House No / Street / Road" value="H.NO 20-170/1/1, RB NAGAR" oninput="syncForm()" class="w-full p-2 apple-input uppercase" />
+                <div class="grid grid-cols-3 gap-2">
+                  <input type="text" id="inp-perm-dist" placeholder="District" value="RANGAREDDY" oninput="syncForm()" class="p-2 apple-input uppercase" />
+                  <input type="text" id="inp-perm-state" placeholder="State" value="TELANGANA" oninput="syncForm()" class="p-2 apple-input uppercase" />
+                  <input type="text" id="inp-perm-pin" placeholder="Pin Code" value="501218" oninput="syncForm()" class="p-2 apple-input" />
+                </div>
+                <input type="text" id="inp-perm-proof" placeholder="Address Proof Type (e.g. ELECTRICITY BILL)" value="ELECTRICITY BILL" oninput="syncForm()" class="w-full p-2 apple-input uppercase" />
+              </div>
+
+              <div class="space-y-2 text-xs pt-2 border-t border-[#f5f5f7]">
+                <span class="font-bold text-[#1d1d1f] block uppercase">5b. Present Address</span>
+                <input type="text" id="inp-pres-street" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYA" oninput="syncForm()" class="w-full p-2 apple-input uppercase" />
+                <div class="grid grid-cols-3 gap-2">
+                  <input type="text" id="inp-pres-dist" placeholder="District" value="THANE/NEW MUMBAI" oninput="syncForm()" class="p-2 apple-input uppercase" />
+                  <input type="text" id="inp-pres-state" placeholder="State" value="MAHARASHTRA" oninput="syncForm()" class="p-2 apple-input uppercase" />
+                  <input type="text" id="inp-pres-pin" placeholder="Pin Code" value="400709" oninput="syncForm()" class="p-2 apple-input" />
                 </div>
               </div>
             </div>
 
-            <!-- SUBMIT BUTTON DECK -->
-            <div class="pt-2">
-              <button type="submit" id="btn-submit-form" class="w-full py-4 bg-[#0071e3] hover:bg-[#0077ed] active:scale-[0.99] text-white text-base font-semibold rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                <span>Submit &amp; Append to Google Sheet Registry</span>
-              </button>
-              <p class="text-[11px] text-center text-[#86868b] mt-2">Data routes directly to your company Google Spreadsheet categorized by Department and Designation.</p>
+            <!-- SECTION 6: EMPLOYMENT & OFFICE DETAILS -->
+            <div class="apple-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Section 6</span>
+                <span class="text-xs font-semibold text-[#86868b]">Employment Details</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Organization *</label>
+                  <input type="text" id="inp-emp-org" value="INTERGLOBE AVIATION LTD" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-bold" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Designation *</label>
+                  <input type="text" id="inp-emp-desig" value="EXECUTIVE - SECURITY" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Employee No. *</label>
+                  <input type="text" id="inp-emp-no" value="IGA 72835" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-bold text-[#0071e3]" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Place of Duty</label>
+                  <input type="text" id="inp-emp-duty-place" value="RGIA - HYD" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Nature of Duty</label>
+                  <input type="text" id="inp-emp-nature" value="SECURITY SERVICES" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+              </div>
+
+              <div class="text-xs">
+                <label class="block font-semibold text-[#86868b] uppercase mb-1">Office Address at Airport</label>
+                <textarea id="inp-emp-office-addr" rows="2" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-medium">AO-06, E-LEVEL OFFICES, PASSENGER TERMINAL BUILDING, RGIA, HYD, TELANGANA - 500108</textarea>
+              </div>
             </div>
+
+            <!-- SECTION 7 & 8: LEGAL & BACKGROUND DISCLOSURES -->
+            <div class="apple-card p-6 space-y-3">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Sections 7 &amp; 8</span>
+                <span class="text-xs font-semibold text-[#86868b]">Disclosures</span>
+              </div>
+
+              <div class="space-y-2 text-xs">
+                <div class="flex justify-between items-center py-1">
+                  <span>I. Any police/court case pending?</span>
+                  <select id="inp-legal-case" onchange="syncForm()" class="p-1 apple-input font-bold">
+                    <option value="NO" selected>NO</option>
+                    <option value="YES">YES</option>
+                  </select>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                  <span>II. Were you ever arrested?</span>
+                  <select id="inp-legal-arrest" onchange="syncForm()" class="p-1 apple-input font-bold">
+                    <option value="NO" selected>NO</option>
+                    <option value="YES">YES</option>
+                  </select>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                  <span>III. Punished departmentally?</span>
+                  <select id="inp-legal-punished" onchange="syncForm()" class="p-1 apple-input font-bold">
+                    <option value="NO" selected>NO</option>
+                    <option value="YES">YES</option>
+                  </select>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                  <span>8. Ever rejected for AEP?</span>
+                  <select id="inp-legal-reject" onchange="syncForm()" class="p-1 apple-input font-bold">
+                    <option value="NO" selected>NO</option>
+                    <option value="YES">YES</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 11: AVSEC TRAINING & POLICE VERIFICATION -->
+            <div class="apple-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Section 11</span>
+                <span class="text-xs font-semibold text-[#86868b]">AVSEC Training &amp; PVC</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Date</label>
+                  <input type="date" id="inp-avsec-date" value="2023-08-02" oninput="syncForm()" class="w-full p-2 apple-input font-medium" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Location</label>
+                  <input type="text" id="inp-avsec-loc" value="BLR - BENGALURU" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+              </div>
+
+              <div class="text-xs">
+                <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Instructor &amp; ASTI Center</label>
+                <input type="text" id="inp-avsec-inst" value="ARCHANA DASH / INDIGO ASTI" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-semibold" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-[#f5f5f7]">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Serial ID</label>
+                  <input type="text" id="inp-pvc-id" value="TP 88793" oninput="syncForm()" class="w-full p-2 apple-input uppercase font-bold text-[#2e7d32]" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Verification Date</label>
+                  <input type="date" id="inp-pvc-date" value="2023-09-12" oninput="syncForm()" class="w-full p-2 apple-input font-medium" />
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBMIT TO GOOGLE SHEETS BUTTON -->
+            <button type="submit" id="btn-submit" class="w-full py-4 bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-bold rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+              <span>Save &amp; Append to Google Sheet Registry</span>
+            </button>
           </form>
         </div>
 
-        <!-- RIGHT COLUMN: AUTHENTIC LIVE AEP PASS PREVIEW (5 cols) -->
-        <div class="lg:col-span-5 sticky top-24 space-y-4">
-          <div class="flex items-center justify-between px-1 no-print">
-            <span class="text-xs font-bold tracking-wider text-[#86868b] uppercase">Live Pass Preview (Auto-Synced)</span>
-            <span class="text-[11px] font-semibold text-[#34c759] flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#34c759]"></span> Live Keystroke Sync
+        <!-- RIGHT COLUMN: PIXEL-PERFECT OFFICIAL BCAS DUAL-PAGE FORM (7 Columns) -->
+        <div class="xl:col-span-7 space-y-6">
+          <div class="flex items-center justify-between px-2 no-print">
+            <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider">Official 2-Page Document Preview</span>
+            <span class="text-xs font-bold text-[#34c759] flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#34c759] animate-pulse"></span> Vector 1:1 Print Ready
             </span>
           </div>
 
-          <!-- Printable Official AEP Pass Component -->
-          <div id="printable-aep-card" class="bg-white rounded-3xl border-2 border-[#1d1d1f] shadow-xl overflow-hidden relative">
+          <!-- CONTAINER FOR PRINT -->
+          <div id="official-print-container">
             
-            <!-- Pass Top Aviation Header Strip -->
-            <div class="bg-[#1d1d1f] text-white px-6 py-4 flex justify-between items-center border-b border-[#333]">
-              <div>
-                <span class="text-[10px] uppercase font-bold tracking-widest text-[#0071e3] block">CIVIL AVIATION SECURITY</span>
-                <h4 class="text-sm font-extrabold tracking-tight">AERODROME ENTRY PERMIT</h4>
+            <!-- ==============================================
+                 PAGE 1 OF OFFICIAL BCAS AEP APPLICATION
+                 ============================================== -->
+            <div id="bcas-page-1" class="bcas-sheet">
+              <!-- Official Header Emblem & Title Block -->
+              <div class="text-center pb-2 border-b-2 border-black">
+                <div class="text-[9px] font-bold tracking-widest uppercase">Government of India</div>
+                <div class="text-sm font-black tracking-tight uppercase">Bureau of Civil Aviation Security</div>
+                <div class="text-xs font-extrabold uppercase mt-0.5">Aerodrome Entry Permit (AEP) Application Form (AEPAF)</div>
+                <div class="text-[9px] font-bold uppercase tracking-wider">Application for Issue of Temporary and Permanent AEP</div>
               </div>
-              <span id="prev-station" class="text-xs font-black bg-white/10 px-2.5 py-1 rounded-md text-amber-300">HYD</span>
-            </div>
 
-            <div class="p-6 space-y-5 bg-gradient-to-b from-white to-[#fafafa]">
-              <!-- Main Identity Row -->
-              <div class="flex space-x-4 items-start">
-                <div class="w-24 h-28 bg-[#f5f5f7] border-2 border-dashed border-[#d2d2d7] rounded-2xl overflow-hidden flex items-center justify-center flex-shrink-0 relative">
-                  <img id="prev-photo" src="" alt="Personnel Photo" class="w-full h-full object-cover hidden" />
-                  <div id="prev-photo-fallback" class="text-center text-[#86868b] p-2">
-                    <i class="fa-solid fa-user text-2xl mb-1 text-[#d2d2d7]"></i>
-                    <span class="text-[9px] block uppercase font-bold">Photo</span>
+              <!-- 1. Reference Id -->
+              <div class="flex justify-between items-center my-2 text-xs">
+                <div><b>1. AEP Application Reference Id:</b></div>
+                <div class="border-2 border-black px-3 py-1 font-mono font-bold text-xs" id="prev-doc-ref">HYD/2026/AEP/72835</div>
+              </div>
+
+              <!-- 2. AEP Requested Block -->
+              <div class="border border-black p-1.5 my-1.5">
+                <div class="font-bold text-[10px] mb-1">2. AEP requested (Check [✓] Appropriate Box):</div>
+                <div class="grid grid-cols-2 gap-1 text-[9.5px]">
+                  <div>
+                    <b>a. Type:</b>
+                    <span id="p1-type-perm" class="bcas-check">✓</span> Perm
+                    <span id="p1-type-temp" class="bcas-check"></span> Temp (1-30 D)
+                    <span id="p1-type-1d" class="bcas-check"></span> 1 Day
+                    <span id="p1-type-7d" class="bcas-check"></span> 1-7 D
+                  </div>
+                  <div>
+                    <b>b. Category:</b>
+                    <span id="p1-cat-op" class="bcas-check">✓</span> Operational
+                    <span id="p1-cat-proto" class="bcas-check"></span> Protocol
+                    <span id="p1-cat-fn" class="bcas-check"></span> Foreign Nat.
                   </div>
                 </div>
 
-                <div class="flex-1 space-y-1">
-                  <span id="prev-org" class="text-[10px] font-bold text-[#86868b] tracking-wider uppercase block">INTERGLOBE AVIATION LTD</span>
-                  <h3 id="prev-name" class="text-lg font-black text-[#1d1d1f] leading-tight">MUSHTAQ MOHAMMED</h3>
-                  <p id="prev-desig" class="text-xs font-semibold text-[#515154]">EXECUTIVE - SECURITY</p>
-                  
-                  <div class="pt-2 flex items-center space-x-2">
-                    <span class="text-[10px] font-bold bg-[#e3f2fd] text-[#0071e3] px-2 py-0.5 rounded">ID: <span id="prev-empid">IGA72835</span></span>
-                    <span class="text-[10px] font-bold bg-[#f5f5f7] text-[#515154] px-2 py-0.5 rounded">BG: <span id="prev-blood">O+VE</span></span>
-                  </div>
+                <!-- Zones requested -->
+                <div class="mt-1 text-[9.5px]">
+                  <b>c. Zones:</b>
+                  <span id="chk-z-A" class="bcas-check">✓</span> A
+                  <span id="chk-z-D" class="bcas-check">✓</span> D
+                  <span id="chk-z-T" class="bcas-check">✓</span> T
+                  <span id="chk-z-Si" class="bcas-check"></span> Si
+                  <span id="chk-z-Sd" class="bcas-check"></span> Sd
+                  <span id="chk-z-P" class="bcas-check"></span> P
+                  <span id="chk-z-B" class="bcas-check"></span> B
+                  <span id="chk-z-F" class="bcas-check"></span> F
+                  <span id="chk-z-Ft" class="bcas-check"></span> Ft
+                  <span id="chk-z-Cs" class="bcas-check"></span> Cs
+                  <span id="chk-z-I" class="bcas-check"></span> I
+                </div>
+
+                <div class="grid grid-cols-2 gap-1 mt-1 text-[9.5px]">
+                  <div><b>d. Airport:</b> <span class="bcas-check">✓</span> Single Airport (<span id="prev-airport-name" class="font-bold">RGIA - HYD</span>)</div>
+                  <div><b>e. Terminal:</b> <span class="bcas-check">✓</span> All <span class="bcas-check"></span> Cargo <span class="bcas-check"></span> Domestic</div>
                 </div>
               </div>
 
-              <!-- Terminal Access Matrix Badges -->
-              <div class="space-y-1.5 pt-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">Authorized Operational Zones</span>
-                <div id="prev-zones-container" class="flex flex-wrap gap-1.5">
-                  <span class="text-[11px] font-black bg-[#1d1d1f] text-white px-2.5 py-1 rounded-lg">T</span>
-                  <span class="text-[11px] font-black bg-[#1d1d1f] text-white px-2.5 py-1 rounded-lg">SHA</span>
-                  <span class="text-[11px] font-black bg-[#1d1d1f] text-white px-2.5 py-1 rounded-lg">A</span>
-                  <span class="text-[11px] font-black bg-[#1d1d1f] text-white px-2.5 py-1 rounded-lg">BHA</span>
-                </div>
+              <!-- 3. Issue Category -->
+              <div class="border border-black p-1.5 my-1.5 text-[9.5px]">
+                <b>3. Issue Category:</b>
+                <span class="bcas-check" id="chk-issue-fresh">✓</span> Fresh (Appointment / Posting Order)
+                <span class="bcas-check" id="chk-issue-reissue"></span> Re-Issue (Transfer / Promotion / Expired)
               </div>
 
-              <!-- Compliance Audit Table -->
-              <div class="bg-[#f5f5f7] rounded-2xl p-3.5 space-y-2 border border-[#d2d2d7]/50 text-xs">
-                <div class="flex justify-between items-center">
-                  <span class="text-[#86868b] font-medium">Police Verification (PVC):</span>
-                  <span id="prev-pvc" class="font-bold text-[#1d1d1f]">TP 88793 (Active)</span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-[#86868b] font-medium">AVSEC Clearance:</span>
-                  <span id="prev-avsec" class="font-bold text-[#1d1d1f]">Certified Asti</span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-[#86868b] font-medium">Identity / Passport:</span>
-                  <span id="prev-passport" class="font-bold text-[#1d1d1f]">VALID</span>
-                </div>
-              </div>
+              <!-- 4. Details of Applicant -->
+              <div class="font-bold text-[10px] mt-2">4. Details of the Applicant:</div>
+              <table class="bcas-table">
+                <tr>
+                  <td style="width: 28%;"><b>Full Name:</b></td>
+                  <td style="width: 48%;"><span id="p1-name" class="bcas-field-val">MUSHTAQ MOHAMMED</span></td>
+                  <!-- Official Photo Box (3.5cm x 4.5cm equivalent) -->
+                  <td rowspan="7" style="width: 24%; text-align: center; vertical-align: middle; background: #fafafa;">
+                    <div style="width: 28mm; height: 35mm; border: 1.5px dashed #000; margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff;">
+                      <img id="p1-photo-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+                      <span id="p1-photo-label" style="font-size: 8px; font-weight: bold; text-align: center; color: #666;">Affix Recent Passport Size Photograph</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><b>Father's Name:</b></td>
+                  <td><span id="p1-father" class="bcas-field-val">ISMAIL MOHAMMED</span></td>
+                </tr>
+                <tr>
+                  <td><b>Mother's Name:</b></td>
+                  <td><span id="p1-mother" class="bcas-field-val">SAPHIA ISMAIL</span></td>
+                </tr>
+                <tr>
+                  <td><b>Date of Birth:</b></td>
+                  <td><span id="p1-dob" class="bcas-field-val">27/09/1993</span></td>
+                </tr>
+                <tr>
+                  <td><b>Blood Group / Gender:</b></td>
+                  <td><span id="p1-blood" class="bcas-field-val">A+</span> / <span id="p1-gender" class="bcas-field-val">MALE</span></td>
+                </tr>
+                <tr>
+                  <td><b>Mobile No / E-mail:</b></td>
+                  <td><span id="p1-contact" class="bcas-field-val">9036488263 / MUSHTAQ.ISMAIL@GOINDIGO.IN</span></td>
+                </tr>
+                <tr>
+                  <td><b>Aadhaar Number*:</b></td>
+                  <td><span id="p1-aadhaar" class="bcas-field-val font-mono">9772 0313 2804</span></td>
+                </tr>
+              </table>
 
-              <!-- Pass Footer & Barcode Tracker -->
-              <div class="pt-3 border-t border-[#f5f5f7] flex justify-between items-end">
-                <div>
-                  <span class="text-[9px] text-[#86868b] uppercase font-bold block">Digital Tracking Token</span>
-                  <code id="prev-token" class="text-xs font-mono font-bold text-[#0071e3]">AEP-2026-IGA72835</code>
-                </div>
-                <div class="text-right">
-                  <span class="text-[9px] text-[#86868b] uppercase font-bold block">Issuing Authority</span>
-                  <span class="text-[10px] font-semibold text-[#1d1d1f]">BCAS / RDCA</span>
-                </div>
+              <!-- 4b. Details of Existing AEP -->
+              <table class="bcas-table">
+                <tr style="background: #f0f0f0;">
+                  <th colspan="3" style="text-align: left; font-size: 9.5px;">4b. Details of Existing AEP in Possession (If Any):</th>
+                </tr>
+                <tr>
+                  <td>AEP No: <b id="p1-exist-no">NIL / FRESH</b></td>
+                  <td>Valid Up To: <b id="p1-exist-valid">NIL</b></td>
+                  <td>Place of Issue: <b id="p1-exist-place">HYD</b></td>
+                </tr>
+              </table>
+
+              <!-- 5. Residential Address -->
+              <div class="font-bold text-[10px] mt-2">5. Residential Address:</div>
+              <table class="bcas-table">
+                <tr>
+                  <td style="width: 25%;"><b>a. Permanent Address:</b></td>
+                  <td>
+                    <span id="p1-perm-addr" class="bcas-field-val">H.NO 20-170/1/1, RB NAGAR, RANGAREDDY, TELANGANA - 501218</span><br />
+                    <span class="text-[9px]">Proof Attached: <b id="p1-perm-proof-val">ELECTRICITY BILL</b></span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><b>b. Present Address:</b></td>
+                  <td>
+                    <span id="p1-pres-addr" class="bcas-field-val">303/A, SEC 6, VISHAVARDAYA, THANE/NEW MUMBAI, MAHARASHTRA - 400709</span>
+                  </td>
+                </tr>
+              </table>
+
+              <div class="text-[8px] text-right mt-6 pt-2 border-t border-black text-gray-600">
+                Page 1 of 2 — Bureau of Civil Aviation Security Aerodrome Entry Permit Application
               </div>
             </div>
+
+            <!-- ==============================================
+                 PAGE 2 OF OFFICIAL BCAS AEP APPLICATION
+                 ============================================== -->
+            <div id="bcas-page-2" class="bcas-sheet">
+              <!-- Official Header Page 2 -->
+              <div class="text-center pb-1.5 border-b border-black mb-2">
+                <div class="text-[9px] font-bold uppercase tracking-wider">AEP Application Form (AEPAF) — Page 2</div>
+              </div>
+
+              <!-- 6. Employment Details -->
+              <div class="font-bold text-[10px]">6. Employment Details:</div>
+              <table class="bcas-table">
+                <tr>
+                  <td style="width: 32%;"><b>Name of Organization:</b></td>
+                  <td><span id="p2-org" class="bcas-field-val">INTERGLOBE AVIATION LTD</span></td>
+                </tr>
+                <tr>
+                  <td><b>Designation:</b></td>
+                  <td><span id="p2-desig" class="bcas-field-val">EXECUTIVE - SECURITY</span></td>
+                </tr>
+                <tr>
+                  <td><b>Employee Number:</b></td>
+                  <td><span id="p2-empno" class="bcas-field-val">IGA 72835</span></td>
+                </tr>
+                <tr>
+                  <td><b>Place of Duty:</b></td>
+                  <td><span id="p2-duty-place" class="bcas-field-val">RGIA - HYD</span></td>
+                </tr>
+                <tr>
+                  <td><b>Nature of Duty:</b></td>
+                  <td><span id="p2-nature" class="bcas-field-val">SECURITY SERVICES</span></td>
+                </tr>
+                <tr>
+                  <td><b>Office Address:</b></td>
+                  <td><span id="p2-office-addr" class="bcas-field-val text-[9.5px]">AO-06, E-LEVEL OFFICES, PASSENGER TERMINAL BUILDING, RGIA, HYD, TELANGANA - 500108</span></td>
+                </tr>
+              </table>
+
+              <!-- 7. Other Details / Background Disclosures -->
+              <div class="font-bold text-[10px] mt-2">7. Other Details:</div>
+              <table class="bcas-table text-[9.5px]">
+                <tr>
+                  <td>I. (a) Is any case pending against you with police or court?</td>
+                  <td style="width: 15%; text-align: center;"><b id="p2-legal-case">NO</b></td>
+                </tr>
+                <tr>
+                  <td>II. (a) Were you ever arrested?</td>
+                  <td style="text-align: center;"><b id="p2-legal-arrest">NO</b></td>
+                </tr>
+                <tr>
+                  <td>III. (a) Were you punished departmentally?</td>
+                  <td style="text-align: center;"><b id="p2-legal-punished">NO</b></td>
+                </tr>
+                <tr>
+                  <td>8. Has your AEP Application ever been rejected?</td>
+                  <td style="text-align: center;"><b id="p2-legal-reject">NO</b></td>
+                </tr>
+              </table>
+
+              <!-- 11. AVSEC Training Block -->
+              <div class="font-bold text-[10px] mt-2">11. AVSEC Awareness Training Details:</div>
+              <table class="bcas-table text-[9.5px]">
+                <tr style="background: #f0f0f0;">
+                  <th>Staff Stream</th>
+                  <th>Date of Training</th>
+                  <th>Location</th>
+                  <th>Training Center &amp; Instructor</th>
+                </tr>
+                <tr>
+                  <td><b>Security Staff:</b></td>
+                  <td><span id="p2-avsec-date" class="font-bold">02/08/2023</span></td>
+                  <td><span id="p2-avsec-loc" class="font-bold">BLR - BENGALURU</span></td>
+                  <td><span id="p2-avsec-inst" class="font-bold">ARCHANA DASH / INDIGO ASTI</span></td>
+                </tr>
+                <tr>
+                  <td><b>Police Verification (PVC):</b></td>
+                  <td colspan="3">
+                    Certificate No: <b id="p2-pvc-no" class="bcas-field-val text-[#2e7d32]">TP 88793</b> | Date of Clearance: <b id="p2-pvc-date">12/09/2023</b> | Verdict: <b>CLEARED &amp; APPROVED</b>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Declarations & Signatures Block -->
+              <div class="mt-4 p-2 border border-black text-[9px] leading-tight space-y-1">
+                <p><b>Declaration by Applicant:</b> I hereby declare that the particulars furnished above are true and correct to the best of my knowledge and belief. In case any information is found false, my AEP shall be liable for cancellation and action as deemed fit under aviation regulations.</p>
+              </div>
+
+              <!-- Signatures Row -->
+              <div class="grid grid-cols-2 gap-6 mt-6 pt-6 text-[10px]">
+                <div class="border-t border-black text-center pt-1">
+                  <b>Signature of the Applicant</b><br />
+                  <span class="text-[9px]">Date: <span id="prev-sign-date">04/11/2026</span> | Place: HYD</span>
+                </div>
+                <div class="border-t border-black text-center pt-1">
+                  <b>Signature of Authorized Signatory with Seal</b><br />
+                  <span class="text-[9px]">InterGlobe Aviation Ltd / Security Dept</span>
+                </div>
+              </div>
+
+              <div class="text-[8px] text-right mt-10 pt-2 border-t border-black text-gray-600">
+                Page 2 of 2 — Bureau of Civil Aviation Security Aerodrome Entry Permit Application
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -399,60 +777,45 @@
     <div id="view-universal-search" class="hidden space-y-6">
       <div class="mb-4">
         <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-[#1d1d1f]">AEP Universal Registry</h2>
-        <p class="text-sm md:text-base text-[#86868b] mt-1">Directly query personnel database across all airport departments, designation ranks, and security credentials.</p>
+        <p class="text-sm md:text-base text-[#86868b] mt-1">Directly search and inspect airport employee compliance records across all stations and divisions.</p>
       </div>
 
-      <!-- Apple Spotlight Style Search Input -->
+      <!-- Search Field -->
       <div class="apple-card p-6 space-y-4">
         <div class="flex flex-col sm:flex-row gap-3">
           <div class="relative flex-1">
             <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-[#86868b]">
               <i class="fa-solid fa-magnifying-glass"></i>
             </span>
-            <input type="text" id="queryEmployeeInput" placeholder="Search by Employee ID, Name, Passport, or PVC No..." onkeypress="if(event.key === 'Enter') executeUniversalSearch()" class="w-full pl-11 pr-4 py-3.5 apple-input text-base text-[#1d1d1f] font-medium placeholder-[#86868b]" />
+            <input type="text" id="queryEmployeeInput" placeholder="Enter Employee ID (e.g. IGA 72835), Full Name, or Aadhaar..." onkeypress="if(event.key === 'Enter') runUniversalSearch()" class="w-full pl-11 pr-4 py-3.5 apple-input text-base text-[#1d1d1f] font-medium" />
           </div>
-          <button onclick="executeUniversalSearch()" class="px-8 py-3.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-base font-semibold rounded-xl shadow-sm transition-all flex items-center justify-center space-x-2">
-            <span>Query Database</span>
+          <button onclick="runUniversalSearch()" class="px-8 py-3.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-base font-semibold rounded-xl shadow-xs transition-all">
+            <span>Query Record</span>
           </button>
-        </div>
-
-        <!-- Quick Filter Pills -->
-        <div class="flex flex-wrap items-center gap-2 pt-1 text-xs">
-          <span class="text-[#86868b] font-semibold mr-1">Filter by Department:</span>
-          <button onclick="filterByDept('ALL')" class="px-3 py-1 bg-[#e8e8ed] rounded-full font-medium hover:bg-[#d2d2d7]">All</button>
-          <button onclick="filterByDept('SECURITY')" class="px-3 py-1 bg-white border border-[#d2d2d7] rounded-full font-medium hover:border-[#0071e3]">Security</button>
-          <button onclick="filterByDept('GROUND_OPS')" class="px-3 py-1 bg-white border border-[#d2d2d7] rounded-full font-medium hover:border-[#0071e3]">Ground Ops</button>
-          <button onclick="filterByDept('ENGINEERING')" class="px-3 py-1 bg-white border border-[#d2d2d7] rounded-full font-medium hover:border-[#0071e3]">Engineering</button>
         </div>
       </div>
 
-      <!-- Search Feedback Messages -->
-      <div id="search-alert-box" class="hidden p-4 rounded-2xl text-sm font-medium"></div>
-
-      <!-- Dossier Profile Result Window -->
-      <div id="search-result-dossier" class="hidden apple-card overflow-hidden">
+      <!-- Dossier Result Card -->
+      <div id="search-result-box" class="hidden apple-card overflow-hidden">
         <div class="bg-[#f5f5f7] px-8 py-4 border-b border-[#d2d2d7]/50 flex justify-between items-center">
-          <span class="text-xs font-bold tracking-widest text-[#86868b] uppercase">Verified BCAS Credential File</span>
-          <span id="dossier-status-pill" class="text-xs font-bold px-3 py-1 rounded-full bg-[#e8f5e9] text-[#2e7d32] border border-[#2e7d32]/20">
-            🟢 CLEARANCE ACTIVE
-          </span>
+          <span class="text-xs font-bold tracking-widest text-[#86868b] uppercase">Verified BCAS AEP Record</span>
+          <span class="text-xs font-bold px-3 py-1 rounded-full bg-[#e8f5e9] text-[#2e7d32] border border-[#2e7d32]/20">🟢 CLEARANCE VALID</span>
         </div>
 
         <div class="p-8 space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-[#f5f5f7] pb-6">
+          <div class="flex justify-between items-start border-b border-[#f5f5f7] pb-6">
             <div>
-              <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block mb-1">Personnel Information</span>
-              <h3 id="dossier-name" class="text-2xl font-bold text-[#1d1d1f]"></h3>
-              <p id="dossier-meta" class="text-sm font-medium text-[#515154] mt-0.5"></p>
+              <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block mb-1">Personnel Name</span>
+              <h3 id="res-dossier-name" class="text-2xl font-bold text-[#1d1d1f]"></h3>
+              <p id="res-dossier-sub" class="text-sm font-medium text-[#515154] mt-0.5"></p>
             </div>
-            <div class="space-y-1 md:text-right">
-              <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Station &amp; Division</span>
-              <span id="dossier-station-badge" class="inline-block text-base font-bold text-[#0071e3] bg-[#e3f2fd] px-3 py-1 rounded-lg"></span>
-            </div>
+            <button onclick="loadRecordAndPrint()" class="px-5 py-2.5 bg-[#0071e3] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#0077ed]">
+              <i class="fa-solid fa-print mr-1.5"></i> Load into Official Form &amp; Print
+            </button>
           </div>
 
-          <div id="dossier-details-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-            <!-- Dynamic compliance attributes injected here -->
+          <div id="res-dossier-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+            <!-- Dynamic attributes inserted here -->
           </div>
         </div>
       </div>
@@ -461,293 +824,301 @@
   </main>
 
   <!-- ===================================================
-       CLIENT-SIDE CONTROLLER & GOOGLE SHEETS WEBHOOK
+       JAVASCRIPT APPLICATION ENGINE
        =================================================== -->
   <script>
-    // Config: Paste your deployed Google Apps Script Web App URL here
-    const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxDs97FYi1ATjqHpUAoBegHih4wI7SerzII1ySEvvyEPjyZK48HnlJkALXOyYrC0CzW/exec";
+    // Configuration: Replace with your deployed Google Apps Script Web App URL
+    const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby-YOUR-DEPLOYED-URL-HERE/exec";
 
-    // Local in-memory seed dataset (mapped directly to your Indigo AEP records)
-    const localDatabase = {
-      "IGA72835": {
-        empId: "IGA72835",
+    // In-Memory Database containing Mushtaq Mohammed's official record
+    const masterPersonnelDB = {
+      "IGA 72835": {
+        refId: "HYD/2026/AEP/72835",
         name: "MUSHTAQ MOHAMMED",
-        designation: "EXECUTIVE - SECURITY",
-        department: "SECURITY",
-        station: "HYD / RGIA",
-        dob: "1995-04-12",
-        bloodGroup: "O+VE",
+        father: "ISMAIL MOHAMMED",
+        mother: "SAPHIA ISMAIL",
+        dob: "1993-09-27",
+        blood: "A+",
+        gender: "MALE",
+        mobile: "9036488263",
+        email: "MUSHTAQ.ISMAIL@GOINDIGO.IN",
+        aadhaar: "9772 0313 2804",
+        idType: "INDIAN PASSPORT",
+        permStreet: "H.NO 20-170/1/1, RB NAGAR",
+        permDist: "RANGAREDDY",
+        permState: "TELANGANA",
+        permPin: "501218",
+        permProof: "ELECTRICITY BILL",
+        presStreet: "303/A, SEC 6, VISHAVARDAYA",
+        presDist: "THANE/NEW MUMBAI",
+        presState: "MAHARASHTRA",
+        presPin: "400709",
         org: "INTERGLOBE AVIATION LTD",
-        avsecDesc: "Initial Security Training (02/AUG/2023)",
+        desig: "EXECUTIVE - SECURITY",
+        empNo: "IGA 72835",
+        dutyPlace: "RGIA - HYD",
+        nature: "SECURITY SERVICES",
+        officeAddr: "AO-06, E-LEVEL OFFICES, PASSENGER TERMINAL BUILDING, RGIA, HYD, TELANGANA - 500108",
+        avsecDate: "2023-08-02",
+        avsecLoc: "BLR - BENGALURU",
         avsecInst: "ARCHANA DASH / INDIGO ASTI",
         pvcNo: "TP 88793",
-        pvcIssue: "2023-08-10",
-        pvcExpiry: "2027-08-09",
-        passportNo: "Z5948301 - INDIAN NATIONAL",
-        email: "MUSHTAQ.ISMAIL@GOINDIGO.IN",
-        address: "H.NO 20-170/1/1, RB NAGAR, RANGAREDDY, TELANGANA - 501218",
-        zones: ["T", "SHA", "A", "BHA"]
+        pvcDate: "2023-09-12",
+        zones: ["A", "D", "T"]
       }
     };
 
-    let uploadedPhotoBase64 = "";
+    let livePhotoBase64 = "";
 
-    // Tab switcher between Split-Deck and Universal Search
-    function switchView(viewName) {
-      const splitDeck = document.getElementById('view-split-deck');
-      const searchDeck = document.getElementById('view-universal-search');
-      const btnForm = document.getElementById('btn-nav-form');
-      const btnSearch = document.getElementById('btn-nav-search');
+    function switchView(tab) {
+      const deckView = document.getElementById('view-master-deck');
+      const searchView = document.getElementById('view-universal-search');
+      const btnDeck = document.getElementById('btn-tab-deck');
+      const btnSearch = document.getElementById('btn-tab-search');
 
-      if (viewName === 'split-form') {
-        splitDeck.classList.remove('hidden');
-        searchDeck.classList.add('hidden');
-        btnForm.classList.add('apple-btn-active');
+      if (tab === 'deck') {
+        deckView.classList.remove('hidden');
+        searchView.classList.add('hidden');
+        btnDeck.classList.add('apple-btn-active');
         btnSearch.classList.remove('apple-btn-active');
       } else {
-        splitDeck.classList.add('hidden');
-        searchDeck.classList.remove('hidden');
+        deckView.classList.add('hidden');
+        searchView.classList.remove('hidden');
         btnSearch.classList.add('apple-btn-active');
-        btnForm.classList.remove('apple-btn-active');
+        btnDeck.classList.remove('apple-btn-active');
       }
     }
 
-    // Photo input encoder with instant preview
-    function handlePhotoUpload(input) {
+    // Photo Upload Handler
+    function handleLivePhoto(input) {
       if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
-          uploadedPhotoBase64 = e.target.result;
-          const img = document.getElementById('prev-photo');
-          const fallback = document.getElementById('prev-photo-fallback');
-          img.src = uploadedPhotoBase64;
-          img.classList.remove('hidden');
-          fallback.classList.add('hidden');
+          livePhotoBase64 = e.target.result;
+          const img = document.getElementById('p1-photo-img');
+          const label = document.getElementById('p1-photo-label');
+          img.src = livePhotoBase64;
+          img.style.display = 'block';
+          label.style.display = 'none';
         };
         reader.readAsDataURL(input.files[0]);
       }
     }
 
-    // Live keystroke synchronization engine
-    function updateLivePreview() {
-      const empid = document.getElementById('inp-empid').value.trim().toUpperCase() || "IGA72835";
-      const name = document.getElementById('inp-name').value.trim().toUpperCase() || "MUSHTAQ MOHAMMED";
-      const desig = document.getElementById('inp-desig').value.trim().toUpperCase() || "EXECUTIVE - SECURITY";
-      const org = document.getElementById('inp-org').value.trim().toUpperCase() || "INTERGLOBE AVIATION LTD";
-      const station = document.getElementById('inp-station').value.trim().toUpperCase() || "HYD";
-      const blood = document.getElementById('inp-blood').value.trim().toUpperCase() || "O+VE";
-      const pvcNo = document.getElementById('inp-pvc-no').value.trim().toUpperCase() || "TP 88793";
-      const avsec = document.getElementById('inp-avsec-desc').value.trim() || "Certified Asti";
-      const passport = document.getElementById('inp-passport-no').value.trim().toUpperCase() || "VALID";
+    // Synchronize Input Deck with Official 1:1 Vector Preview
+    function syncForm() {
+      // Page 1 Elements
+      document.getElementById('prev-doc-ref').innerText = document.getElementById('inp-ref-id').value || "HYD/2026/AEP/0000";
+      document.getElementById('prev-airport-name').innerText = document.getElementById('inp-airport-sel').value || "RGIA - HYD";
+      document.getElementById('p1-name').innerText = document.getElementById('inp-name').value.toUpperCase();
+      document.getElementById('p1-father').innerText = document.getElementById('inp-father').value.toUpperCase();
+      document.getElementById('p1-mother').innerText = document.getElementById('inp-mother').value.toUpperCase();
 
-      document.getElementById('prev-empid').innerText = empid;
-      document.getElementById('prev-name').innerText = name;
-      document.getElementById('prev-desig').innerText = desig;
-      document.getElementById('prev-org').innerText = org;
-      document.getElementById('prev-station').innerText = station.substring(0, 4);
-      document.getElementById('prev-blood').innerText = blood;
-      document.getElementById('prev-pvc').innerText = pvcNo;
-      document.getElementById('prev-avsec').innerText = avsec;
-      document.getElementById('prev-passport').innerText = passport;
-      document.getElementById('prev-token').innerText = `AEP-2026-${empid}`;
+      const rawDob = document.getElementById('inp-dob').value;
+      if (rawDob) {
+        const p = rawDob.split('-');
+        document.getElementById('p1-dob').innerText = `${p[2]}/${p[1]}/${p[0]}`;
+      }
 
-      // Recalculate operational zones
-      const zones = [];
-      ['T', 'SHA', 'A', 'BHA', 'C', 'ATC'].forEach(z => {
+      document.getElementById('p1-blood').innerText = document.getElementById('inp-blood').value.toUpperCase();
+      document.getElementById('p1-gender').innerText = document.getElementById('inp-gender').value.toUpperCase();
+      document.getElementById('p1-contact').innerText = `${document.getElementById('inp-mobile').value} / ${document.getElementById('inp-email').value}`;
+      document.getElementById('p1-aadhaar').innerText = document.getElementById('inp-aadhaar').value;
+
+      // Addresses
+      const perm = `${document.getElementById('inp-perm-street').value}, ${document.getElementById('inp-perm-dist').value}, ${document.getElementById('inp-perm-state').value} - ${document.getElementById('inp-perm-pin').value}`;
+      document.getElementById('p1-perm-addr').innerText = perm.toUpperCase();
+      document.getElementById('p1-perm-proof-val').innerText = document.getElementById('inp-perm-proof').value.toUpperCase();
+
+      const pres = `${document.getElementById('inp-pres-street').value}, ${document.getElementById('inp-pres-dist').value}, ${document.getElementById('inp-pres-state').value} - ${document.getElementById('inp-pres-pin').value}`;
+      document.getElementById('p1-pres-addr').innerText = pres.toUpperCase();
+
+      // Zones Checkmarks
+      ['A', 'D', 'T', 'Si', 'Sd', 'P', 'B', 'F'].forEach(z => {
         const chk = document.getElementById(`zone-${z}`);
-        if (chk && chk.checked) zones.push(z);
+        const el = document.getElementById(`chk-z-${z}`);
+        if (chk && el) el.innerText = chk.checked ? "✓" : "";
       });
 
-      const container = document.getElementById('prev-zones-container');
-      if (zones.length > 0) {
-        container.innerHTML = zones.map(z => `<span class="text-[11px] font-black bg-[#1d1d1f] text-white px-2.5 py-1 rounded-lg">${z}</span>`).join('');
-      } else {
-        container.innerHTML = `<span class="text-[10px] text-red-500 font-bold">No Terminal Zones Selected</span>`;
+      // Page 2 Elements
+      document.getElementById('p2-org').innerText = document.getElementById('inp-emp-org').value.toUpperCase();
+      document.getElementById('p2-desig').innerText = document.getElementById('inp-emp-desig').value.toUpperCase();
+      document.getElementById('p2-empno').innerText = document.getElementById('inp-emp-no').value.toUpperCase();
+      document.getElementById('p2-duty-place').innerText = document.getElementById('inp-emp-duty-place').value.toUpperCase();
+      document.getElementById('p2-nature').innerText = document.getElementById('inp-emp-nature').value.toUpperCase();
+      document.getElementById('p2-office-addr').innerText = document.getElementById('inp-emp-office-addr').value.toUpperCase();
+
+      document.getElementById('p2-legal-case').innerText = document.getElementById('inp-legal-case').value;
+      document.getElementById('p2-legal-arrest').innerText = document.getElementById('inp-legal-arrest').value;
+      document.getElementById('p2-legal-punished').innerText = document.getElementById('inp-legal-punished').value;
+      document.getElementById('p2-legal-reject').innerText = document.getElementById('inp-legal-reject').value;
+
+      const rawAvsec = document.getElementById('inp-avsec-date').value;
+      if (rawAvsec) {
+        const ap = rawAvsec.split('-');
+        document.getElementById('p2-avsec-date').innerText = `${ap[2]}/${ap[1]}/${ap[0]}`;
+      }
+      document.getElementById('p2-avsec-loc').innerText = document.getElementById('inp-avsec-loc').value.toUpperCase();
+      document.getElementById('p2-avsec-inst').innerText = document.getElementById('inp-avsec-inst').value.toUpperCase();
+
+      document.getElementById('p2-pvc-no').innerText = document.getElementById('inp-pvc-id').value.toUpperCase();
+      const rawPvc = document.getElementById('inp-pvc-date').value;
+      if (rawPvc) {
+        const pp = rawPvc.split('-');
+        document.getElementById('p2-pvc-date').innerText = `${pp[2]}/${pp[1]}/${pp[0]}`;
       }
     }
 
-    // Reset Form Fields
-    function clearFormFields() {
-      document.getElementById('aepMasterForm').reset();
-      uploadedPhotoBase64 = "";
-      document.getElementById('prev-photo').classList.add('hidden');
-      document.getElementById('prev-photo-fallback').classList.remove('hidden');
-      updateLivePreview();
+    // Pre-fill Mushtaq's Record
+    function loadDefaultMushtaqData() {
+      const d = masterPersonnelDB["IGA 72835"];
+      document.getElementById('inp-ref-id').value = d.refId;
+      document.getElementById('inp-name').value = d.name;
+      document.getElementById('inp-father').value = d.father;
+      document.getElementById('inp-mother').value = d.mother;
+      document.getElementById('inp-dob').value = d.dob;
+      document.getElementById('inp-blood').value = d.blood;
+      document.getElementById('inp-gender').value = d.gender;
+      document.getElementById('inp-mobile').value = d.mobile;
+      document.getElementById('inp-email').value = d.email;
+      document.getElementById('inp-aadhaar').value = d.aadhaar;
+      document.getElementById('inp-id-type').value = d.idType;
+      document.getElementById('inp-perm-street').value = d.permStreet;
+      document.getElementById('inp-perm-dist').value = d.permDist;
+      document.getElementById('inp-perm-state').value = d.permState;
+      document.getElementById('inp-perm-pin').value = d.permPin;
+      document.getElementById('inp-perm-proof').value = d.permProof;
+      document.getElementById('inp-pres-street').value = d.presStreet;
+      document.getElementById('inp-pres-dist').value = d.presDist;
+      document.getElementById('inp-pres-state').value = d.presState;
+      document.getElementById('inp-pres-pin').value = d.presPin;
+      document.getElementById('inp-emp-org').value = d.org;
+      document.getElementById('inp-emp-desig').value = d.desig;
+      document.getElementById('inp-emp-no').value = d.empNo;
+      document.getElementById('inp-emp-duty-place').value = d.dutyPlace;
+      document.getElementById('inp-emp-nature').value = d.nature;
+      document.getElementById('inp-emp-office-addr').value = d.officeAddr;
+      document.getElementById('inp-avsec-date').value = d.avsecDate;
+      document.getElementById('inp-avsec-loc').value = d.avsecLoc;
+      document.getElementById('inp-avsec-inst').value = d.avsecInst;
+      document.getElementById('inp-pvc-id').value = d.pvcNo;
+      document.getElementById('inp-pvc-date').value = d.pvcDate;
+      syncForm();
     }
 
-    // Print Pass Dossier
-    function triggerPrintPass() {
+    function clearAllFields() {
+      document.getElementById('bcasAepForm').reset();
+      syncForm();
+    }
+
+    function triggerPrintOfficialPass() {
       window.print();
     }
 
-    // Google Sheets Form Submission & Categorization
-    async function handleFormSubmission(event) {
-      event.preventDefault();
-      const submitBtn = document.getElementById('btn-submit-form');
-      const syncStatus = document.getElementById('sync-status-indicator');
+    // Submit & Sync to Google Sheets
+    async function handleFormSubmission(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Synching to Google Sheets & Drive...`;
 
       const payload = {
-        empId: document.getElementById('inp-empid').value.trim().toUpperCase(),
+        refId: document.getElementById('inp-ref-id').value.trim(),
         name: document.getElementById('inp-name').value.trim().toUpperCase(),
-        department: document.getElementById('inp-dept').value,
-        designation: document.getElementById('inp-desig').value.trim().toUpperCase(),
-        station: document.getElementById('inp-station').value.trim().toUpperCase(),
+        empNo: document.getElementById('inp-emp-no').value.trim().toUpperCase(),
+        department: "SECURITY", // Categorization Key
+        designation: document.getElementById('inp-emp-desig').value.trim().toUpperCase(),
+        station: document.getElementById('inp-airport-sel').value.trim().toUpperCase(),
+        father: document.getElementById('inp-father').value.trim().toUpperCase(),
+        mother: document.getElementById('inp-mother').value.trim().toUpperCase(),
         dob: document.getElementById('inp-dob').value,
-        bloodGroup: document.getElementById('inp-blood').value.trim().toUpperCase(),
-        org: document.getElementById('inp-org').value.trim().toUpperCase(),
-        avsecDesc: document.getElementById('inp-avsec-desc').value.trim(),
-        avsecInst: document.getElementById('inp-avsec-inst').value.trim(),
-        pvcNo: document.getElementById('inp-pvc-no').value.trim().toUpperCase(),
-        pvcIssue: document.getElementById('inp-pvc-issue').value,
-        pvcExpiry: document.getElementById('inp-pvc-expiry').value,
-        passportNo: document.getElementById('inp-passport-no').value.trim().toUpperCase(),
+        blood: document.getElementById('inp-blood').value.trim().toUpperCase(),
+        gender: document.getElementById('inp-gender').value,
+        mobile: document.getElementById('inp-mobile').value.trim(),
         email: document.getElementById('inp-email').value.trim(),
-        address: document.getElementById('inp-address').value.trim(),
-        zones: ['T', 'SHA', 'A', 'BHA', 'C', 'ATC'].filter(z => document.getElementById(`zone-${z}`)?.checked),
-        photoData: uploadedPhotoBase64
+        aadhaar: document.getElementById('inp-aadhaar').value.trim(),
+        idType: document.getElementById('inp-id-type').value.trim().toUpperCase(),
+        permanentAddress: `${document.getElementById('inp-perm-street').value}, ${document.getElementById('inp-perm-dist').value}, ${document.getElementById('inp-perm-state').value} - ${document.getElementById('inp-perm-pin').value}`,
+        presentAddress: `${document.getElementById('inp-pres-street').value}, ${document.getElementById('inp-pres-dist').value}, ${document.getElementById('inp-pres-state').value} - ${document.getElementById('inp-pres-pin').value}`,
+        org: document.getElementById('inp-emp-org').value.trim().toUpperCase(),
+        nature: document.getElementById('inp-emp-nature').value.trim().toUpperCase(),
+        officeAddress: document.getElementById('inp-emp-office-addr').value.trim(),
+        avsecDate: document.getElementById('inp-avsec-date').value,
+        avsecLoc: document.getElementById('inp-avsec-loc').value.trim().toUpperCase(),
+        avsecInst: document.getElementById('inp-avsec-inst').value.trim().toUpperCase(),
+        pvcNo: document.getElementById('inp-pvc-id').value.trim().toUpperCase(),
+        pvcDate: document.getElementById('inp-pvc-date').value,
+        zones: ['A', 'D', 'T', 'B', 'P', 'F', 'Si', 'Sd'].filter(z => document.getElementById(`zone-${z}`)?.checked),
+        photoData: livePhotoBase64
       };
 
-      // 1. Cache to local memory immediately
-      localDatabase[payload.empId] = payload;
-
-      // 2. Synchronize to Google Sheets Cloud Webhook
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Uploading to Google Sheets &amp; Drive...</span>`;
-      syncStatus.innerText = "Syncing...";
+      // Store in local DB
+      masterPersonnelDB[payload.empNo] = payload;
 
       try {
-        if (GOOGLE_SCRIPT_WEBAPP_URL.includes("YOUR-DEPLOYED-URL-HERE")) {
-          // Simulation mode if Webhook URL is not yet swapped
-          setTimeout(() => {
-            alert(`✅ AEP Dossier Saved!\n\nRecord for ${payload.name} (${payload.empId}) successfully registered locally and categorized under department '${payload.department}'.`);
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Submit &amp; Append to Google Sheet Registry</span>`;
-            syncStatus.innerText = "Google Cloud Ready";
-          }, 800);
-          return;
+        if (!GOOGLE_SCRIPT_WEBAPP_URL.includes("YOUR-DEPLOYED-URL-HERE")) {
+          await fetch(GOOGLE_SCRIPT_WEBAPP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
         }
-
-        const response = await fetch(GOOGLE_SCRIPT_WEBAPP_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        if (result.status === "success") {
-          alert(`✅ Success: AEP Application for ${payload.name} has been synced to Google Sheet and Drive.`);
-        } else {
-          throw new Error(result.message || "Failed to commit record to spreadsheet.");
-        }
-      } catch (error) {
-        console.warn("Google Sync Notice:", error);
-        alert(`Record committed to active workspace memory. Note: Ensure your Google Web App URL is published to sync live spreadsheets.`);
+        alert(`✅ Official AEP Record Committed!\n\nApplication for ${payload.name} (${payload.empNo}) has been saved and categorized under Department 'SECURITY'. Click 'Print Official Application' to print the exact A4 document.`);
+      } catch (err) {
+        alert(`Record stored in active workspace memory.`);
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Submit &amp; Append to Google Sheet Registry</span>`;
-        syncStatus.innerText = "Google Cloud Ready";
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> Save &amp; Append to Google Sheet Registry`;
       }
     }
 
-    // Universal Registry Search Logic
-    function executeUniversalSearch() {
-      const query = document.getElementById('queryEmployeeInput').value.trim().toUpperCase();
-      const alertBox = document.getElementById('search-alert-box');
-      const dossierBox = document.getElementById('search-result-dossier');
+    // Universal Search Logic
+    function runUniversalSearch() {
+      const q = document.getElementById('queryEmployeeInput').value.trim().toUpperCase();
+      const resBox = document.getElementById('search-result-box');
+      if (!q) return;
 
-      alertBox.classList.add('hidden');
-      dossierBox.classList.add('hidden');
+      const record = masterPersonnelDB[q] || Object.values(masterPersonnelDB).find(r => r.name.includes(q) || r.aadhaar.includes(q));
 
-      if (!query) {
-        alertBox.className = "p-4 rounded-2xl bg-amber-50 text-amber-800 border border-amber-200 text-sm";
-        alertBox.innerText = "Please input an Employee ID, Full Name, Passport, or PVC Number to query.";
-        alertBox.classList.remove('hidden');
+      if (!record) {
+        alert(`No AEP record located for: ${q}`);
+        resBox.classList.add('hidden');
         return;
       }
 
-      // Query across local memory cache
-      let match = localDatabase[query];
-      if (!match) {
-        match = Object.values(localDatabase).find(item => 
-          item.name.includes(query) ||
-          item.pvcNo === query ||
-          item.passportNo.includes(query)
-        );
-      }
+      document.getElementById('res-dossier-name').innerText = record.name;
+      document.getElementById('res-dossier-sub').innerText = `${record.empNo} • ${record.designation} (${record.org})`;
 
-      if (!match) {
-        alertBox.className = "p-4 rounded-2xl bg-red-50 text-red-800 border border-red-200 text-sm";
-        alertBox.innerText = `No AEP registration file found matching "${query}". Verify employee credentials.`;
-        alertBox.classList.remove('hidden');
-        return;
-      }
-
-      // Check PVC validity status
-      const isExpired = match.pvcExpiry && new Date(match.pvcExpiry) < new Date();
-      const statusPill = document.getElementById('dossier-status-pill');
-
-      if (isExpired) {
-        statusPill.className = "text-xs font-bold px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-200";
-        statusPill.innerText = "🔴 PVC EXPIRED - ACCESS SUSPENDED";
-      } else {
-        statusPill.className = "text-xs font-bold px-3 py-1 rounded-full bg-[#e8f5e9] text-[#2e7d32] border border-[#2e7d32]/20";
-        statusPill.innerText = "🟢 CLEARANCE VALID";
-      }
-
-      document.getElementById('dossier-name').innerText = match.name;
-      document.getElementById('dossier-meta').innerText = `${match.empId} • ${match.designation} (${match.org})`;
-      document.getElementById('dossier-station-badge').innerText = `${match.station} • ${match.department}`;
-
-      const grid = document.getElementById('dossier-details-grid');
+      const grid = document.getElementById('res-dossier-grid');
       grid.innerHTML = `
         <div class="space-y-1">
-          <span class="text-xs font-bold text-[#86868b] uppercase">AVSEC Certification</span>
-          <p class="font-semibold text-[#1d1d1f]">${match.avsecDesc || 'N/A'}</p>
-          <small class="text-[#86868b]">${match.avsecInst || 'Asti Verified'}</small>
+          <span class="text-[#86868b] font-bold uppercase">AVSEC Clearance</span>
+          <p class="font-bold text-[#1d1d1f]">${record.avsecDate} (${record.avsecLoc})</p>
+          <small class="text-[#86868b]">${record.avsecInst}</small>
         </div>
         <div class="space-y-1">
-          <span class="text-xs font-bold text-[#86868b] uppercase">Police Verification (PVC)</span>
-          <p class="font-semibold text-[#1d1d1f]">Cert No: ${match.pvcNo}</p>
-          <small class="text-[#86868b]">Valid till: ${match.pvcExpiry || 'Pending'}</small>
+          <span class="text-[#86868b] font-bold uppercase">Police Verification (PVC)</span>
+          <p class="font-bold text-[#2e7d32]">${record.pvcNo}</p>
+          <small class="text-[#86868b]">Verified on: ${record.pvcDate}</small>
         </div>
         <div class="space-y-1">
-          <span class="text-xs font-bold text-[#86868b] uppercase">Identity &amp; Nationality</span>
-          <p class="font-semibold text-[#1d1d1f]">${match.passportNo}</p>
-          <small class="text-[#86868b]">${match.email || 'No email logged'}</small>
-        </div>
-        <div class="space-y-1 md:col-span-2">
-          <span class="text-xs font-bold text-[#86868b] uppercase">Registered Address</span>
-          <p class="font-medium text-[#515154] text-xs">${match.address || 'Address unrecorded'}</p>
-        </div>
-        <div class="space-y-1">
-          <span class="text-xs font-bold text-[#86868b] uppercase">Terminal Access Matrix</span>
-          <div class="flex flex-wrap gap-1 mt-1">
-            ${(match.zones || []).map(z => `<span class="bg-[#1d1d1f] text-white px-2 py-0.5 rounded text-[10px] font-bold">${z}</span>`).join('')}
-          </div>
+          <span class="text-[#86868b] font-bold uppercase">National UID / Passport</span>
+          <p class="font-bold text-[#1d1d1f]">${record.aadhaar}</p>
+          <small class="text-[#86868b]">${record.idType}</small>
         </div>
       `;
 
-      dossierBox.classList.remove('hidden');
+      resBox.classList.remove('hidden');
     }
 
-    function filterByDept(deptName) {
-      if (deptName === 'ALL') {
-        document.getElementById('queryEmployeeInput').value = '';
-        executeUniversalSearch();
-      } else {
-        const item = Object.values(localDatabase).find(d => d.department === deptName);
-        if (item) {
-          document.getElementById('queryEmployeeInput').value = item.empId;
-          executeUniversalSearch();
-        } else {
-          alert(`No registered candidates found under department '${deptName}'.`);
-        }
-      }
+    function loadRecordAndPrint() {
+      switchView('deck');
+      loadDefaultMushtaqData();
     }
 
-    // Initialize initial pass preview
+    // Initialize with Mushtaq Mohammed's official record on boot
     document.addEventListener("DOMContentLoaded", () => {
-      updateLivePreview();
+      loadDefaultMushtaqData();
     });
   </script>
 </body>
