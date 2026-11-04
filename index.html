@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>AEP Portal | Official BCAS Form Engine (Approach 1)</title>
+  <title>AEP Portal | Official BCAS Form Engine</title>
   
   <meta name="theme-color" content="#f5f5f7" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -54,12 +54,102 @@
       border-color: #0071e3;
       box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
     }
+
+    /* ===================================================
+       OFFICIAL BCAS A4 PRINT ENGINE (EXACT 1:1 REPLICA)
+       =================================================== */
+    .bcas-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 12mm 14mm;
+      margin: 0 auto 24px auto;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border: 1px solid #d2d2d7;
+      color: #000000;
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+      font-size: 10px;
+      line-height: 1.25;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .bcas-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1.2px solid #000000;
+      margin-top: 3px;
+      margin-bottom: 5px;
+    }
+
+    .bcas-table th, .bcas-table td {
+      border: 1px solid #000000;
+      padding: 2.5px 4px;
+      vertical-align: middle;
+    }
+
+    .bcas-check {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      border: 1px solid #000000;
+      text-align: center;
+      line-height: 10px;
+      font-size: 9px;
+      font-weight: bold;
+      margin-right: 2px;
+      vertical-align: middle;
+      background: #fff;
+    }
+
+    .bcas-field-val {
+      font-weight: bold;
+      color: #000;
+      text-transform: uppercase;
+    }
+
+    /* BROWSER PRINT ENGINE RULES */
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #official-print-document, #official-print-document * {
+        visibility: visible !important;
+      }
+      #official-print-document {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+      }
+      .bcas-sheet {
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        width: 100% !important;
+        min-height: 297mm !important;
+        margin: 0 !important;
+        padding: 10mm 14mm !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+    }
   </style>
 </head>
 <body class="bg-[#f5f5f7] text-[#1d1d1f] min-h-screen flex flex-col antialiased">
 
   <!-- Apple Glass Navigation Header -->
-  <header class="fixed top-0 left-0 right-0 h-16 apple-glass-nav border-b border-[#d2d2d7]/50 z-50">
+  <header class="fixed top-0 left-0 right-0 h-16 apple-glass-nav border-b border-[#d2d2d7]/50 z-50 no-print">
     <div class="max-w-7xl mx-auto h-full px-6 flex justify-between items-center">
       <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('form')">
         <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0071e3] to-[#42a5f5] flex items-center justify-center text-white shadow-xs">
@@ -67,419 +157,652 @@
         </div>
         <div>
           <span class="text-base font-semibold tracking-tight block leading-tight">AEP Form Engine</span>
-          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">BCAS AEPAF Official Generator</span>
+          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Bureau of Civil Aviation Security</span>
         </div>
       </div>
 
       <!-- Segmented Navigation Bar -->
       <div class="flex items-center space-x-1 p-1 bg-[#e8e8ed] rounded-full border border-[#d2d2d7]/40">
         <button id="tab-btn-form" onclick="switchTab('form')" class="px-5 py-1.5 rounded-full text-xs font-semibold text-[#515154] apple-btn-active transition-all focus:outline-none">
-          <i class="fa-solid fa-pen-to-square mr-1.5"></i> All 11 Sections
+          <i class="fa-solid fa-pen-to-square mr-1.5"></i> Entry &amp; Live Form
         </button>
         <button id="tab-btn-search" onclick="switchTab('search')" class="px-5 py-1.5 rounded-full text-xs font-semibold text-[#515154] hover:text-[#1d1d1f] transition-all focus:outline-none">
           <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Universal Directory
         </button>
       </div>
 
-      <!-- Quick Action: Direct PDF Download -->
-      <button onclick="generateAndDownloadOfficialPDF()" class="px-4 py-2 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-xl shadow-xs transition-all flex items-center space-x-1.5">
-        <i class="fa-solid fa-download"></i>
-        <span>Download Official PDF (A4)</span>
-      </button>
+      <!-- Direct Print / Export Actions -->
+      <div class="flex items-center space-x-2">
+        <button onclick="triggerDirectPrint()" class="px-4 py-2 bg-[#1d1d1f] hover:bg-black text-white text-xs font-semibold rounded-xl shadow-xs transition-all flex items-center space-x-1.5">
+          <i class="fa-solid fa-print"></i>
+          <span>Print Official Application (A4)</span>
+        </button>
+        <button onclick="generateAndDownloadOfficialPDF()" class="px-4 py-2 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-xl shadow-xs transition-all flex items-center space-x-1.5">
+          <i class="fa-solid fa-download"></i>
+          <span>Download PDF</span>
+        </button>
+      </div>
     </div>
   </header>
 
   <!-- MAIN WORKSPACE -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 pt-24 pb-20">
 
-    <!-- VIEW 1: DATA ENTRY FOR ALL 11 SECTIONS -->
+    <!-- VIEW 1: DATA ENTRY & OFFICIAL 2-PAGE DOCUMENT DECK -->
     <div id="view-form" class="space-y-6">
 
       <!-- Action Toolbar -->
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 no-print">
         <div>
-          <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-[#1d1d1f]">AEP Full Application Form</h1>
-          <p class="text-sm md:text-base text-[#86868b] mt-1">Fill out the official 11 sections. The system will compile the authentic 2-page PDF and synchronize with Google Sheets.</p>
+          <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-[#1d1d1f]">AEP Full Application Form (AEPAF)</h1>
+          <p class="text-sm md:text-base text-[#86868b] mt-1">Official Government of India AEP proforma. Complete all 11 sections with live synchronization and direct A4 printing.</p>
         </div>
         
         <div class="flex items-center space-x-2">
           <button onclick="loadSampleMushtaqData()" class="px-4 py-2 bg-white text-[#0071e3] border border-[#0071e3]/30 hover:bg-[#e3f2fd] text-xs font-semibold rounded-xl shadow-xs transition-all">
             <i class="fa-solid fa-bolt mr-1"></i> Pre-fill Mushtaq's Record
           </button>
-          <button onclick="document.getElementById('masterAepForm').reset()" class="px-4 py-2 bg-white text-[#86868b] hover:text-[#1d1d1f] border border-[#d2d2d7] text-xs font-semibold rounded-xl shadow-xs transition-all">
+          <button onclick="document.getElementById('masterAepForm').reset(); syncFormToDOM();" class="px-4 py-2 bg-white text-[#86868b] hover:text-[#1d1d1f] border border-[#d2d2d7] text-xs font-semibold rounded-xl shadow-xs transition-all">
             <i class="fa-solid fa-arrow-rotate-left mr-1"></i> Reset
           </button>
         </div>
       </div>
 
-      <!-- Form Grid -->
-      <form id="masterAepForm" onsubmit="handleFormSubmission(event)" class="space-y-6">
+      <!-- Master Grid: Left 5 Cols (Input Deck) | Right 7 Cols (Official 2-Page Vector Preview) -->
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
 
-        <!-- SECTION 1, 2, 3: PERMIT DETAILS, ZONES & ISSUE CATEGORY -->
-        <div class="apple-card p-6 md:p-8 space-y-5">
-          <div class="flex items-center space-x-2.5 border-b border-[#f5f5f7] pb-3">
-            <span class="w-6 h-6 rounded-lg bg-[#e3f2fd] text-[#0071e3] flex items-center justify-center text-xs font-bold">1-3</span>
-            <h3 class="text-base font-semibold text-[#1d1d1f]">AEP Request, Operational Zones &amp; Issue Category</h3>
+        <!-- LEFT COLUMN: INPUT CONTROLS (no-print) -->
+        <div class="xl:col-span-5 space-y-4 no-print">
+          <form id="masterAepForm" onsubmit="handleFormSubmission(event)" class="space-y-4">
+            
+            <!-- SECTIONS 1, 2 & 3: PERMIT DETAILS, ZONES & ISSUE CATEGORY -->
+            <div class="apple-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Sections 1, 2 &amp; 3</span>
+                <span class="text-xs font-semibold text-[#86868b]">Permit Type &amp; Zones</span>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">1. AEP Ref ID *</label>
+                <input type="text" id="refId" required value="HYD/2026/AEP/72835" oninput="syncFormToDOM()" class="w-full px-3.5 py-2 apple-input text-xs font-bold uppercase" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">2a. Permit Type</label>
+                  <select id="permitType" onchange="syncFormToDOM()" class="w-full p-2 apple-input font-medium">
+                    <option value="Permanent" selected>Permanent</option>
+                    <option value="Temporary (1 to 30 Days)">Temporary (1 to 30 Days)</option>
+                    <option value="1 Day">1 Day</option>
+                    <option value="1-7 Days">1-7 Days</option>
+                    <option value="3 Months">3 Months</option>
+                    <option value="6 Months">6 Months</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">2b. Category</label>
+                  <select id="category" onchange="syncFormToDOM()" class="w-full p-2 apple-input font-medium">
+                    <option value="Operational" selected>Operational</option>
+                    <option value="Protocol">Protocol</option>
+                    <option value="Foreign National">Foreign National</option>
+                    <option value="Government Security Agencies">Govt Security Agencies</option>
+                    <option value="Infra">Infra</option>
+                    <option value="Tool of Trade">Tool of Trade</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- 2c. Operational Zones -->
+              <div>
+                <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1.5">2c. Operational Zones Requested</label>
+                <div class="grid grid-cols-4 gap-2 text-xs font-medium">
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone_A" checked onchange="syncFormToDOM()" class="rounded text-[#0071e3]" />
+                    <span>A (Apron)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone_D" checked onchange="syncFormToDOM()" class="rounded text-[#0071e3]" />
+                    <span>D (Domestic)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone_T" checked onchange="syncFormToDOM()" class="rounded text-[#0071e3]" />
+                    <span>T (Terminal)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone_B" onchange="syncFormToDOM()" class="rounded text-[#0071e3]" />
+                    <span>B (Baggage)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone_P" onchange="syncFormToDOM()" class="rounded text-[#0071e3]" />
+                    <span>P (Perimeter)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone_F" onchange="syncFormToDOM()" class="rounded text-[#0071e3]" />
+                    <span>F (Freight)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone_Si" onchange="syncFormToDOM()" class="rounded text-[#0071e3]" />
+                    <span>Si (Sec Intl)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone_Sd" onchange="syncFormToDOM()" class="rounded text-[#0071e3]" />
+                    <span>Sd (Sec Dom)</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone_Ft" onchange="syncFormToDOM()" class="rounded text-[#0071e3]" />
+                    <span>Ft</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone_Cs" onchange="syncFormToDOM()" class="rounded text-[#0071e3]" />
+                    <span>Cs</span>
+                  </label>
+                  <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
+                    <input type="checkbox" id="zone_I" onchange="syncFormToDOM()" class="rounded text-[#0071e3]" />
+                    <span>I (ATC)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">2d. Airport</label>
+                  <input type="text" id="airport" value="RGIA - HYD" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">3. Issue Category</label>
+                  <select id="issueCategory" onchange="syncFormToDOM()" class="w-full p-2 apple-input font-medium">
+                    <option value="Fresh" selected>Fresh (Appointment Order)</option>
+                    <option value="Re-Issue">Re-Issue (Expired / Promotion)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 4: DETAILS OF THE APPLICANT -->
+            <div class="apple-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Section 4</span>
+                <span class="text-xs font-semibold text-[#86868b]">Applicant Identity</span>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Full Name (As on Passport) *</label>
+                <input type="text" id="fullName" required value="MUSHTAQ MOHAMMED" oninput="syncFormToDOM()" class="w-full px-3.5 py-2 apple-input text-xs font-bold uppercase" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Father's Name *</label>
+                  <input type="text" id="fatherName" required value="ISMAIL MOHAMMED" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Mother's Name *</label>
+                  <input type="text" id="motherName" required value="SAPHIA ISMAIL" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Date of Birth</label>
+                  <input type="date" id="dob" value="1993-09-27" oninput="syncFormToDOM()" class="w-full p-2 apple-input font-medium" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Blood Group</label>
+                  <input type="text" id="bloodGroup" value="A+" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-bold" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Gender</label>
+                  <select id="gender" onchange="syncFormToDOM()" class="w-full p-2 apple-input font-medium">
+                    <option value="Male" selected>Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Mobile No *</label>
+                  <input type="tel" id="mobile" required value="9036488263" oninput="syncFormToDOM()" class="w-full p-2 apple-input font-medium" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Corporate E-mail *</label>
+                  <input type="email" id="email" required value="MUSHTAQ.ISMAIL@GOINDIGO.IN" oninput="syncFormToDOM()" class="w-full p-2 apple-input font-medium" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Aadhaar No. (12 digits) *</label>
+                  <input type="text" id="aadhaarNo" required value="9772 0313 2804" oninput="syncFormToDOM()" class="w-full p-2 apple-input font-bold" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Type of ID Proof</label>
+                  <input type="text" id="idProofType" value="INDIAN PASSPORT" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+              </div>
+
+              <!-- Photo Uploader -->
+              <div>
+                <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Official Passport Photo (3.5 cm x 4.5 cm)</label>
+                <input type="file" id="photoInput" accept="image/jpeg,image/png" onchange="handlePhotoUpload(this)" class="w-full text-xs text-[#86868b] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer" />
+              </div>
+            </div>
+
+            <!-- SECTION 5: RESIDENTIAL ADDRESSES -->
+            <div class="apple-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Section 5</span>
+                <span class="text-xs font-semibold text-[#86868b]">Residential Addresses</span>
+              </div>
+
+              <div class="space-y-2 text-xs">
+                <span class="font-bold text-[#1d1d1f] block uppercase">5a. Permanent Address</span>
+                <input type="text" id="permStreet" placeholder="House No / Street / Road" value="H.NO 20-170/1/1, RB NAGAR" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase" />
+                <div class="grid grid-cols-3 gap-2">
+                  <input type="text" id="permDistrict" placeholder="District" value="RANGAREDDY" oninput="syncFormToDOM()" class="p-2 apple-input uppercase" />
+                  <input type="text" id="permState" placeholder="State" value="TELANGANA" oninput="syncFormToDOM()" class="p-2 apple-input uppercase" />
+                  <input type="text" id="permPin" placeholder="Pin Code" value="501218" oninput="syncFormToDOM()" class="p-2 apple-input" />
+                </div>
+                <input type="text" id="permProof" placeholder="Address Proof Type (e.g. ELECTRICITY BILL)" value="ELECTRICITY BILL" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase" />
+              </div>
+
+              <div class="space-y-2 text-xs pt-2 border-t border-[#f5f5f7]">
+                <span class="font-bold text-[#1d1d1f] block uppercase">5b. Present Address</span>
+                <input type="text" id="presStreet" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYA" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase" />
+                <div class="grid grid-cols-3 gap-2">
+                  <input type="text" id="presDistrict" placeholder="District" value="THANE/NEW MUMBAI" oninput="syncFormToDOM()" class="p-2 apple-input uppercase" />
+                  <input type="text" id="presState" placeholder="State" value="MAHARASHTRA" oninput="syncFormToDOM()" class="p-2 apple-input uppercase" />
+                  <input type="text" id="presPin" placeholder="Pin Code" value="400709" oninput="syncFormToDOM()" class="p-2 apple-input" />
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 6: EMPLOYMENT DETAILS -->
+            <div class="apple-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Section 6</span>
+                <span class="text-xs font-semibold text-[#86868b]">Employment Details</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Organization *</label>
+                  <input type="text" id="empOrg" value="INTERGLOBE AVIATION LTD" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-bold" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Designation *</label>
+                  <input type="text" id="empDesig" value="EXECUTIVE - SECURITY" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Employee No. *</label>
+                  <input type="text" id="empNo" value="IGA 72835" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-bold text-[#0071e3]" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Place of Duty</label>
+                  <input type="text" id="empDutyPlace" value="RGIA - HYD" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">Nature of Duty</label>
+                  <input type="text" id="empNature" value="SECURITY SERVICES" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+              </div>
+
+              <div class="text-xs">
+                <label class="block font-semibold text-[#86868b] uppercase mb-1">Airport Terminal Office Address</label>
+                <textarea id="empOfficeAddr" rows="2" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-medium">AO-06, E-LEVEL OFFICES, PASSENGER TERMINAL BUILDING, RGIA, HYD, TELANGANA - 500108</textarea>
+              </div>
+            </div>
+
+            <!-- SECTION 7 & 8: LEGAL DISCLOSURES -->
+            <div class="apple-card p-6 space-y-3">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Sections 7 &amp; 8</span>
+                <span class="text-xs font-semibold text-[#86868b]">Disclosures</span>
+              </div>
+
+              <div class="space-y-2 text-xs">
+                <div class="flex justify-between items-center py-1">
+                  <span>I. Any police/court case pending?</span>
+                  <select id="casePending" onchange="syncFormToDOM()" class="p-1 apple-input font-bold">
+                    <option value="NO" selected>NO</option>
+                    <option value="YES">YES</option>
+                  </select>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                  <span>II. Were you ever arrested?</span>
+                  <select id="everArrested" onchange="syncFormToDOM()" class="p-1 apple-input font-bold">
+                    <option value="NO" selected>NO</option>
+                    <option value="YES">YES</option>
+                  </select>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                  <span>III. Punished departmentally?</span>
+                  <select id="everPunished" onchange="syncFormToDOM()" class="p-1 apple-input font-bold">
+                    <option value="NO" selected>NO</option>
+                    <option value="YES">YES</option>
+                  </select>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                  <span>8. Ever rejected for AEP?</span>
+                  <select id="everRejected" onchange="syncFormToDOM()" class="p-1 apple-input font-bold">
+                    <option value="NO" selected>NO</option>
+                    <option value="YES">YES</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 11: AVSEC TRAINING & POLICE VERIFICATION -->
+            <div class="apple-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+                <span class="text-xs font-bold text-[#0071e3] tracking-wider uppercase">Section 11</span>
+                <span class="text-xs font-semibold text-[#86868b]">AVSEC Training &amp; PVC</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Date</label>
+                  <input type="date" id="avsecDate" value="2023-08-02" oninput="syncFormToDOM()" class="w-full p-2 apple-input font-medium" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Location</label>
+                  <input type="text" id="avsecLocation" value="BLR - BENGALURU" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-semibold" />
+                </div>
+              </div>
+
+              <div class="text-xs">
+                <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Instructor &amp; ASTI Center</label>
+                <input type="text" id="avsecInstructor" value="ARCHANA DASH / INDIGO ASTI" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-semibold" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-[#f5f5f7]">
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Serial ID</label>
+                  <input type="text" id="pvcNo" value="TP 88793" oninput="syncFormToDOM()" class="w-full p-2 apple-input uppercase font-bold text-[#2e7d32]" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Verification Date</label>
+                  <input type="date" id="pvcDate" value="2023-09-12" oninput="syncFormToDOM()" class="w-full p-2 apple-input font-medium" />
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <button type="submit" id="btn-sync-gsheet" class="w-full py-4 bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-bold rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+              <span>Save &amp; Append to Google Sheet Registry</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- RIGHT COLUMN: OFFICIAL 2-PAGE DOCUMENT (PRINT TARGET) -->
+        <div class="xl:col-span-7 space-y-6">
+          <div class="flex items-center justify-between px-2 no-print">
+            <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider">Official BCAS Form Layout (A4)</span>
+            <span class="text-xs font-bold text-[#34c759] flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#34c759]"></span> Live Keystroke Sync
+            </span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">1. AEP Ref ID</label>
-              <input type="text" id="refId" required value="HYD/2026/AEP/72835" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">2a. Permit Type</label>
-              <select id="permitType" class="w-full p-2.5 apple-input text-xs font-medium">
-                <option value="Permanent" selected>Permanent</option>
-                <option value="Temporary (1 to 30 Days)">Temporary (1 to 30 Days)</option>
-                <option value="1 Day">1 Day</option>
-                <option value="1-7 Days">1-7 Days</option>
-                <option value="3 Months">3 Months</option>
-                <option value="6 Months">6 Months</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">2b. Category</label>
-              <select id="category" class="w-full p-2.5 apple-input text-xs font-medium">
-                <option value="Operational" selected>Operational</option>
-                <option value="Protocol">Protocol</option>
-                <option value="Foreign National">Foreign National</option>
-                <option value="Government Security Agencies">Government Security Agencies</option>
-                <option value="Infra">Infra</option>
-                <option value="Tool of Trade">Tool of Trade</option>
-              </select>
-            </div>
-          </div>
+          <!-- PRINTABLE DOCUMENT WRAPPER -->
+          <div id="official-print-document">
 
-          <!-- 2c. Operational Zones -->
-          <div>
-            <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1.5">2c. Operational Zones Requested (Check all that apply)</label>
-            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-xs">
-              <label class="flex items-center space-x-2 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                <input type="checkbox" id="zone_A" checked class="w-4 h-4 text-[#0071e3] rounded" />
-                <span class="font-bold">A (Apron)</span>
-              </label>
-              <label class="flex items-center space-x-2 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                <input type="checkbox" id="zone_D" checked class="w-4 h-4 text-[#0071e3] rounded" />
-                <span class="font-bold">D (Domestic)</span>
-              </label>
-              <label class="flex items-center space-x-2 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                <input type="checkbox" id="zone_T" checked class="w-4 h-4 text-[#0071e3] rounded" />
-                <span class="font-bold">T (Terminal)</span>
-              </label>
-              <label class="flex items-center space-x-2 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                <input type="checkbox" id="zone_B" class="w-4 h-4 text-[#0071e3] rounded" />
-                <span class="font-bold">B (Baggage)</span>
-              </label>
-              <label class="flex items-center space-x-2 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                <input type="checkbox" id="zone_P" class="w-4 h-4 text-[#0071e3] rounded" />
-                <span class="font-bold">P (Perimeter)</span>
-              </label>
-              <label class="flex items-center space-x-2 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                <input type="checkbox" id="zone_F" class="w-4 h-4 text-[#0071e3] rounded" />
-                <span class="font-bold">F (Freight/Cargo)</span>
-              </label>
-              <label class="flex items-center space-x-2 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                <input type="checkbox" id="zone_Si" class="w-4 h-4 text-[#0071e3] rounded" />
-                <span class="font-bold">Si (Sec Intl)</span>
-              </label>
-              <label class="flex items-center space-x-2 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                <input type="checkbox" id="zone_Sd" class="w-4 h-4 text-[#0071e3] rounded" />
-                <span class="font-bold">Sd (Sec Dom)</span>
-              </label>
-              <label class="flex items-center space-x-2 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                <input type="checkbox" id="zone_Ft" class="w-4 h-4 text-[#0071e3] rounded" />
-                <span class="font-bold">Ft</span>
-              </label>
-              <label class="flex items-center space-x-2 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                <input type="checkbox" id="zone_Cs" class="w-4 h-4 text-[#0071e3] rounded" />
-                <span class="font-bold">Cs</span>
-              </label>
-              <label class="flex items-center space-x-2 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                <input type="checkbox" id="zone_I" class="w-4 h-4 text-[#0071e3] rounded" />
-                <span class="font-bold">I (ATC Tower)</span>
-              </label>
-            </div>
-          </div>
+            <!-- ==============================================
+                 PAGE 1 OF OFFICIAL BCAS AEP APPLICATION
+                 ============================================== -->
+            <div id="bcas-page-1" class="bcas-sheet">
+              <div class="text-center pb-2 border-b-2 border-black">
+                <div class="text-[9px] font-bold tracking-widest uppercase">Government of India</div>
+                <div class="text-sm font-black tracking-tight uppercase">Bureau of Civil Aviation Security</div>
+                <div class="text-xs font-extrabold uppercase mt-0.5">Aerodrome Entry Permit (AEP) Application Form (AEPAF)</div>
+                <div class="text-[9px] font-bold uppercase tracking-wider">Application for Issue of Temporary and Permanent AEP</div>
+              </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">2d. Airport Requested</label>
-              <input type="text" id="airport" value="RGIA - HYD" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
+              <!-- 1. Reference Id -->
+              <div class="flex justify-between items-center my-2 text-xs">
+                <div><b>1. AEP Application Reference Id:</b></div>
+                <div class="border-2 border-black px-3 py-1 font-mono font-bold text-xs" id="p1-ref-id">HYD/2026/AEP/72835</div>
+              </div>
+
+              <!-- 2. AEP Requested Box -->
+              <div class="border border-black p-1.5 my-1.5">
+                <div class="font-bold text-[10px] mb-1">2. AEP requested (Check [✓] Appropriate Box):</div>
+                <div class="grid grid-cols-2 gap-1 text-[9px]">
+                  <div>
+                    <b>a. Type:</b>
+                    <span id="p1-chk-type-perm" class="bcas-check">✓</span> Perm
+                    <span id="p1-chk-type-temp" class="bcas-check"></span> Temp
+                    <span id="p1-chk-type-1d" class="bcas-check"></span> 1 Day
+                    <span id="p1-chk-type-7d" class="bcas-check"></span> 1-7 D
+                  </div>
+                  <div>
+                    <b>b. Category:</b>
+                    <span id="p1-chk-cat-op" class="bcas-check">✓</span> Operational
+                    <span id="p1-chk-cat-proto" class="bcas-check"></span> Protocol
+                  </div>
+                </div>
+
+                <!-- 2c. Zones -->
+                <div class="mt-1 text-[9px]">
+                  <b>c. Zones:</b>
+                  <span id="p1-z-A" class="bcas-check">✓</span> A
+                  <span id="p1-z-D" class="bcas-check">✓</span> D
+                  <span id="p1-z-T" class="bcas-check">✓</span> T
+                  <span id="p1-z-Si" class="bcas-check"></span> Si
+                  <span id="p1-z-Sd" class="bcas-check"></span> Sd
+                  <span id="p1-z-P" class="bcas-check"></span> P
+                  <span id="p1-z-B" class="bcas-check"></span> B
+                  <span id="p1-z-F" class="bcas-check"></span> F
+                  <span id="p1-z-Ft" class="bcas-check"></span> Ft
+                  <span id="p1-z-Cs" class="bcas-check"></span> Cs
+                  <span id="p1-z-I" class="bcas-check"></span> I
+                </div>
+
+                <div class="grid grid-cols-2 gap-1 mt-1 text-[9px]">
+                  <div><b>d. Airport:</b> <span class="bcas-check">✓</span> Single Airport (<span id="p1-airport-text" class="font-bold">RGIA - HYD</span>)</div>
+                  <div><b>e. Terminal:</b> <span class="bcas-check">✓</span> All <span class="bcas-check"></span> Cargo <span class="bcas-check"></span> Domestic</div>
+                </div>
+              </div>
+
+              <!-- 3. Issue Category -->
+              <div class="border border-black p-1.5 my-1.5 text-[9px]">
+                <b>3. Issue Category:</b>
+                <span class="bcas-check" id="p1-chk-fresh">✓</span> Fresh (Appointment / Posting Order)
+                <span class="bcas-check" id="p1-chk-reissue"></span> Re-Issue
+              </div>
+
+              <!-- 4. Details of the Applicant Table -->
+              <div class="font-bold text-[10px] mt-2">4. Details of the Applicant:</div>
+              <table class="bcas-table">
+                <tr>
+                  <td style="width: 28%;"><b>Full Name:</b></td>
+                  <td style="width: 48%;"><span id="p1-name" class="bcas-field-val">MUSHTAQ MOHAMMED</span></td>
+                  <!-- Photo Box (3.5 cm x 4.5 cm) -->
+                  <td rowspan="7" style="width: 24%; text-align: center; vertical-align: middle; background: #fafafa;">
+                    <div style="width: 28mm; height: 35mm; border: 1.5px dashed #000; margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff;">
+                      <img id="p1-photo-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+                      <span id="p1-photo-label" style="font-size: 8px; font-weight: bold; text-align: center; color: #666;">Affix Recent Passport Size Photograph</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><b>Father's Name:</b></td>
+                  <td><span id="p1-father" class="bcas-field-val">ISMAIL MOHAMMED</span></td>
+                </tr>
+                <tr>
+                  <td><b>Mother's Name:</b></td>
+                  <td><span id="p1-mother" class="bcas-field-val">SAPHIA ISMAIL</span></td>
+                </tr>
+                <tr>
+                  <td><b>Date of Birth:</b></td>
+                  <td><span id="p1-dob" class="bcas-field-val">27/09/1993</span></td>
+                </tr>
+                <tr>
+                  <td><b>Blood Group / Gender:</b></td>
+                  <td><span id="p1-blood" class="bcas-field-val">A+</span> / <span id="p1-gender" class="bcas-field-val">MALE</span></td>
+                </tr>
+                <tr>
+                  <td><b>Mobile &amp; E-mail:</b></td>
+                  <td><span id="p1-contact" class="bcas-field-val">9036488263 / MUSHTAQ.ISMAIL@GOINDIGO.IN</span></td>
+                </tr>
+                <tr>
+                  <td><b>Aadhaar Number*:</b></td>
+                  <td><span id="p1-aadhaar" class="bcas-field-val font-mono">9772 0313 2804</span></td>
+                </tr>
+              </table>
+
+              <!-- 4b. Existing AEP -->
+              <table class="bcas-table">
+                <tr style="background: #f0f0f0;">
+                  <th colspan="3" style="text-align: left; font-size: 9px;">4b. Details of Existing AEP in Possession (If Any):</th>
+                </tr>
+                <tr>
+                  <td>AEP No: <b id="p1-exist-no">NIL</b></td>
+                  <td>Valid Up To: <b id="p1-exist-valid">NIL</b></td>
+                  <td>Place of Issue: <b id="p1-exist-place">HYD</b></td>
+                </tr>
+              </table>
+
+              <!-- 5. Residential Address -->
+              <div class="font-bold text-[10px] mt-2">5. Residential Address:</div>
+              <table class="bcas-table">
+                <tr>
+                  <td style="width: 25%;"><b>a. Permanent Address:</b></td>
+                  <td>
+                    <span id="p1-perm-addr" class="bcas-field-val">H.NO 20-170/1/1, RB NAGAR, RANGAREDDY, TELANGANA - 501218</span><br />
+                    <span class="text-[9px]">Proof Attached: <b id="p1-perm-proof-val">ELECTRICITY BILL</b></span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><b>b. Present Address:</b></td>
+                  <td>
+                    <span id="p1-pres-addr" class="bcas-field-val">303/A, SEC 6, VISHAVARDAYA, THANE/NEW MUMBAI, MAHARASHTRA - 400709</span>
+                  </td>
+                </tr>
+              </table>
+
+              <div class="text-[8px] text-right mt-6 pt-2 border-t border-black text-gray-600">
+                Page 1 of 2 — Bureau of Civil Aviation Security Aerodrome Entry Permit Application
+              </div>
             </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">2e. Terminal Access</label>
-              <select id="terminalAccess" class="w-full p-2.5 apple-input text-xs font-medium">
-                <option value="All" selected>All</option>
-                <option value="Cargo">Cargo</option>
-                <option value="International">International</option>
-                <option value="Domestic">Domestic</option>
-                <option value="General Aviation">General Aviation</option>
-              </select>
+
+            <!-- ==============================================
+                 PAGE 2 OF OFFICIAL BCAS AEP APPLICATION
+                 ============================================== -->
+            <div id="bcas-page-2" class="bcas-sheet">
+              <div class="text-center pb-1.5 border-b border-black mb-2">
+                <div class="text-[9px] font-bold uppercase tracking-wider">AEP Application Form (AEPAF) — Page 2</div>
+              </div>
+
+              <!-- 6. Employment Details -->
+              <div class="font-bold text-[10px]">6. Employment Details:</div>
+              <table class="bcas-table">
+                <tr>
+                  <td style="width: 32%;"><b>Name of Organization:</b></td>
+                  <td><span id="p2-org" class="bcas-field-val">INTERGLOBE AVIATION LTD</span></td>
+                </tr>
+                <tr>
+                  <td><b>Designation:</b></td>
+                  <td><span id="p2-desig" class="bcas-field-val">EXECUTIVE - SECURITY</span></td>
+                </tr>
+                <tr>
+                  <td><b>Employee Number:</b></td>
+                  <td><span id="p2-empno" class="bcas-field-val">IGA 72835</span></td>
+                </tr>
+                <tr>
+                  <td><b>Place of Duty:</b></td>
+                  <td><span id="p2-duty-place" class="bcas-field-val">RGIA - HYD</span></td>
+                </tr>
+                <tr>
+                  <td><b>Nature of Duty:</b></td>
+                  <td><span id="p2-nature" class="bcas-field-val">SECURITY SERVICES</span></td>
+                </tr>
+                <tr>
+                  <td><b>Office Address:</b></td>
+                  <td><span id="p2-office-addr" class="bcas-field-val text-[9px]">AO-06, E-LEVEL OFFICES, PASSENGER TERMINAL BUILDING, RGIA, HYD, TELANGANA - 500108</span></td>
+                </tr>
+              </table>
+
+              <!-- 7. Other Details / Background Disclosures -->
+              <div class="font-bold text-[10px] mt-2">7. Other Details:</div>
+              <table class="bcas-table text-[9px]">
+                <tr>
+                  <td>I. (a) Is any case pending against you with police or court?</td>
+                  <td style="width: 15%; text-align: center;"><b id="p2-legal-case">NO</b></td>
+                </tr>
+                <tr>
+                  <td>II. (a) Were you ever arrested?</td>
+                  <td style="text-align: center;"><b id="p2-legal-arrest">NO</b></td>
+                </tr>
+                <tr>
+                  <td>III. (a) Were you punished departmentally?</td>
+                  <td style="text-align: center;"><b id="p2-legal-punished">NO</b></td>
+                </tr>
+                <tr>
+                  <td>8. Has your AEP Application ever been rejected?</td>
+                  <td style="text-align: center;"><b id="p2-legal-reject">NO</b></td>
+                </tr>
+              </table>
+
+              <!-- 11. AVSEC Training Block -->
+              <div class="font-bold text-[10px] mt-2">11. AVSEC Awareness Training Details:</div>
+              <table class="bcas-table text-[9px]">
+                <tr style="background: #f0f0f0;">
+                  <th>Staff Stream</th>
+                  <th>Date of Training</th>
+                  <th>Location</th>
+                  <th>Training Center &amp; Instructor</th>
+                </tr>
+                <tr>
+                  <td><b>Security Staff:</b></td>
+                  <td><span id="p2-avsec-date" class="font-bold">02/08/2023</span></td>
+                  <td><span id="p2-avsec-loc" class="font-bold">BLR - BENGALURU</span></td>
+                  <td><span id="p2-avsec-inst" class="font-bold">ARCHANA DASH / INDIGO ASTI</span></td>
+                </tr>
+                <tr>
+                  <td><b>Police Verification (PVC):</b></td>
+                  <td colspan="3">
+                    Certificate No: <b id="p2-pvc-no" class="bcas-field-val text-[#2e7d32]">TP 88793</b> | Date of Clearance: <b id="p2-pvc-date">12/09/2023</b> | Verdict: <b>CLEARED &amp; APPROVED</b>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Declarations -->
+              <div class="mt-4 p-2 border border-black text-[9px] leading-tight space-y-1">
+                <p><b>Declaration by Applicant:</b> I hereby declare that the particulars furnished above are true and correct to the best of my knowledge and belief. In case any information is found false, my AEP shall be liable for cancellation and action as deemed fit under aviation regulations.</p>
+              </div>
+
+              <!-- Signatures Row -->
+              <div class="grid grid-cols-2 gap-6 mt-6 pt-6 text-[10px]">
+                <div class="border-t border-black text-center pt-1">
+                  <b>Signature of the Applicant</b><br />
+                  <span class="text-[9px]">Date: 04/11/2026 | Place: HYD</span>
+                </div>
+                <div class="border-t border-black text-center pt-1">
+                  <b>Signature of Authorized Signatory with Seal</b><br />
+                  <span class="text-[9px]">InterGlobe Aviation Ltd / Security Dept</span>
+                </div>
+              </div>
+
+              <div class="text-[8px] text-right mt-10 pt-2 border-t border-black text-gray-600">
+                Page 2 of 2 — Bureau of Civil Aviation Security Aerodrome Entry Permit Application
+              </div>
             </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">3. Issue Category</label>
-              <select id="issueCategory" class="w-full p-2.5 apple-input text-xs font-medium">
-                <option value="Fresh (Appointment / Posting Order)" selected>Fresh (Appointment Order)</option>
-                <option value="Re-Issue (Expired)">Re-Issue (Expired)</option>
-                <option value="Re-Issue (Promotion / Designation Change)">Re-Issue (Promotion)</option>
-                <option value="Re-Issue (Transfer Order)">Re-Issue (Transfer)</option>
-                <option value="Re-Issue (Loss / Police FIR)">Re-Issue (Loss/FIR)</option>
-              </select>
-            </div>
+
           </div>
         </div>
 
-        <!-- SECTION 4: APPLICANT PERSONAL DETAILS -->
-        <div class="apple-card p-6 md:p-8 space-y-5">
-          <div class="flex items-center space-x-2.5 border-b border-[#f5f5f7] pb-3">
-            <span class="w-6 h-6 rounded-lg bg-[#e8f5e9] text-[#2e7d32] flex items-center justify-center text-xs font-bold">4</span>
-            <h3 class="text-base font-semibold text-[#1d1d1f]">Section 4: Details of Applicant &amp; Existing Pass</h3>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Full Name (As on Passport) *</label>
-              <input type="text" id="fullName" required value="MUSHTAQ MOHAMMED" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Father's Name *</label>
-              <input type="text" id="fatherName" required value="ISMAIL MOHAMMED" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Mother's Name *</label>
-              <input type="text" id="motherName" required value="SAPHIA ISMAIL" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Date of Birth *</label>
-              <input type="date" id="dob" required value="1993-09-27" class="w-full p-2.5 apple-input text-xs font-medium" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Blood Group *</label>
-              <input type="text" id="bloodGroup" required value="A+" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Gender *</label>
-              <select id="gender" class="w-full p-2.5 apple-input text-xs font-medium">
-                <option value="Male" selected>Male</option>
-                <option value="Female">Female</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Mobile No *</label>
-              <input type="tel" id="mobile" required value="9036488263" class="w-full p-2.5 apple-input text-xs font-medium" />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Corporate Email *</label>
-              <input type="email" id="email" required value="MUSHTAQ.ISMAIL@GOINDIGO.IN" class="w-full p-2.5 apple-input text-xs font-medium" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Next of Kin Mobile</label>
-              <input type="tel" id="kinMobile" value="9036488263" class="w-full p-2.5 apple-input text-xs font-medium" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Aadhaar Card No (12 Digits) *</label>
-              <input type="text" id="aadhaarNo" required value="9772 0313 2804" class="w-full p-2.5 apple-input text-xs font-bold" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Type of ID Proof</label>
-              <input type="text" id="idProofType" value="INDIAN PASSPORT" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-          </div>
-
-          <!-- Existing AEP sub-table -->
-          <div class="p-3 bg-[#f5f5f7] rounded-xl space-y-2">
-            <span class="text-xs font-bold text-[#1d1d1f] block uppercase">4b. Details of Existing AEP in Possession (If Any)</span>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <input type="text" id="existAepNo" placeholder="Existing AEP No (or NIL)" value="NIL" class="p-2 apple-input text-xs uppercase" />
-              <input type="text" id="existValidUpTo" placeholder="Valid Up To (or NIL)" value="NIL" class="p-2 apple-input text-xs uppercase" />
-              <input type="text" id="existPlaceIssue" placeholder="Place of Issue" value="HYD" class="p-2 apple-input text-xs uppercase" />
-            </div>
-          </div>
-
-          <!-- Photo Upload (Will be embedded in PDF) -->
-          <div>
-            <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Applicant Passport Photo (Will stamp into 3.5cm x 4.5cm box)</label>
-            <input type="file" id="photoInput" accept="image/jpeg,image/png" onchange="processPhoto(this)" class="w-full text-xs text-[#86868b] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer" />
-          </div>
-        </div>
-
-        <!-- SECTION 5: RESIDENTIAL ADDRESSES -->
-        <div class="apple-card p-6 md:p-8 space-y-5">
-          <div class="flex items-center space-x-2.5 border-b border-[#f5f5f7] pb-3">
-            <span class="w-6 h-6 rounded-lg bg-[#fff3e0] text-[#e65100] flex items-center justify-center text-xs font-bold">5</span>
-            <h3 class="text-base font-semibold text-[#1d1d1f]">Section 5: Residential Addresses</h3>
-          </div>
-
-          <!-- 5a. Permanent Address -->
-          <div class="space-y-2">
-            <span class="text-xs font-bold text-[#1d1d1f] uppercase block">5a. Permanent Address</span>
-            <input type="text" id="permStreet" placeholder="House No / Street / Road" value="H.NO 20-170/1/1, RB NAGAR" class="w-full p-2.5 apple-input text-xs uppercase font-medium" />
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-              <input type="text" id="permDistrict" placeholder="District" value="RANGAREDDY" class="p-2.5 apple-input text-xs uppercase font-medium" />
-              <input type="text" id="permState" placeholder="State" value="TELANGANA" class="p-2.5 apple-input text-xs uppercase font-medium" />
-              <input type="text" id="permPin" placeholder="Pin Code" value="501218" class="p-2.5 apple-input text-xs font-medium" />
-              <input type="text" id="permProof" placeholder="Proof Type (e.g. ELECTRICITY BILL)" value="ELECTRICITY BILL" class="p-2.5 apple-input text-xs uppercase font-semibold" />
-            </div>
-          </div>
-
-          <!-- 5b. Present Address -->
-          <div class="space-y-2 pt-2 border-t border-[#f5f5f7]">
-            <span class="text-xs font-bold text-[#1d1d1f] uppercase block">5b. Present Address</span>
-            <input type="text" id="presStreet" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYA" class="w-full p-2.5 apple-input text-xs uppercase font-medium" />
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <input type="text" id="presDistrict" placeholder="District" value="THANE/NEW MUMBAI" class="p-2.5 apple-input text-xs uppercase font-medium" />
-              <input type="text" id="presState" placeholder="State" value="MAHARASHTRA" class="p-2.5 apple-input text-xs uppercase font-medium" />
-              <input type="text" id="presPin" placeholder="Pin Code" value="400709" class="p-2.5 apple-input text-xs font-medium" />
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 6: EMPLOYMENT DETAILS -->
-        <div class="apple-card p-6 md:p-8 space-y-5">
-          <div class="flex items-center space-x-2.5 border-b border-[#f5f5f7] pb-3">
-            <span class="w-6 h-6 rounded-lg bg-[#ede7f6] text-[#512da8] flex items-center justify-center text-xs font-bold">6</span>
-            <h3 class="text-base font-semibold text-[#1d1d1f]">Section 6: Employment Details (Airport Unit)</h3>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Organization *</label>
-              <input type="text" id="empOrg" required value="INTERGLOBE AVIATION LTD" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Designation *</label>
-              <input type="text" id="empDesig" required value="EXECUTIVE - SECURITY" class="w-full p-2.5 apple-input text-xs font-semibold uppercase" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Employee Number *</label>
-              <input type="text" id="empNo" required value="IGA 72835" class="w-full p-2.5 apple-input text-xs font-bold text-[#0071e3] uppercase" />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Place of Duty *</label>
-              <input type="text" id="empDutyPlace" required value="RGIA - HYD" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Nature of Duty *</label>
-              <input type="text" id="empNature" required value="SECURITY SERVICES" class="w-full p-2.5 apple-input text-xs font-semibold uppercase" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Retirement Date</label>
-              <input type="date" id="empRetirement" value="2053-09-26" class="w-full p-2.5 apple-input text-xs font-medium" />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Airport Terminal Office Address *</label>
-            <textarea id="empOfficeAddr" rows="2" class="w-full p-2.5 apple-input text-xs uppercase font-medium">AO-06, E-LEVEL OFFICES, PASSENGER TERMINAL BUILDING, RGIA, HYD, TELANGANA - 500108</textarea>
-          </div>
-        </div>
-
-        <!-- SECTION 7, 8, 9: LEGAL DISCLOSURES, REJECTION & PREVIOUS ZONES -->
-        <div class="apple-card p-6 md:p-8 space-y-4">
-          <div class="flex items-center space-x-2.5 border-b border-[#f5f5f7] pb-3">
-            <span class="w-6 h-6 rounded-lg bg-[#fce4ec] text-[#c2185b] flex items-center justify-center text-xs font-bold">7-9</span>
-            <h3 class="text-base font-semibold text-[#1d1d1f]">Sections 7, 8 &amp; 9: Legal Disclosures &amp; Rejection History</h3>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-            <div>
-              <label class="block font-semibold text-[#86868b] uppercase mb-1">7.I Police/Court Case?</label>
-              <select id="casePending" class="w-full p-2 apple-input font-bold">
-                <option value="No" selected>No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-semibold text-[#86868b] uppercase mb-1">7.II Ever Arrested?</label>
-              <select id="everArrested" class="w-full p-2 apple-input font-bold">
-                <option value="No" selected>No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-semibold text-[#86868b] uppercase mb-1">7.III Punished Dept?</label>
-              <select id="everPunished" class="w-full p-2 apple-input font-bold">
-                <option value="No" selected>No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-semibold text-[#86868b] uppercase mb-1">8. Ever Rejected AEP?</label>
-              <select id="everRejected" class="w-full p-2 apple-input font-bold">
-                <option value="No" selected>No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 10 & 11: AVSEC TRAINING & POLICE VERIFICATION (PVC) -->
-        <div class="apple-card p-6 md:p-8 space-y-5">
-          <div class="flex items-center space-x-2.5 border-b border-[#f5f5f7] pb-3">
-            <span class="w-6 h-6 rounded-lg bg-[#e0f2f1] text-[#00695c] flex items-center justify-center text-xs font-bold">11</span>
-            <h3 class="text-base font-semibold text-[#1d1d1f]">Section 11: AVSEC Training &amp; Police Verification Certificate</h3>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">AVSEC Training Date *</label>
-              <input type="date" id="avsecDate" required value="2023-08-02" class="w-full p-2.5 apple-input text-xs font-medium" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Training Location *</label>
-              <input type="text" id="avsecLocation" required value="BLR - BENGALURU" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Instructor &amp; ASTI Center *</label>
-              <input type="text" id="avsecInstructor" required value="ARCHANA DASH / INDIGO ASTI" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-[#f5f5f7]">
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">PVC Serial ID *</label>
-              <input type="text" id="pvcNo" required value="TP 88793" class="w-full p-2.5 apple-input text-xs font-bold text-[#2e7d32] uppercase" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">PVC Clearance Date *</label>
-              <input type="date" id="pvcDate" required value="2023-09-12" class="w-full p-2.5 apple-input text-xs font-medium" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Passport / ID Expiry</label>
-              <input type="date" id="passportExpiry" value="2053-09-26" class="w-full p-2.5 apple-input text-xs font-medium" />
-            </div>
-          </div>
-        </div>
-
-        <!-- SUBMIT / DOWNLOAD BUTTONS -->
-        <div class="flex flex-col sm:flex-row gap-4 pt-2">
-          <button type="button" onclick="generateAndDownloadOfficialPDF()" class="flex-1 py-4 bg-[#1d1d1f] hover:bg-black text-white text-sm font-bold rounded-2xl shadow-sm transition-all flex items-center justify-center space-x-2">
-            <i class="fa-solid fa-file-pdf text-base"></i>
-            <span>Generate &amp; Download Official BCAS PDF</span>
-          </button>
-          <button type="submit" id="btn-sync-gsheet" class="flex-1 py-4 bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-bold rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
-            <i class="fa-solid fa-cloud-arrow-up text-base"></i>
-            <span>Save &amp; Append to Google Sheet Registry</span>
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
 
-    <!-- VIEW 2: UNIVERSAL REGISTRY & RECORD SEARCH -->
+    <!-- VIEW 2: UNIVERSAL SEARCH & DIRECTORY -->
     <div id="view-search" class="hidden space-y-6">
       <div>
         <h2 class="text-3xl font-bold tracking-tight text-[#1d1d1f]">AEP Universal Directory</h2>
-        <p class="text-sm text-[#86868b] mt-1">Search any employee in the registry to auto-load their records and download their stamped official application.</p>
+        <p class="text-sm text-[#86868b] mt-1">Search any employee in the registry to auto-load their records and print their official application.</p>
       </div>
 
       <!-- Search Bar -->
@@ -511,9 +834,9 @@
               <h3 id="resName" class="text-2xl font-bold text-[#1d1d1f]"></h3>
               <p id="resMeta" class="text-sm font-medium text-[#515154] mt-0.5"></p>
             </div>
-            <button onclick="loadFromRegistryAndDownload()" class="px-5 py-2.5 bg-[#0071e3] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#0077ed] flex items-center space-x-1.5">
-              <i class="fa-solid fa-download"></i>
-              <span>Download Stamped Official PDF</span>
+            <button onclick="loadFromRegistryAndPrint()" class="px-5 py-2.5 bg-[#0071e3] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#0077ed] flex items-center space-x-1.5">
+              <i class="fa-solid fa-print"></i>
+              <span>Load into Official Form &amp; Print</span>
             </button>
           </div>
 
@@ -525,13 +848,11 @@
   </main>
 
   <!-- ===================================================
-       CLIENT-SIDE JAVASCRIPT CONTROLLER (APPROACH 1)
+       CLIENT-SIDE JAVASCRIPT CONTROLLER
        =================================================== -->
   <script>
-    // Configuration: Replace with your deployed Google Apps Script Web App URL
-    const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyi8MzksResUSIWAcTj2yjBU5JEr-Q5H9ag68cW38BaQE5Ehuy1uMQBqbMXrvn22va4/exec";
+    const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby-YOUR-DEPLOYED-URL-HERE/exec";
 
-    // In-memory master database pre-loaded with Mushtaq Mohammed's official credentials
     const personnelRegistryDB = {
       "IGA 72835": {
         refId: "HYD/2026/AEP/72835",
@@ -540,7 +861,7 @@
         zones: ["A", "D", "T"],
         airport: "RGIA - HYD",
         terminalAccess: "All",
-        issueCategory: "Fresh (Appointment / Posting Order)",
+        issueCategory: "Fresh",
         fullName: "MUSHTAQ MOHAMMED",
         fatherName: "ISMAIL MOHAMMED",
         motherName: "SAPHIA ISMAIL",
@@ -549,7 +870,6 @@
         gender: "Male",
         mobile: "9036488263",
         email: "MUSHTAQ.ISMAIL@GOINDIGO.IN",
-        kinMobile: "9036488263",
         aadhaarNo: "9772 0313 2804",
         idProofType: "INDIAN PASSPORT",
         existAepNo: "NIL",
@@ -569,22 +889,21 @@
         empNo: "IGA 72835",
         empDutyPlace: "RGIA - HYD",
         empNature: "SECURITY SERVICES",
-        empRetirement: "2053-09-26",
         empOfficeAddr: "AO-06, E-LEVEL OFFICES, PASSENGER TERMINAL BUILDING, RGIA, HYD, TELANGANA - 500108",
-        casePending: "No",
-        everArrested: "No",
-        everPunished: "No",
-        everRejected: "No",
+        casePending: "NO",
+        everArrested: "NO",
+        everPunished: "NO",
+        everRejected: "NO",
         avsecDate: "2023-08-02",
         avsecLocation: "BLR - BENGALURU",
         avsecInstructor: "ARCHANA DASH / INDIGO ASTI",
         pvcNo: "TP 88793",
-        pvcDate: "2023-09-12",
-        passportExpiry: "2053-09-26"
+        pvcDate: "2023-09-12"
       }
     };
 
     let uploadedPhotoBytes = null;
+    let uploadedPhotoBase64 = null;
 
     function switchTab(tab) {
       document.getElementById('view-form').classList.toggle('hidden', tab !== 'form');
@@ -593,13 +912,25 @@
       document.getElementById('tab-btn-search').classList.toggle('apple-btn-active', tab === 'search');
     }
 
-    function processPhoto(input) {
+    function handlePhotoUpload(input) {
       if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
+        const file = input.files[0];
+        const readerArray = new FileReader();
+        readerArray.onload = function(e) {
           uploadedPhotoBytes = new Uint8Array(e.target.result);
         };
-        reader.readAsArrayBuffer(input.files[0]);
+        readerArray.readAsArrayBuffer(file);
+
+        const readerData = new FileReader();
+        readerData.onload = function(e) {
+          uploadedPhotoBase64 = e.target.result;
+          const img = document.getElementById('p1-photo-img');
+          const lbl = document.getElementById('p1-photo-label');
+          img.src = uploadedPhotoBase64;
+          img.style.display = 'block';
+          lbl.style.display = 'none';
+        };
+        readerData.readAsDataURL(file);
       }
     }
 
@@ -615,22 +946,17 @@
         category: document.getElementById('category').value,
         zones: zones,
         airport: document.getElementById('airport').value.trim(),
-        terminalAccess: document.getElementById('terminalAccess').value,
         issueCategory: document.getElementById('issueCategory').value,
         fullName: document.getElementById('fullName').value.trim().toUpperCase(),
         fatherName: document.getElementById('fatherName').value.trim().toUpperCase(),
         motherName: document.getElementById('motherName').value.trim().toUpperCase(),
         dob: document.getElementById('dob').value,
         bloodGroup: document.getElementById('bloodGroup').value.trim().toUpperCase(),
-        gender: document.getElementById('gender').value,
+        gender: document.getElementById('gender').value.toUpperCase(),
         mobile: document.getElementById('mobile').value.trim(),
         email: document.getElementById('email').value.trim().toUpperCase(),
-        kinMobile: document.getElementById('kinMobile').value.trim(),
         aadhaarNo: document.getElementById('aadhaarNo').value.trim(),
         idProofType: document.getElementById('idProofType').value.trim().toUpperCase(),
-        existAepNo: document.getElementById('existAepNo').value.trim().toUpperCase(),
-        existValidUpTo: document.getElementById('existValidUpTo').value.trim().toUpperCase(),
-        existPlaceIssue: document.getElementById('existPlaceIssue').value.trim().toUpperCase(),
         permStreet: document.getElementById('permStreet').value.trim().toUpperCase(),
         permDistrict: document.getElementById('permDistrict').value.trim().toUpperCase(),
         permState: document.getElementById('permState').value.trim().toUpperCase(),
@@ -645,7 +971,6 @@
         empNo: document.getElementById('empNo').value.trim().toUpperCase(),
         empDutyPlace: document.getElementById('empDutyPlace').value.trim().toUpperCase(),
         empNature: document.getElementById('empNature').value.trim().toUpperCase(),
-        empRetirement: document.getElementById('empRetirement').value,
         empOfficeAddr: document.getElementById('empOfficeAddr').value.trim().toUpperCase(),
         casePending: document.getElementById('casePending').value,
         everArrested: document.getElementById('everArrested').value,
@@ -655,9 +980,273 @@
         avsecLocation: document.getElementById('avsecLocation').value.trim().toUpperCase(),
         avsecInstructor: document.getElementById('avsecInstructor').value.trim().toUpperCase(),
         pvcNo: document.getElementById('pvcNo').value.trim().toUpperCase(),
-        pvcDate: document.getElementById('pvcDate').value,
-        passportExpiry: document.getElementById('passportExpiry').value
+        pvcDate: document.getElementById('pvcDate').value
       };
+    }
+
+    // Synchronize Input to the In-DOM Official 2-Page Document
+    function syncFormToDOM() {
+      const d = collectFormData();
+
+      document.getElementById('p1-ref-id').innerText = d.refId;
+      document.getElementById('p1-airport-text').innerText = d.airport;
+      document.getElementById('p1-name').innerText = d.fullName;
+      document.getElementById('p1-father').innerText = d.fatherName;
+      document.getElementById('p1-mother').innerText = d.motherName;
+
+      if (d.dob) {
+        const p = d.dob.split('-');
+        document.getElementById('p1-dob').innerText = `${p[2]}/${p[1]}/${p[0]}`;
+      }
+
+      document.getElementById('p1-blood').innerText = d.bloodGroup;
+      document.getElementById('p1-gender').innerText = d.gender;
+      document.getElementById('p1-contact').innerText = `${d.mobile} / ${d.email}`;
+      document.getElementById('p1-aadhaar').innerText = d.aadhaarNo;
+
+      document.getElementById('p1-perm-addr').innerText = `${d.permStreet}, ${d.permDistrict}, ${d.permState} - ${d.permPin}`;
+      document.getElementById('p1-perm-proof-val').innerText = d.permProof;
+      document.getElementById('p1-pres-addr').innerText = `${d.presStreet}, ${d.presDistrict}, ${d.presState} - ${d.presPin}`;
+
+      // Checkbox marks
+      ['A', 'D', 'T', 'Si', 'Sd', 'P', 'B', 'F', 'Ft', 'Cs', 'I'].forEach(z => {
+        const el = document.getElementById(`p1-z-${z}`);
+        if (el) el.innerText = d.zones.includes(z) ? "✓" : "";
+      });
+
+      // Page 2
+      document.getElementById('p2-org').innerText = d.empOrg;
+      document.getElementById('p2-desig').innerText = d.empDesig;
+      document.getElementById('p2-empno').innerText = d.empNo;
+      document.getElementById('p2-duty-place').innerText = d.empDutyPlace;
+      document.getElementById('p2-nature').innerText = d.empNature;
+      document.getElementById('p2-office-addr').innerText = d.empOfficeAddr;
+
+      document.getElementById('p2-legal-case').innerText = d.casePending;
+      document.getElementById('p2-legal-arrest').innerText = d.everArrested;
+      document.getElementById('p2-legal-punished').innerText = d.everPunished;
+      document.getElementById('p2-legal-reject').innerText = d.everRejected;
+
+      if (d.avsecDate) {
+        const ap = d.avsecDate.split('-');
+        document.getElementById('p2-avsec-date').innerText = `${ap[2]}/${ap[1]}/${ap[0]}`;
+      }
+      document.getElementById('p2-avsec-loc').innerText = d.avsecLocation;
+      document.getElementById('p2-avsec-inst').innerText = d.avsecInstructor;
+
+      document.getElementById('p2-pvc-no').innerText = d.pvcNo;
+      if (d.pvcDate) {
+        const pp = d.pvcDate.split('-');
+        document.getElementById('p2-pvc-date').innerText = `${pp[2]}/${pp[1]}/${pp[0]}`;
+      }
+    }
+
+    // 1-CLICK DIRECT PRINT: Flawlessly triggers the system printer dialog
+    function triggerDirectPrint() {
+      syncFormToDOM();
+      window.print();
+    }
+
+    // PDF-LIB COMPILER (Zero WinAnsi Encoding Crash)
+    async function generateAndDownloadOfficialPDF() {
+      const data = collectFormData();
+      const { PDFDocument, rgb, StandardFonts } = PDFLib;
+
+      try {
+        const pdfDoc = await PDFDocument.create();
+        const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+        const width = 595.28;
+        const height = 841.89;
+        const margin = 36;
+        const tWidth = width - (margin * 2);
+
+        // Vector checkmark helper: NEVER CRASHES ON WINANSI
+        const drawBoxWithCheck = (page, x, y, checked) => {
+          page.drawRectangle({ x, y, width: 10, height: 10, borderColor: rgb(0,0,0), borderWidth: 1 });
+          if (checked) {
+            page.drawLine({ start: { x: x + 2, y: y + 5 }, end: { x: x + 4, y: y + 2 }, thickness: 1.5, color: rgb(0,0,0) });
+            page.drawLine({ start: { x: x + 4, y: y + 2 }, end: { x: x + 8, y: y + 8 }, thickness: 1.5, color: rgb(0,0,0) });
+          }
+        };
+
+        // ---------------- PAGE 1 ----------------
+        const page1 = pdfDoc.addPage([width, height]);
+        let y = height - 40;
+
+        page1.drawText("GOVERNMENT OF INDIA", { x: width / 2 - 55, y, size: 8, font: fontBold });
+        y -= 11;
+        page1.drawText("BUREAU OF CIVIL AVIATION SECURITY", { x: width / 2 - 95, y, size: 9.5, font: fontBold });
+        y -= 11;
+        page1.drawText("AERODROME ENTRY PERMIT (AEP) APPLICATION FORM (AEPAF)", { x: width / 2 - 130, y, size: 8, font: fontBold });
+        y -= 12;
+        page1.drawLine({ start: { x: margin, y }, end: { x: width - margin, y }, thickness: 1, color: rgb(0,0,0) });
+        y -= 16;
+
+        page1.drawText("1. AEP Application Reference Id:", { x: margin, y, size: 8, font: fontBold });
+        page1.drawRectangle({ x: margin + 145, y: y - 2, width: 130, height: 14, borderColor: rgb(0,0,0), borderWidth: 1 });
+        page1.drawText(data.refId, { x: margin + 150, y: y + 2, size: 8, font: fontBold });
+        y -= 22;
+
+        // Section 2
+        page1.drawRectangle({ x: margin, y: y - 76, width: tWidth, height: 84, borderColor: rgb(0,0,0), borderWidth: 1 });
+        page1.drawText("2. AEP requested:", { x: margin + 6, y: y - 2, size: 8, font: fontBold });
+        
+        drawBoxWithCheck(page1, margin + 45, y - 16, data.permitType === 'Permanent');
+        page1.drawText("Permanent", { x: margin + 60, y: y - 14, size: 7.5, font: fontRegular });
+
+        drawBoxWithCheck(page1, margin + 120, y - 16, data.permitType.includes('Temporary'));
+        page1.drawText("Temporary", { x: margin + 135, y: y - 14, size: 7.5, font: fontRegular });
+
+        drawBoxWithCheck(page1, margin + 270, y - 16, data.category === 'Operational');
+        page1.drawText("Operational", { x: margin + 285, y: y - 14, size: 7.5, font: fontRegular });
+
+        // Zones
+        page1.drawText("Zones:", { x: margin + 6, y: y - 34, size: 7.5, font: fontBold });
+        let zX = margin + 45;
+        ['A', 'D', 'T', 'B', 'P', 'F', 'Si', 'Sd', 'I'].forEach(z => {
+          drawBoxWithCheck(page1, zX, y - 36, data.zones.includes(z));
+          page1.drawText(z, { x: zX + 13, y: y - 34, size: 7.5, font: fontRegular });
+          zX += 34;
+        });
+
+        page1.drawText(`Airport: [X] Single Airport (${data.airport})`, { x: margin + 6, y: y - 52, size: 7.5, font: fontRegular });
+        page1.drawText(`Terminal: [X] All    [ ] Cargo    [ ] Domestic`, { x: margin + 6, y: y - 68, size: 7.5, font: fontRegular });
+        y -= 88;
+
+        // Section 3
+        y -= 6;
+        page1.drawRectangle({ x: margin, y: y - 16, width: tWidth, height: 20, borderColor: rgb(0,0,0), borderWidth: 1 });
+        page1.drawText(`3. Issue Category:  [X] Fresh (Appointment / Posting Order)    [ ] Re-Issue`, { x: margin + 6, y: y - 4, size: 7.5, font: fontRegular });
+        y -= 26;
+
+        // Section 4
+        y -= 6;
+        page1.drawText("4. Details of the Applicant:", { x: margin, y, size: 8, font: fontBold });
+        y -= 6;
+        const tTop = y;
+        const tHeight = 145;
+        const photoWidth = 100;
+        page1.drawRectangle({ x: margin, y: tTop - tHeight, width: tWidth, height: tHeight, borderColor: rgb(0,0,0), borderWidth: 1 });
+        page1.drawLine({ start: { x: tWidth + margin - photoWidth, y: tTop }, end: { x: tWidth + margin - photoWidth, y: tTop - tHeight }, thickness: 1, color: rgb(0,0,0) });
+
+        if (uploadedPhotoBytes) {
+          try {
+            const imgEmbed = await pdfDoc.embedJpg(uploadedPhotoBytes).catch(async () => await pdfDoc.embedPng(uploadedPhotoBytes));
+            page1.drawImage(imgEmbed, { x: tWidth + margin - photoWidth + 10, y: tTop - tHeight + 15, width: 80, height: 105 });
+          } catch (e) {}
+        } else {
+          page1.drawText("Affix Passport Photo", { x: tWidth + margin - photoWidth + 12, y: tTop - 60, size: 7, font: fontBold });
+          page1.drawText("(3.5cm x 4.5cm)", { x: tWidth + margin - photoWidth + 18, y: tTop - 72, size: 6.5, font: fontRegular });
+        }
+
+        let rY = tTop - 15;
+        const addAppRow = (lbl, val) => {
+          page1.drawText(lbl, { x: margin + 6, y: rY, size: 7.5, font: fontBold });
+          page1.drawText(val || "", { x: margin + 110, y: rY, size: 7.5, font: fontRegular });
+          page1.drawLine({ start: { x: margin, y: rY - 5 }, end: { x: tWidth + margin - photoWidth, y: rY - 5 }, thickness: 0.5, color: rgb(0.7,0.7,0.7) });
+          rY -= 17;
+        };
+
+        addAppRow("Full Name:", data.fullName);
+        addAppRow("Father's Name:", data.fatherName);
+        addAppRow("Mother's Name:", data.motherName);
+        addAppRow("DOB & Blood Group:", `${data.dob}   (Blood: ${data.bloodGroup} | ${data.gender})`);
+        addAppRow("Mobile & E-mail:", `${data.mobile} / ${data.email}`);
+        addAppRow("Aadhaar No*:", `${data.aadhaarNo}   (ID: ${data.idProofType})`);
+        addAppRow("Existing AEP No:", "NIL (Fresh Application)");
+
+        y = tTop - tHeight - 16;
+
+        // Section 5
+        page1.drawText("5. Residential Address:", { x: margin, y, size: 8, font: fontBold });
+        y -= 6;
+        page1.drawRectangle({ x: margin, y: y - 80, width: tWidth, height: 80, borderColor: rgb(0,0,0), borderWidth: 1 });
+        page1.drawText("a. Permanent Address:", { x: margin + 6, y: y - 14, size: 7.5, font: fontBold });
+        page1.drawText(`${data.permStreet}, ${data.permDistrict}, ${data.permState} - ${data.permPin}`, { x: margin + 115, y: y - 14, size: 7, font: fontRegular });
+        page1.drawText(`Proof Attached: ${data.permProof}`, { x: margin + 115, y: y - 25, size: 6.5, font: fontBold });
+
+        page1.drawLine({ start: { x: margin, y: y - 35 }, end: { x: tWidth + margin, y: y - 35 }, thickness: 0.5, color: rgb(0.5,0.5,0.5) });
+
+        page1.drawText("b. Present Address:", { x: margin + 6, y: y - 52, size: 7.5, font: fontBold });
+        page1.drawText(`${data.presStreet}, ${data.presDistrict}, ${data.presState} - ${data.presPin}`, { x: margin + 115, y: y - 52, size: 7, font: fontRegular });
+
+        page1.drawText("Page 1 of 2 — BCAS Aerodrome Entry Permit Official Proforma", { x: width - margin - 220, y: 15, size: 6.5, font: fontRegular, color: rgb(0.4,0.4,0.4) });
+
+        // ---------------- PAGE 2 ----------------
+        const page2 = pdfDoc.addPage([width, height]);
+        let y2 = height - 40;
+
+        page2.drawText("AERODROME ENTRY PERMIT APPLICATION FORM (AEPAF) — PAGE 2", { x: width / 2 - 130, y: y2, size: 8, font: fontBold });
+        y2 -= 12;
+        page2.drawLine({ start: { x: margin, y: y2 }, end: { x: width - margin, y: y2 }, thickness: 1, color: rgb(0,0,0) });
+        y2 -= 18;
+
+        page2.drawText("6. Employment Details:", { x: margin, y: y2, size: 8, font: fontBold });
+        y2 -= 6;
+        const eTop = y2;
+        page2.drawRectangle({ x: margin, y: eTop - 95, width: tWidth, height: 95, borderColor: rgb(0,0,0), borderWidth: 1 });
+        let eY = eTop - 14;
+        const addEmpRow = (lbl, val) => {
+          page2.drawText(lbl, { x: margin + 6, y: eY, size: 7.5, font: fontBold });
+          page2.drawText(val || "", { x: margin + 130, y: eY, size: 7, font: fontRegular });
+          page2.drawLine({ start: { x: margin, y: eY - 5 }, end: { x: tWidth + margin, y: eY - 5 }, thickness: 0.5, color: rgb(0.8,0.8,0.8) });
+          eY -= 16;
+        };
+
+        addEmpRow("Organization:", data.empOrg);
+        addEmpRow("Designation & Emp No:", `${data.empDesig}   (Emp ID: ${data.empNo})`);
+        addEmpRow("Place & Nature of Duty:", `${data.empDutyPlace}   (${data.empNature})`);
+        addEmpRow("Office Address at Airport:", data.empOfficeAddr.substring(0, 68));
+        y2 = eTop - 105;
+
+        // Disclosures
+        y2 -= 6;
+        page2.drawText("7. Other Details / Background Disclosures:", { x: margin, y: y2, size: 8, font: fontBold });
+        y2 -= 6;
+        page2.drawRectangle({ x: margin, y: y2 - 60, width: tWidth, height: 60, borderColor: rgb(0,0,0), borderWidth: 1 });
+        page2.drawText(`I. Case pending with police/court: ${data.casePending}`, { x: margin + 6, y: y2 - 14, size: 7, font: fontRegular });
+        page2.drawText(`II. Were you ever arrested: ${data.everArrested}`, { x: margin + 6, y: y2 - 28, size: 7, font: fontRegular });
+        page2.drawText(`III. Punished departmentally: ${data.everPunished}`, { x: margin + 6, y: y2 - 42, size: 7, font: fontRegular });
+        page2.drawText(`8. Ever rejected for AEP: ${data.everRejected}`, { x: margin + 6, y: y2 - 54, size: 7, font: fontRegular });
+        y2 -= 75;
+
+        // Section 11
+        page2.drawText("11. AVSEC Training & Police Verification (PVC):", { x: margin, y: y2, size: 8, font: fontBold });
+        y2 -= 6;
+        page2.drawRectangle({ x: margin, y: y2 - 55, width: tWidth, height: 55, borderColor: rgb(0,0,0), borderWidth: 1 });
+        page2.drawText(`AVSEC Training Date: ${data.avsecDate}   Location: ${data.avsecLocation}`, { x: margin + 6, y: y2 - 14, size: 7, font: fontBold });
+        page2.drawText(`Instructor & Center: ${data.avsecInstructor}`, { x: margin + 6, y: y2 - 26, size: 7, font: fontRegular });
+        page2.drawLine({ start: { x: margin, y: y2 - 32 }, end: { x: tWidth + margin, y: y2 - 32 }, thickness: 0.5, color: rgb(0.8,0.8,0.8) });
+        page2.drawText(`PVC Serial ID: ${data.pvcNo}   Cleared Date: ${data.pvcDate}   [VERIFIED]`, { x: margin + 6, y: y2 - 45, size: 7, font: fontBold });
+        y2 -= 70;
+
+        // Declarations & Signatures
+        page2.drawText("Declaration: I hereby declare that the particulars furnished above are true and correct.", { x: margin + 6, y: y2, size: 7, font: fontRegular });
+        y2 -= 40;
+
+        page2.drawLine({ start: { x: margin + 20, y: y2 }, end: { x: margin + 160, y: y2 }, thickness: 1, color: rgb(0,0,0) });
+        page2.drawLine({ start: { x: width - margin - 180, y: y2 }, end: { x: width - margin - 20, y: y2 }, thickness: 1, color: rgb(0,0,0) });
+        page2.drawText("Signature of Applicant", { x: margin + 45, y: y2 - 12, size: 7.5, font: fontBold });
+        page2.drawText("Signature of Authorized Signatory", { x: width - margin - 170, y: y2 - 12, size: 7.5, font: fontBold });
+
+        page2.drawText("Page 2 of 2 — BCAS Aerodrome Entry Permit Official Proforma", { x: width - margin - 220, y: 15, size: 6.5, font: fontRegular, color: rgb(0.4,0.4,0.4) });
+
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `AEP_Application_${data.empNo.replace(/\s+/g, '_')}.pdf`;
+        a.click();
+
+      } catch (err) {
+        console.error("PDF generation failed:", err);
+        alert("Notice: Direct print view is ready! Opening system printer...");
+        triggerDirectPrint();
+      }
     }
 
     function loadSampleMushtaqData() {
@@ -673,258 +1262,9 @@
           if (el) el.value = d[k];
         }
       });
+      syncFormToDOM();
     }
 
-    // ===================================================
-    // APPROACH 1: PDF-LIB OFFICIAL 2-PAGE STAMPING ENGINE
-    // ===================================================
-    async function generateAndDownloadOfficialPDF() {
-      const data = collectFormData();
-      const { PDFDocument, rgb, StandardFonts } = PDFLib;
-
-      const pdfDoc = await PDFDocument.create();
-      const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-      // A4 dimensions: 595.28 x 841.89 points
-      const width = 595.28;
-      const height = 841.89;
-
-      // ==========================================
-      // PAGE 1: SECTIONS 1 TO 5
-      // ==========================================
-      const page1 = pdfDoc.addPage([width, height]);
-      const margin = 36;
-      let y = height - 40;
-
-      // Official Header Block
-      page1.drawText("GOVERNMENT OF INDIA", { x: width / 2 - 65, y, size: 8, font: fontBold, color: rgb(0, 0, 0) });
-      y -= 12;
-      page1.drawText("BUREAU OF CIVIL AVIATION SECURITY", { x: width / 2 - 105, y, size: 10, font: fontBold, color: rgb(0, 0, 0) });
-      y -= 12;
-      page1.drawText("AERODROME ENTRY PERMIT (AEP) APPLICATION FORM (AEPAF)", { x: width / 2 - 145, y, size: 8.5, font: fontBold, color: rgb(0, 0, 0) });
-      y -= 10;
-      page1.drawText("APPLICATION FOR ISSUE OF TEMPORARY AND PERMANENT AEP", { x: width / 2 - 130, y, size: 7.5, font: fontRegular, color: rgb(0, 0, 0) });
-      y -= 12;
-
-      page1.drawLine({ start: { x: margin, y }, end: { x: width - margin, y }, thickness: 1, color: rgb(0, 0, 0) });
-      y -= 16;
-
-      // 1. Reference Id
-      page1.drawText("1. AEP Application Reference Id:", { x: margin, y, size: 8.5, font: fontBold });
-      page1.drawRectangle({ x: margin + 160, y: y - 3, width: 140, height: 16, borderColor: rgb(0, 0, 0), borderWidth: 1 });
-      page1.drawText(data.refId, { x: margin + 168, y: y + 1, size: 8.5, font: fontBold });
-      y -= 22;
-
-      // 2. AEP Requested Box
-      const box2Top = y;
-      page1.drawRectangle({ x: margin, y: y - 76, width: width - (margin * 2), height: 86, borderColor: rgb(0, 0, 0), borderWidth: 1 });
-      page1.drawText("2. AEP requested (Check [✓] Appropriate Box):", { x: margin + 6, y: y - 2, size: 8, font: fontBold });
-      
-      // 2a & 2b Type and Category
-      page1.drawText(`a. Type: [${data.permitType === 'Permanent' ? '✓' : ' '}] Perm   [${data.permitType.includes('Temporary') ? '✓' : ' '}] Temp   [${data.permitType === '1 Day' ? '✓' : ' '}] 1 Day   [${data.permitType === '1-7 Days' ? '✓' : ' '}] 1-7 D`, { x: margin + 6, y: y - 16, size: 7.5, font: fontRegular });
-      page1.drawText(`b. Category: [${data.category === 'Operational' ? '✓' : ' '}] Operational   [${data.category === 'Protocol' ? '✓' : ' '}] Protocol   [${data.category === 'Infra' ? '✓' : ' '}] Infra`, { x: margin + 280, y: y - 16, size: 7.5, font: fontRegular });
-
-      // 2c Zones
-      const zStr = ['A', 'D', 'T', 'Si', 'Sd', 'P', 'B', 'F', 'Ft', 'Cs', 'I']
-        .map(z => `[${data.zones.includes(z) ? '✓' : ' '}] ${z}`).join('  ');
-      page1.drawText(`c. Zones: ${zStr}`, { x: margin + 6, y: y - 34, size: 7.5, font: fontRegular });
-
-      // 2d & 2e Airport & Terminal
-      page1.drawText(`d. Airport: [✓] Single Airport (${data.airport})   [ ] All Domestic   [ ] Region`, { x: margin + 6, y: y - 52, size: 7.5, font: fontRegular });
-      page1.drawText(`e. Terminal: [${data.terminalAccess === 'All' ? '✓' : ' '}] All   [${data.terminalAccess === 'Cargo' ? '✓' : ' '}] Cargo   [${data.terminalAccess === 'Domestic' ? '✓' : ' '}] Domestic`, { x: margin + 6, y: y - 68, size: 7.5, font: fontRegular });
-      y -= 86;
-
-      // 3. Issue Category Box
-      y -= 10;
-      page1.drawRectangle({ x: margin, y: y - 16, width: width - (margin * 2), height: 22, borderColor: rgb(0, 0, 0), borderWidth: 1 });
-      page1.drawText(`3. Issue Category:  [${data.issueCategory.startsWith('Fresh') ? '✓' : ' '}] Fresh (Appointment/Posting)    [${data.issueCategory.startsWith('Re-Issue') ? '✓' : ' '}] Re-Issue (${data.issueCategory})`, { x: margin + 6, y: y - 4, size: 7.5, font: fontRegular });
-      y -= 26;
-
-      // 4. Details of the Applicant Table
-      y -= 8;
-      page1.drawText("4. Details of the Applicant:", { x: margin, y, size: 8.5, font: fontBold });
-      y -= 6;
-
-      const tTop = y;
-      const tHeight = 150;
-      const tWidth = width - (margin * 2);
-      const photoWidth = 100;
-      const photoHeight = 125;
-
-      page1.drawRectangle({ x: margin, y: tTop - tHeight, width: tWidth, height: tHeight, borderColor: rgb(0, 0, 0), borderWidth: 1 });
-      page1.drawLine({ start: { x: tWidth + margin - photoWidth, y: tTop }, end: { x: tWidth + margin - photoWidth, y: tTop - tHeight }, thickness: 1, color: rgb(0, 0, 0) });
-
-      // Photo Box placement (3.5 cm x 4.5 cm proportional)
-      if (uploadedPhotoBytes) {
-        try {
-          const embeddedImg = await pdfDoc.embedJpg(uploadedPhotoBytes).catch(async () => await pdfDoc.embedPng(uploadedPhotoBytes));
-          page1.drawImage(embeddedImg, {
-            x: tWidth + margin - photoWidth + 10,
-            y: tTop - tHeight + 15,
-            width: 80,
-            height: 105
-          });
-        } catch (err) {
-          page1.drawText("Photo Attached", { x: tWidth + margin - photoWidth + 15, y: tTop - 70, size: 7, font: fontBold });
-        }
-      } else {
-        page1.drawText("Affix Recent", { x: tWidth + margin - photoWidth + 24, y: tTop - 50, size: 7.5, font: fontBold });
-        page1.drawText("Passport Photo", { x: tWidth + margin - photoWidth + 20, y: tTop - 62, size: 7.5, font: fontBold });
-        page1.drawText("(3.5cm x 4.5cm)", { x: tWidth + margin - photoWidth + 18, y: tTop - 74, size: 7, font: fontRegular });
-      }
-
-      // Rows in Section 4 Table
-      let rowY = tTop - 15;
-      const drawTableRow = (label, val) => {
-        page1.drawText(label, { x: margin + 6, y: rowY, size: 7.5, font: fontBold });
-        page1.drawText(val || "", { x: margin + 115, y: rowY, size: 7.5, font: fontRegular });
-        page1.drawLine({ start: { x: margin, y: rowY - 5 }, end: { x: tWidth + margin - photoWidth, y: rowY - 5 }, thickness: 0.5, color: rgb(0.7, 0.7, 0.7) });
-        rowY -= 17;
-      };
-
-      drawTableRow("Full Name:", data.fullName);
-      drawTableRow("Father's Name:", data.fatherName);
-      drawTableRow("Mother's Name:", data.motherName);
-      drawTableRow("Date of Birth:", `${data.dob}   (Blood Group: ${data.bloodGroup} | Gender: ${data.gender})`);
-      drawTableRow("Mobile & E-mail:", `${data.mobile} / ${data.email}`);
-      drawTableRow("Next of Kin Mobile:", data.kinMobile);
-      drawTableRow("Aadhaar No. (12 Digit)*:", `${data.aadhaarNo}   (ID Proof: ${data.idProofType})`);
-
-      y = tTop - tHeight - 14;
-
-      // 4b. Existing AEP Box
-      page1.drawRectangle({ x: margin, y: y - 24, width: tWidth, height: 28, borderColor: rgb(0, 0, 0), borderWidth: 1 });
-      page1.drawText("4b. Details of Existing AEP in Possession:  AEP No: " + data.existAepNo + "   Valid Up To: " + data.existValidUpTo + "   Place: " + data.existPlaceIssue, { x: margin + 6, y: y - 10, size: 7.5, font: fontRegular });
-      y -= 34;
-
-      // 5. Residential Address
-      y -= 6;
-      page1.drawText("5. Residential Address:", { x: margin, y, size: 8.5, font: fontBold });
-      y -= 6;
-
-      const aTop = y;
-      const aHeight = 90;
-      page1.drawRectangle({ x: margin, y: aTop - aHeight, width: tWidth, height: aHeight, borderColor: rgb(0, 0, 0), borderWidth: 1 });
-
-      page1.drawText("a. Permanent Address:", { x: margin + 6, y: aTop - 15, size: 8, font: fontBold });
-      page1.drawText(`${data.permStreet}, ${data.permDistrict}, ${data.permState} - ${data.permPin}`, { x: margin + 120, y: aTop - 15, size: 7.5, font: fontRegular });
-      page1.drawText(`Proof Attached: ${data.permProof}`, { x: margin + 120, y: aTop - 27, size: 7, font: fontBold });
-
-      page1.drawLine({ start: { x: margin, y: aTop - 36 }, end: { x: tWidth + margin, y: aTop - 36 }, thickness: 0.5, color: rgb(0.5, 0.5, 0.5) });
-
-      page1.drawText("b. Present Address:", { x: margin + 6, y: aTop - 55, size: 8, font: fontBold });
-      page1.drawText(`${data.presStreet}, ${data.presDistrict}, ${data.presState} - ${data.presPin}`, { x: margin + 120, y: aTop - 55, size: 7.5, font: fontRegular });
-
-      page1.drawText("Page 1 of 2 — BCAS Aerodrome Entry Permit Official Proforma", { x: width - margin - 230, y: 20, size: 7, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
-
-      // ==========================================
-      // PAGE 2: SECTIONS 6 TO 11 & SIGNATURES
-      // ==========================================
-      const page2 = pdfDoc.addPage([width, height]);
-      let y2 = height - 40;
-
-      page2.drawText("AERODROME ENTRY PERMIT APPLICATION FORM (AEPAF) — PAGE 2", { x: width / 2 - 135, y: y2, size: 8.5, font: fontBold });
-      y2 -= 12;
-      page2.drawLine({ start: { x: margin, y: y2 }, end: { x: width - margin, y: y2 }, thickness: 1, color: rgb(0, 0, 0) });
-      y2 -= 18;
-
-      // 6. Employment Details
-      page2.drawText("6. Employment Details:", { x: margin, y: y2, size: 8.5, font: fontBold });
-      y2 -= 6;
-
-      const eTop = y2;
-      const eHeight = 110;
-      page2.drawRectangle({ x: margin, y: eTop - eHeight, width: tWidth, height: eHeight, borderColor: rgb(0, 0, 0), borderWidth: 1 });
-
-      let eRowY = eTop - 15;
-      const drawEmpRow = (lbl, val) => {
-        page2.drawText(lbl, { x: margin + 6, y: eRowY, size: 7.5, font: fontBold });
-        page2.drawText(val || "", { x: margin + 140, y: eRowY, size: 7.5, font: fontRegular });
-        page2.drawLine({ start: { x: margin, y: eRowY - 5 }, end: { x: tWidth + margin, y: eRowY - 5 }, thickness: 0.5, color: rgb(0.8, 0.8, 0.8) });
-        eRowY -= 17;
-      };
-
-      drawEmpRow("Name of Organization:", data.empOrg);
-      drawEmpRow("Designation & Emp No:", `${data.empDesig}   (Emp ID: ${data.empNo})`);
-      drawEmpRow("Place & Nature of Duty:", `${data.empDutyPlace}   (${data.empNature})`);
-      drawEmpRow("Date of Retirement:", data.empRetirement);
-      drawEmpRow("Office Address at Airport:", data.empOfficeAddr.substring(0, 68));
-
-      y2 = eTop - eHeight - 16;
-
-      // 7. Background & Legal Disclosures
-      page2.drawText("7. Other Details / Background Disclosures:", { x: margin, y: y2, size: 8.5, font: fontBold });
-      y2 -= 6;
-
-      const lTop = y2;
-      const lHeight = 72;
-      page2.drawRectangle({ x: margin, y: lTop - lHeight, width: tWidth, height: lHeight, borderColor: rgb(0, 0, 0), borderWidth: 1 });
-
-      page2.drawText("I. (a) Is any case pending against you with the police or court? (Yes/No)", { x: margin + 6, y: lTop - 15, size: 7.5, font: fontRegular });
-      page2.drawText(data.casePending, { x: width - margin - 35, y: lTop - 15, size: 7.5, font: fontBold });
-
-      page2.drawText("II. (a) Were you ever arrested? (Yes/No)", { x: margin + 6, y: lTop - 32, size: 7.5, font: fontRegular });
-      page2.drawText(data.everArrested, { x: width - margin - 35, y: lTop - 32, size: 7.5, font: fontBold });
-
-      page2.drawText("III. (a) Were you punished departmentally? (Yes/No)", { x: margin + 6, y: lTop - 49, size: 7.5, font: fontRegular });
-      page2.drawText(data.everPunished, { x: width - margin - 35, y: lTop - 49, size: 7.5, font: fontBold });
-
-      page2.drawText("8. Has your AEP Application ever been rejected? (Yes/No)", { x: margin + 6, y: lTop - 64, size: 7.5, font: fontRegular });
-      page2.drawText(data.everRejected, { x: width - margin - 35, y: lTop - 64, size: 7.5, font: fontBold });
-
-      y2 = lTop - lHeight - 16;
-
-      // 11. AVSEC & PVC Block
-      page2.drawText("11. AVSEC Awareness Training & Police Verification (PVC):", { x: margin, y: y2, size: 8.5, font: fontBold });
-      y2 -= 6;
-
-      const avTop = y2;
-      const avHeight = 65;
-      page2.drawRectangle({ x: margin, y: avTop - avHeight, width: tWidth, height: avHeight, borderColor: rgb(0, 0, 0), borderWidth: 1 });
-
-      page2.drawText(`AVSEC Date: ${data.avsecDate}   Location: ${data.avsecLocation}`, { x: margin + 6, y: avTop - 16, size: 7.5, font: fontBold });
-      page2.drawText(`Instructor & Center: ${data.avsecInstructor}`, { x: margin + 6, y: avTop - 30, size: 7.5, font: fontRegular });
-      page2.drawLine({ start: { x: margin, y: avTop - 38 }, end: { x: tWidth + margin, y: avTop - 38 }, thickness: 0.5, color: rgb(0.8, 0.8, 0.8) });
-
-      page2.drawText(`Police Verification (PVC) No: ${data.pvcNo}   Cleared Date: ${data.pvcDate}   [VERIFIED]`, { x: margin + 6, y: avTop - 52, size: 7.5, font: fontBold });
-
-      y2 = avTop - avHeight - 20;
-
-      // Legal Declaration
-      page2.drawRectangle({ x: margin, y: y2 - 40, width: tWidth, height: 44, borderColor: rgb(0, 0, 0), borderWidth: 0.8 });
-      page2.drawText("Declaration by Applicant: I hereby declare that the particulars furnished above are true and", { x: margin + 6, y: y2 - 12, size: 7.2, font: fontRegular });
-      page2.drawText("correct to the best of my knowledge. If any information is found false, my permit is liable to cancellation.", { x: margin + 6, y: y2 - 24, size: 7.2, font: fontRegular });
-
-      y2 -= 65;
-
-      // Signatures
-      page2.drawLine({ start: { x: margin + 20, y: y2 }, end: { x: margin + 180, y: y2 }, thickness: 1, color: rgb(0, 0, 0) });
-      page2.drawLine({ start: { x: width - margin - 200, y: y2 }, end: { x: width - margin - 20, y: y2 }, thickness: 1, color: rgb(0, 0, 0) });
-
-      page2.drawText("Signature of the Applicant", { x: margin + 45, y: y2 - 12, size: 8, font: fontBold });
-      page2.drawText("Date: 04/11/2026   Place: HYD", { x: margin + 40, y: y2 - 24, size: 7, font: fontRegular });
-
-      page2.drawText("Signature of Authorized Signatory with Seal", { x: width - margin - 190, y: y2 - 12, size: 8, font: fontBold });
-      page2.drawText(data.empOrg, { x: width - margin - 170, y: y2 - 24, size: 7, font: fontRegular });
-
-      page2.drawText("Page 2 of 2 — BCAS Aerodrome Entry Permit Official Proforma", { x: width - margin - 230, y: 20, size: 7, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
-
-      // Serialize and open / download
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-
-      // Trigger standard browser download
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `AEP_Application_${data.empNo.replace(/\s+/g, '_')}.pdf`;
-      link.click();
-    }
-
-    // ===================================================
-    // GOOGLE SHEETS & DRIVE POSTING
-    // ===================================================
     async function handleFormSubmission(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-sync-gsheet');
@@ -951,9 +1291,6 @@
       }
     }
 
-    // ===================================================
-    // UNIVERSAL SEARCH QUERY
-    // ===================================================
     function searchRegistry() {
       const q = document.getElementById('searchInput').value.trim().toUpperCase();
       const card = document.getElementById('searchResultCard');
@@ -983,24 +1320,25 @@
           <small class="text-[#86868b]">Verified on: ${record.pvcDate}</small>
         </div>
         <div class="space-y-1">
-          <span class="text-[#86868b] font-bold uppercase">National UID / Passport</span>
+          <span class="text-[#86868b] font-bold uppercase">National UID</span>
           <p class="font-bold text-[#1d1d1f]">${record.aadhaarNo}</p>
-          <small class="text-[#86868b]">${record.idProofType}</small>
+          <small class="text-[#86868b]">Passport Valid</small>
         </div>
       `;
 
       card.classList.remove('hidden');
     }
 
-    function loadFromRegistryAndDownload() {
+    function loadFromRegistryAndPrint() {
       switchTab('form');
       loadSampleMushtaqData();
-      generateAndDownloadOfficialPDF();
+      triggerDirectPrint();
     }
 
-    // Pre-populate with Mushtaq Mohammed's record on load
+    // Initialize Mushtaq's record on load
     document.addEventListener("DOMContentLoaded", () => {
       loadSampleMushtaqData();
+      syncFormToDOM();
     });
   </script>
 </body>
