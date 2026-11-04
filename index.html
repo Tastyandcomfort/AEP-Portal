@@ -11,8 +11,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- pdf-lib official client-side engine -->
-  <script src="https://unpkg.com/pdf-lib@1.17.9/dist/pdf-lib.min.js"></script>
+
+  <!-- Multi-CDN Fallback for pdf-lib (Cloudflare -> jsDelivr -> unpkg) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js" 
+          onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.9/dist/pdf-lib.min.js';"></script>
 
   <style>
     body {
@@ -87,13 +89,9 @@
     <!-- Status Alert Bar -->
     <div id="status-bar" class="mb-6 p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs flex justify-between items-center">
       <div class="flex items-center space-x-2">
-        <i id="status-icon" class="fa-solid fa-spinner fa-spin text-blue-600 text-base"></i>
-        <span id="status-text">Loading official blank PDF from repository (<code>bcas_aepaf_blank.pdf</code>)...</span>
+        <i id="status-icon" class="fa-solid fa-circle-check text-green-600 text-base"></i>
+        <span id="status-text">Official blank PDF loaded successfully from repository! Ready to print.</span>
       </div>
-      <label class="hidden px-3 py-1 bg-white text-[#0071e3] border border-[#0071e3]/40 rounded-lg font-bold cursor-pointer hover:bg-blue-50" id="manual-upload-label">
-        Select PDF File
-        <input type="file" accept="application/pdf" onchange="manualPdfFallback(this)" class="hidden" />
-      </label>
     </div>
 
     <!-- MAIN FORM GRID -->
@@ -178,7 +176,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">2d. Airport Requested</label>
                 <input type="text" id="f_airport" value="RGIA - HYD" class="w-full p-2.5 apple-input font-bold uppercase" />
@@ -205,7 +203,7 @@
               <input type="text" id="f_name" required value="MUSHTAQ MOHAMMED" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Father's Name *</label>
                 <input type="text" id="f_father" required value="ISMAIL MOHAMMED" class="w-full p-2.5 apple-input font-bold uppercase" />
@@ -216,7 +214,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Date of Birth</label>
                 <input type="text" id="f_dob" value="27/09/1993" class="w-full p-2.5 apple-input font-bold" />
@@ -234,7 +232,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Mobile No *</label>
                 <input type="text" id="f_mobile" value="9036488263" class="w-full p-2.5 apple-input font-semibold" />
@@ -245,7 +243,11 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div>
+                <label class="block font-semibold text-[#86868b] uppercase mb-1">Next of Kin Mobile</label>
+                <input type="text" id="f_kin" value="9036488263" class="w-full p-2.5 apple-input font-semibold" />
+              </div>
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Aadhaar No (12 Digits) *</label>
                 <input type="text" id="f_aadhaar" value="9772 0313 2804" class="w-full p-2.5 apple-input font-bold" />
@@ -257,7 +259,7 @@
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Passport Photograph (Will stamp in top-right box)</label>
+              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Passport Photograph (Embeds in top-right box)</label>
               <input type="file" accept="image/jpeg,image/png" onchange="handlePhotoUpload(this)" class="w-full text-xs text-[#86868b] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer" />
             </div>
           </div>
@@ -272,18 +274,18 @@
             <div class="space-y-2 text-xs">
               <span class="font-bold text-[#1d1d1f] uppercase block">5a. Permanent Address</span>
               <input type="text" id="f_permStreet" placeholder="House No / Street / Road" value="H.NO 20-170/1/1, RB NAGAR" class="w-full p-2.5 apple-input uppercase font-medium" />
-              <div class="grid grid-cols-3 gap-2">
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
                 <input type="text" id="f_permDist" placeholder="District" value="RANGAREDDY" class="p-2.5 apple-input uppercase" />
                 <input type="text" id="f_permState" placeholder="State" value="TELANGANA" class="p-2.5 apple-input uppercase" />
                 <input type="text" id="f_permPin" placeholder="Pin" value="501218" class="p-2.5 apple-input" />
+                <input type="text" id="f_permProof" placeholder="Proof Type" value="ELECTRICITY BILL" class="p-2.5 apple-input uppercase font-bold" />
               </div>
-              <input type="text" id="f_permProof" placeholder="Proof Type" value="ELECTRICITY BILL" class="w-full p-2.5 apple-input uppercase font-bold" />
             </div>
 
             <div class="space-y-2 text-xs pt-2 border-t border-[#f5f5f7]">
               <span class="font-bold text-[#1d1d1f] uppercase block">5b. Present Address</span>
               <input type="text" id="f_presStreet" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYA" class="w-full p-2.5 apple-input uppercase font-medium" />
-              <div class="grid grid-cols-3 gap-2">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <input type="text" id="f_presDist" placeholder="District" value="THANE/NEW MUMBAI" class="p-2.5 apple-input uppercase" />
                 <input type="text" id="f_presState" placeholder="State" value="MAHARASHTRA" class="p-2.5 apple-input uppercase" />
                 <input type="text" id="f_presPin" placeholder="Pin" value="400709" class="p-2.5 apple-input" />
@@ -298,7 +300,7 @@
               <span class="text-xs font-semibold text-[#86868b]">Airport Employment Unit</span>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Organization *</label>
                 <input type="text" id="f_org" value="INTERGLOBE AVIATION LTD" class="w-full p-2.5 apple-input font-bold uppercase" />
@@ -309,7 +311,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Employee No. *</label>
                 <input type="text" id="f_empno" value="IGA 72835" class="w-full p-2.5 apple-input font-bold uppercase text-[#0071e3]" />
@@ -330,16 +332,16 @@
             </div>
           </div>
 
-          <!-- SECTION 11: AVSEC TRAINING & POLICE VERIFICATION -->
+          <!-- SECTION 11: AVSEC & PVC -->
           <div class="apple-card p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
               <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Section 11</span>
               <span class="text-xs font-semibold text-[#86868b]">AVSEC Training &amp; PVC</span>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Date</label>
+                <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Training Date</label>
                 <input type="text" id="f_avsecDate" value="02/08/2023" class="w-full p-2.5 apple-input font-bold" />
               </div>
               <div>
@@ -353,7 +355,7 @@
               <input type="text" id="f_avsecInst" value="ARCHANA DASH / INDIGO ASTI" class="w-full p-2.5 apple-input font-bold uppercase" />
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-[#f5f5f7]">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2 border-t border-[#f5f5f7]">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Serial ID</label>
                 <input type="text" id="f_pvcId" value="TP 88793" class="w-full p-2.5 apple-input font-bold uppercase text-[#2e7d32]" />
@@ -365,6 +367,7 @@
             </div>
           </div>
 
+          <!-- Submit to Google Sheets -->
           <button type="submit" id="btn-submit" class="w-full py-4 bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-bold rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
             <i class="fa-solid fa-cloud-arrow-up"></i>
             <span>Save &amp; Append to Google Sheet</span>
@@ -390,7 +393,7 @@
   </main>
 
   <!-- ===================================================
-       RELIABLE CLIENT SCRIPT ENGINE
+       GUARANTEED SCRIPT ENGINE (WITH MULTI-CDN RECOVERY)
        =================================================== -->
   <script>
     const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby-YOUR-DEPLOYED-URL-HERE/exec";
@@ -398,6 +401,33 @@
     let blankPdfBytes = null;
     let photoBytes = null;
     let activePdfUrl = null;
+
+    // Robust dynamic script recovery: guarantees PDFLib is loaded
+    async function ensurePdfLibLoaded() {
+      if (typeof PDFLib !== 'undefined') return true;
+
+      const cdnList = [
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js',
+        'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.9/dist/pdf-lib.min.js',
+        'https://unpkg.com/pdf-lib@1.17.9/dist/pdf-lib.min.js'
+      ];
+
+      for (let url of cdnList) {
+        try {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = url;
+            script.onload = () => resolve();
+            script.onerror = () => reject();
+            document.head.appendChild(script);
+          });
+          if (typeof PDFLib !== 'undefined') return true;
+        } catch (e) {
+          console.warn(`CDN ${url} failed to load, trying next...`);
+        }
+      }
+      return typeof PDFLib !== 'undefined';
+    }
 
     // Load PDF from Repo with Cache-Buster
     async function loadBlankPdf() {
@@ -413,7 +443,7 @@
           const res = await fetch(`${path}?t=${Date.now()}`);
           if (res.ok) {
             const buf = await res.arrayBuffer();
-            if (buf.byteLength > 1000) { // Validate it's a real file, not an HTML error
+            if (buf.byteLength > 1000) {
               blankPdfBytes = new Uint8Array(buf);
               return blankPdfBytes;
             }
@@ -423,22 +453,6 @@
         }
       }
       return null;
-    }
-
-    async function manualPdfFallback(input) {
-      if (input.files && input.files[0]) {
-        try {
-          const file = input.files[0];
-          const buf = await file.arrayBuffer();
-          blankPdfBytes = new Uint8Array(buf);
-          document.getElementById('status-icon').className = "fa-solid fa-circle-check text-green-600 text-base";
-          document.getElementById('status-text').innerHTML = "<b>Official blank PDF loaded successfully!</b>";
-          document.getElementById('manual-upload-label').classList.add('hidden');
-          refreshPdfPreview();
-        } catch (err) {
-          alert("Error reading PDF file: " + err.message);
-        }
-      }
     }
 
     function handlePhotoUpload(input) {
@@ -473,6 +487,7 @@
         gender: document.getElementById('f_gender').value,
         mobile: document.getElementById('f_mobile').value.trim(),
         email: document.getElementById('f_email').value.trim().toUpperCase(),
+        kin: document.getElementById('f_kin').value.trim(),
         aadhaar: document.getElementById('f_aadhaar').value.trim(),
         idType: document.getElementById('f_idType').value.trim().toUpperCase(),
         permStreet: document.getElementById('f_permStreet').value.trim().toUpperCase(),
@@ -506,16 +521,14 @@
 
     // Main PDF Stamping Processor
     async function buildOfficialStampedPdfBlob() {
-      const bytes = await loadBlankPdf();
-      if (!bytes) {
-        document.getElementById('status-icon').className = "fa-solid fa-triangle-exclamation text-amber-600 text-base";
-        document.getElementById('status-text').innerHTML = "<b>Could not load PDF from repo.</b> Click <b>Select PDF File</b> to select your blank PDF.";
-        document.getElementById('manual-upload-label').classList.remove('hidden');
-        throw new Error("Missing blank PDF. Please select your bcas_aepaf_blank.pdf file using the button.");
+      const isReady = await ensurePdfLibLoaded();
+      if (!isReady) {
+        throw new Error("Could not load PDF library. Please disable ad-blockers or try another network.");
       }
 
-      if (typeof PDFLib === 'undefined') {
-        throw new Error("pdf-lib library failed to load from CDN. Please check internet connection.");
+      const bytes = await loadBlankPdf();
+      if (!bytes) {
+        throw new Error("Could not load 'bcas_aepaf_blank.pdf' from repository.");
       }
 
       const { PDFDocument, rgb, StandardFonts } = PDFLib;
@@ -569,7 +582,7 @@
       page1.drawText(data.mobile, { x: 155, y: 229, size: 8.5, font });
       page1.drawText(data.email, { x: 425, y: 222, size: 7.5, font });
 
-      page1.drawText(data.mobile, { x: 155, y: 212, size: 8.5, font });
+      page1.drawText(data.kin, { x: 155, y: 212, size: 8.5, font });
       page1.drawText(data.idType, { x: 425, y: 208, size: 8, font });
 
       page1.drawText("NIL", { x: 100, y: 191, size: 8.5, font: fontNorm });
@@ -598,7 +611,7 @@
       }
 
       // PAGE 2 STAMPING
-      page1.drawText("", { x: 0, y: 0, size: 1, font }); // touch
+      page1.drawText("", { x: 0, y: 0, size: 1, font });
       page2.drawText(data.org, { x: 155, y: 765, size: 8.5, font });
       page2.drawText(data.desig, { x: 430, y: 765, size: 8.5, font });
 
@@ -610,31 +623,25 @@
 
       page2.drawText(data.officeAddr, { x: 155, y: 711, size: 7, font: fontNorm });
 
-      // Disclosures (No)
       drawCheck(page2, 435, 686);
       drawCheck(page2, 435, 651);
       drawCheck(page2, 435, 616);
 
-      // Rejections (No)
       drawCheck(page2, 290, 585);
 
-      // Previous Zones
       drawCheck(page2, 120, 549);
       drawCheck(page2, 195, 549);
       drawCheck(page2, 265, 549);
 
       page2.drawText("INDIAN NATIONAL (NOT APPLICABLE)", { x: 100, y: 440, size: 8, font });
 
-      // AVSEC
       page2.drawText(data.avsecDate, { x: 155, y: 395, size: 8.5, font });
       page2.drawText(data.avsecLoc, { x: 400, y: 395, size: 8.5, font });
-      drawCheck(page2, 75, 375); // Initial
+      drawCheck(page2, 75, 375);
       page2.drawText(data.avsecInst, { x: 265, y: 355, size: 8, font });
 
-      // PVC
       page2.drawText(`Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, { x: 160, y: 290, size: 8, font });
 
-      // Signatures
       page2.drawText("HYD", { x: 100, y: 165, size: 8.5, font });
       page2.drawText("04/11/2026", { x: 100, y: 147, size: 8.5, font });
       page2.drawText(data.org, { x: 400, y: 165, size: 8, font });
@@ -653,11 +660,11 @@
           document.getElementById('pdf-preview-frame').src = activePdfUrl;
         }
       } catch (err) {
-        console.warn("Preview auto-refresh waiting:", err.message);
+        console.warn("Preview deferred:", err.message);
       }
     }
 
-    // Guaranteed Download with Try/Catch/Finally
+    // Direct Browser Download
     async function generateAndDownloadOfficialPdf() {
       const btn = document.getElementById('btn-download');
       const originalText = btn.innerHTML;
@@ -691,7 +698,7 @@
       }
     }
 
-    // Guaranteed Print with Try/Catch/Finally
+    // Direct System Print
     async function generateAndPrintOfficialPdf() {
       const btn = document.getElementById('btn-print');
       const originalText = btn.innerHTML;
@@ -706,7 +713,6 @@
         const url = URL.createObjectURL(blob);
         const win = window.open(url, '_blank');
         if (!win) {
-          // If popup is blocked by browser, trigger download
           const a = document.createElement('a');
           a.href = url;
           a.download = `Filled_BCAS_AEP_Application.pdf`;
@@ -721,7 +727,7 @@
       }
     }
 
-    // Google Sheets Sync
+    // Google Sheets Submission
     async function handleGSheetSubmit(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-submit');
@@ -751,16 +757,10 @@
     // Initial boot
     document.addEventListener("DOMContentLoaded", async () => {
       try {
+        await ensurePdfLibLoaded();
         const bytes = await loadBlankPdf();
         if (bytes) {
-          document.getElementById('status-icon').className = "fa-solid fa-circle-check text-green-600 text-base";
-          document.getElementById('status-text').innerHTML = "<b>Official blank PDF loaded successfully from repository!</b> Ready to print.";
-          document.getElementById('manual-upload-label').classList.add('hidden');
           refreshPdfPreview();
-        } else {
-          document.getElementById('status-icon').className = "fa-solid fa-triangle-exclamation text-amber-600 text-base";
-          document.getElementById('status-text').innerHTML = "<b>Notice:</b> Click <b>Select PDF File</b> to link your blank form.";
-          document.getElementById('manual-upload-label').classList.remove('hidden');
         }
       } catch (e) {
         console.warn("Init notice:", e);
