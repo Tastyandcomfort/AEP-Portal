@@ -208,11 +208,11 @@
             <div class="grid grid-cols-3 gap-3 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Date of Birth</label>
-                <input type="text" id="f_dob" value="27/09/1993" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold" />
+                <input type="text" id="f_dob" value="27/09/1993" class="w-full p-2.5 apple-input font-bold" />
               </div>
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Blood Group</label>
-                <input type="text" id="f_blood" value="A+" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase" />
+                <input type="text" id="f_blood" value="A+" class="w-full p-2.5 apple-input font-bold uppercase" />
               </div>
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Gender</label>
@@ -326,7 +326,7 @@
               <span class="text-xs font-semibold text-[#86868b]">AVSEC Training &amp; PVC</span>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Training Date</label>
                 <input type="text" id="f_avsecDate" value="02/08/2023" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold" />
@@ -342,7 +342,7 @@
               <input type="text" id="f_avsecInst" value="ARCHANA DASH / INDIGO ASTI" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase" />
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-[#f5f5f7]">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2 border-t border-[#f5f5f7]">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Serial ID</label>
                 <input type="text" id="f_pvcId" value="TP 88793" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase text-[#2e7d32]" />
@@ -472,13 +472,14 @@
       };
     }
 
+    // Precise vector checkmark that fits directly into the official checkboxes
     function drawCheck(page, x, y) {
       const { rgb } = PDFLib;
-      page.drawLine({ start: { x: x - 1, y: y + 3 }, end: { x: x + 2, y }, thickness: 1.5, color: rgb(0,0,0) });
-      page.drawLine({ start: { x: x + 2, y }, end: { x: x + 6, y: y + 7 }, thickness: 1.5, color: rgb(0,0,0) });
+      page.drawLine({ start: { x: x, y: y + 2 }, end: { x: x + 2.5, y: y }, thickness: 1.4, color: rgb(0,0,0) });
+      page.drawLine({ start: { x: x + 2.5, y: y }, end: { x: x + 6.5, y: y + 6 }, thickness: 1.4, color: rgb(0,0,0) });
     }
 
-    // Main PDF Stamping Processor with Exact Box Calibration
+    // RE-CALIBRATED COORDINATE STAMPING ENGINE
     async function buildOfficialStampedPdfBlob() {
       if (typeof PDFLib === 'undefined') {
         throw new Error("PDFLib library is loading or blocked by network. Please wait a moment and try again.");
@@ -501,145 +502,145 @@
       const page2 = pages[1] || page1;
 
       // ==========================================
-      // PAGE 1: EXACT RE-CALIBRATED COORDINATES
+      // PAGE 1: EXACT CALIBRATED COORDINATES
       // ==========================================
 
-      // 1. Reference Id box
-      page1.drawText(data.refId, { x: 355, y: 694, size: 9, font });
+      // 1. Reference Id box (Centered inside the box)
+      page1.drawText(data.refId, { x: 356, y: 700, size: 8.5, font });
 
-      // 2a. Type
-      if (data.type === 'Permanent') drawCheck(page1, 169, 634);
-      if (data.type.includes('Temporary')) drawCheck(page1, 391, 634);
-      if (data.type === '1Day') drawCheck(page1, 169, 615);
-      if (data.type === '1-7Days') drawCheck(page1, 237, 615);
-      if (data.type === '3Months') drawCheck(page1, 315, 615);
-      if (data.type === '6Months') drawCheck(page1, 391, 615);
+      // 2a. Type (Centered inside printed checkboxes)
+      if (data.type === 'Permanent') drawCheck(page1, 172, 649);
+      if (data.type.includes('Temporary')) drawCheck(page1, 394, 649);
+      if (data.type === '1Day') drawCheck(page1, 172, 630);
+      if (data.type === '1-7Days') drawCheck(page1, 240, 630);
+      if (data.type === '3Months') drawCheck(page1, 318, 630);
+      if (data.type === '6Months') drawCheck(page1, 394, 630);
 
       // 2b. Category
-      if (data.category === 'Operational') drawCheck(page1, 169, 583);
-      if (data.category === 'Protocol') drawCheck(page1, 169, 565);
-      if (data.category === 'ForeignNational') drawCheck(page1, 169, 547);
-      if (data.category === 'GovtSecurity') drawCheck(page1, 391, 583);
-      if (data.category === 'Infra') drawCheck(page1, 391, 565);
-      if (data.category === 'ToolOfTrade') drawCheck(page1, 391, 547);
+      if (data.category === 'Operational') drawCheck(page1, 172, 600);
+      if (data.category === 'Protocol') drawCheck(page1, 172, 582);
+      if (data.category === 'ForeignNational') drawCheck(page1, 172, 564);
+      if (data.category === 'GovtSecurity') drawCheck(page1, 394, 600);
+      if (data.category === 'Infra') drawCheck(page1, 394, 582);
+      if (data.category === 'ToolOfTrade') drawCheck(page1, 394, 564);
 
       // 2c. Zones
-      if (data.zones.includes('A')) drawCheck(page1, 169, 540);
-      if (data.zones.includes('D')) drawCheck(page1, 244, 540);
-      if (data.zones.includes('T')) drawCheck(page1, 316, 540);
-      if (data.zones.includes('Si')) drawCheck(page1, 392, 540);
-      if (data.zones.includes('Sd')) drawCheck(page1, 456, 540);
-      if (data.zones.includes('P')) drawCheck(page1, 524, 540);
-      if (data.zones.includes('B')) drawCheck(page1, 169, 521);
-      if (data.zones.includes('F')) drawCheck(page1, 244, 521);
+      if (data.zones.includes('A')) drawCheck(page1, 172, 538);
+      if (data.zones.includes('D')) drawCheck(page1, 248, 538);
+      if (data.zones.includes('T')) drawCheck(page1, 320, 538);
+      if (data.zones.includes('Si')) drawCheck(page1, 394, 538);
+      if (data.zones.includes('Sd')) drawCheck(page1, 460, 538);
+      if (data.zones.includes('P')) drawCheck(page1, 528, 538);
+      if (data.zones.includes('B')) drawCheck(page1, 172, 519);
+      if (data.zones.includes('F')) drawCheck(page1, 248, 519);
 
       // 2d. Airport
-      drawCheck(page1, 169, 495);
-      page1.drawText(data.airport, { x: 245, y: 493, size: 8, font });
+      drawCheck(page1, 172, 492);
+      page1.drawText(data.airport, { x: 260, y: 490, size: 8, font });
 
       // 2e. Terminal
-      drawCheck(page1, 201, 389); // All
+      drawCheck(page1, 203, 386); // All
 
       // 3. Issue Category
-      drawCheck(page1, 391, 371); // Fresh
-      drawCheck(page1, 169, 346); // Appointment order
+      drawCheck(page1, 394, 368); // Fresh
+      drawCheck(page1, 172, 343); // Appointment order
 
       // 4. Details of Applicant
-      if (data.gender === 'Male') drawCheck(page1, 201, 260);
-      if (data.gender === 'Female') drawCheck(page1, 265, 260);
+      if (data.gender === 'Male') drawCheck(page1, 204, 258);
+      if (data.gender === 'Female') drawCheck(page1, 268, 258);
 
-      // SECTION 4 TABLE ROWS (DROPPED INTO EXACT CELLS)
-      page1.drawText(data.name, { x: 150, y: 242, size: 8, font });
-      page1.drawText(data.aadhaar, { x: 418, y: 242, size: 8, font });
+      // SECTION 4 CELLS (Vertically and horizontally centered)
+      page1.drawText(data.name, { x: 154, y: 238, size: 7.5, font });
+      page1.drawText(data.aadhaar, { x: 424, y: 238, size: 7.5, font });
 
-      page1.drawText(data.father, { x: 150, y: 225, size: 8, font });
-      page1.drawText(data.mother, { x: 418, y: 225, size: 8, font });
+      page1.drawText(data.father, { x: 154, y: 221, size: 7.5, font });
+      page1.drawText(data.mother, { x: 424, y: 221, size: 7.5, font });
 
-      page1.drawText(data.dob, { x: 150, y: 207, size: 8, font });
-      page1.drawText(data.blood, { x: 418, y: 209, size: 8, font });
-      page1.drawText(data.gender.toUpperCase(), { x: 418, y: 196, size: 8, font });
+      page1.drawText(data.dob, { x: 154, y: 204, size: 7.5, font });
+      page1.drawText(data.blood, { x: 424, y: 204, size: 7.5, font });
+      page1.drawText(data.gender.toUpperCase(), { x: 424, y: 191, size: 7.5, font });
 
-      page1.drawText(data.mobile, { x: 150, y: 190, size: 8, font });
-      page1.drawText(data.email, { x: 418, y: 183, size: 7, font });
+      page1.drawText(data.mobile, { x: 154, y: 187, size: 7.5, font });
+      page1.drawText(data.email, { x: 424, y: 178, size: 6.8, font });
 
-      page1.drawText(data.mobile, { x: 150, y: 173, size: 8, font });
-      page1.drawText(data.idType, { x: 418, y: 170, size: 7.5, font });
+      page1.drawText(data.mobile, { x: 154, y: 170, size: 7.5, font });
+      page1.drawText(data.idType, { x: 424, y: 165, size: 7.2, font });
 
       // 4b. Existing AEP
-      page1.drawText("NIL", { x: 80, y: 143, size: 8, font: fontNorm });
-      page1.drawText("NIL", { x: 270, y: 143, size: 8, font: fontNorm });
-      page1.drawText("HYD", { x: 485, y: 143, size: 8, font: fontNorm });
+      page1.drawText("NIL", { x: 88, y: 140, size: 7.5, font: fontNorm });
+      page1.drawText("NIL", { x: 275, y: 140, size: 7.5, font: fontNorm });
+      page1.drawText("HYD", { x: 490, y: 140, size: 7.5, font: fontNorm });
 
       // 5a. Permanent Address
-      page1.drawText(data.permStreet, { x: 150, y: 107, size: 7, font: fontNorm });
-      page1.drawText(data.permDist, { x: 150, y: 91, size: 7, font: fontNorm });
-      page1.drawText(data.permState, { x: 150, y: 75, size: 7, font: fontNorm });
-      page1.drawText(data.permPin, { x: 150, y: 59, size: 7, font: fontNorm });
-      page1.drawText(data.permProof, { x: 180, y: 43, size: 7, font });
+      page1.drawText(data.permStreet, { x: 154, y: 104, size: 6.8, font: fontNorm });
+      page1.drawText(data.permDist, { x: 154, y: 88, size: 6.8, font: fontNorm });
+      page1.drawText(data.permState, { x: 154, y: 72, size: 6.8, font: fontNorm });
+      page1.drawText(data.permPin, { x: 154, y: 56, size: 6.8, font: fontNorm });
+      page1.drawText(data.permProof, { x: 185, y: 40, size: 6.8, font });
 
       // 5b. Present Address
-      page1.drawText(data.presStreet, { x: 418, y: 107, size: 7, font: fontNorm });
-      page1.drawText(data.presDist, { x: 418, y: 91, size: 7, font: fontNorm });
-      page1.drawText(data.presState, { x: 418, y: 75, size: 7, font: fontNorm });
-      page1.drawText(data.presPin, { x: 418, y: 59, size: 7, font: fontNorm });
+      page1.drawText(data.presStreet, { x: 424, y: 104, size: 6.8, font: fontNorm });
+      page1.drawText(data.presDist, { x: 424, y: 88, size: 6.8, font: fontNorm });
+      page1.drawText(data.presState, { x: 424, y: 72, size: 6.8, font: fontNorm });
+      page1.drawText(data.presPin, { x: 424, y: 56, size: 6.8, font: fontNorm });
 
-      // Embed Photograph in exact top right box
+      // Passport Photograph stamped directly in top-right box
       if (photoBytes) {
         try {
           const img = await pdfDoc.embedJpg(photoBytes).catch(async () => await pdfDoc.embedPng(photoBytes));
-          page1.drawImage(img, { x: 477, y: 686, width: 100, height: 128 });
+          page1.drawImage(img, { x: 479, y: 690, width: 98, height: 122 });
         } catch (e) {
           console.warn("Photo embedding notice:", e);
         }
       }
 
       // ==========================================
-      // PAGE 2: EXACT RE-CALIBRATED COORDINATES
+      // PAGE 2: EXACT CALIBRATED COORDINATES
       // ==========================================
 
       // 6. Employment Details
       page1.drawText("", { x: 0, y: 0, size: 1, font }); // touch
-      page2.drawText(data.org, { x: 150, y: 758, size: 8, font });
-      page2.drawText(data.desig, { x: 425, y: 758, size: 8, font });
+      page2.drawText(data.org, { x: 154, y: 755, size: 7.8, font });
+      page2.drawText(data.desig, { x: 432, y: 755, size: 7.8, font });
 
-      page2.drawText(data.empNo, { x: 150, y: 739, size: 8.5, font });
-      page2.drawText(data.dutyPlace, { x: 425, y: 739, size: 8, font });
+      page2.drawText(data.empNo, { x: 154, y: 736, size: 8, font });
+      page2.drawText(data.dutyPlace, { x: 432, y: 736, size: 7.8, font });
 
-      page2.drawText(data.nature, { x: 150, y: 721, size: 8, font });
-      page2.drawText("26/09/2053", { x: 425, y: 721, size: 8, font });
+      page2.drawText(data.nature, { x: 154, y: 718, size: 7.8, font });
+      page2.drawText("26/09/2053", { x: 432, y: 718, size: 7.8, font });
 
-      page2.drawText(data.officeAddr, { x: 150, y: 703, size: 6.5, font: fontNorm });
+      page2.drawText(data.officeAddr, { x: 154, y: 700, size: 6.2, font: fontNorm });
 
       // 7. Disclosures (No)
-      drawCheck(page2, 432, 673);
-      drawCheck(page2, 432, 636);
-      drawCheck(page2, 432, 599);
+      drawCheck(page2, 438, 668);
+      drawCheck(page2, 438, 631);
+      drawCheck(page2, 438, 594);
 
       // 8. Rejections (No)
-      drawCheck(page2, 286, 566);
+      drawCheck(page2, 292, 562);
 
       // 9. Previous Zones
-      drawCheck(page2, 118, 527);
-      drawCheck(page2, 190, 527);
-      drawCheck(page2, 257, 527);
+      drawCheck(page2, 120, 523);
+      drawCheck(page2, 192, 523);
+      drawCheck(page2, 260, 523);
 
       // 10. Foreign Nationals
-      page2.drawText("INDIAN NATIONAL (NOT APPLICABLE)", { x: 150, y: 432, size: 7.5, font });
+      page2.drawText("INDIAN NATIONAL (NOT APPLICABLE)", { x: 150, y: 428, size: 7.2, font });
 
       // 11. AVSEC Training
-      page2.drawText(data.avsecDate, { x: 150, y: 388, size: 8, font });
-      page2.drawText(data.avsecLoc, { x: 395, y: 388, size: 8, font });
-      drawCheck(page2, 73, 370); // Initial
-      page2.drawText(data.avsecInst, { x: 260, y: 349, size: 7.5, font });
+      page2.drawText(data.avsecDate, { x: 154, y: 384, size: 7.8, font });
+      page2.drawText(data.avsecLoc, { x: 398, y: 384, size: 7.8, font });
+      drawCheck(page2, 74, 366); // Initial
+      page2.drawText(data.avsecInst, { x: 265, y: 345, size: 7.2, font });
 
       // PVC Stamp Line
-      page2.drawText(`Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, { x: 160, y: 290, size: 8, font });
+      page2.drawText(`Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, { x: 160, y: 286, size: 7.5, font });
 
       // Signatures
-      page2.drawText("HYD", { x: 90, y: 177, size: 8.5, font });
-      page2.drawText("04/11/2026", { x: 90, y: 156, size: 8, font });
-      page2.drawText(data.org, { x: 360, y: 177, size: 7.5, font });
-      page2.drawText("SECURITY DEPT", { x: 410, y: 132, size: 7.5, font });
+      page2.drawText("HYD", { x: 92, y: 173, size: 8, font });
+      page2.drawText("04/11/2026", { x: 92, y: 152, size: 7.5, font });
+      page2.drawText(data.org, { x: 360, y: 173, size: 7.2, font });
+      page2.drawText("SECURITY DEPT", { x: 410, y: 128, size: 7.2, font });
 
       const stampedBytes = await pdfDoc.save();
       return new Blob([stampedBytes], { type: "application/pdf" });
