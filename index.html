@@ -183,7 +183,7 @@
           </div>
 
           <!-- SECTION 4: APPLICANT IDENTITY & PHOTO -->
-          <div class="apple-card p-6 space-y-4">
+          <div class="apple-card p-6 md:p-8 space-y-4">
             <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
               <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Section 4</span>
               <span class="text-xs font-semibold text-[#86868b]">Applicant Credentials</span>
@@ -208,11 +208,11 @@
             <div class="grid grid-cols-3 gap-3 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Date of Birth</label>
-                <input type="text" id="f_dob" value="27/09/1993" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold" />
+                <input type="text" id="f_dob" value="27/09/1993" class="w-full p-2.5 apple-input font-bold" />
               </div>
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Blood Group</label>
-                <input type="text" id="f_blood" value="A+" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase" />
+                <input type="text" id="f_blood" value="A+" class="w-full p-2.5 apple-input font-bold uppercase" />
               </div>
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Gender</label>
@@ -234,7 +234,11 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="grid grid-cols-3 gap-3 text-xs">
+              <div>
+                <label class="block font-semibold text-[#86868b] uppercase mb-1">Next of Kin Mobile</label>
+                <input type="text" id="f_kin" value="9036488263" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-semibold" />
+              </div>
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Aadhaar Card No (12 Digits) *</label>
                 <input type="text" id="f_aadhaar" value="9772 0313 2804" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold" />
@@ -378,7 +382,7 @@
   </main>
 
   <!-- ===================================================
-       GUARANTEED SCRIPT ENGINE WITH PRECISE COORDINATES
+       GUARANTEED SCRIPT ENGINE WITH SAFE EXTRACTOR
        =================================================== -->
   <script>
     const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby-YOUR-DEPLOYED-URL-HERE/exec";
@@ -387,6 +391,17 @@
     let photoBytes = null;
     let activePdfUrl = null;
     let debounceTimer = null;
+
+    // Crash-proof safe input extractor: Never returns null or throws errors
+    function getVal(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    }
+
+    function isChecked(id) {
+      const el = document.getElementById(id);
+      return el ? el.checked : false;
+    }
 
     function debounceRefresh() {
       clearTimeout(debounceTimer);
@@ -429,55 +444,55 @@
     function collectData() {
       const zones = [];
       ['A', 'D', 'T', 'Si', 'Sd', 'P', 'B', 'F'].forEach(z => {
-        if (document.getElementById(`zone_${z}`)?.checked) zones.push(z);
+        if (isChecked(`zone_${z}`)) zones.push(z);
       });
 
       return {
-        refId: document.getElementById('f_refId').value.trim(),
-        type: document.getElementById('f_type').value,
-        category: document.getElementById('f_category').value,
+        refId: getVal('f_refId'),
+        type: getVal('f_type'),
+        category: getVal('f_category'),
         zones: zones,
-        airport: document.getElementById('f_airport').value.trim().toUpperCase(),
-        issueCat: document.getElementById('f_issueCat').value,
-        name: document.getElementById('f_name').value.trim().toUpperCase(),
-        father: document.getElementById('f_father').value.trim().toUpperCase(),
-        mother: document.getElementById('f_mother').value.trim().toUpperCase(),
-        dob: document.getElementById('f_dob').value.trim(),
-        blood: document.getElementById('f_blood').value.trim().toUpperCase(),
-        gender: document.getElementById('f_gender').value,
-        mobile: document.getElementById('f_mobile').value.trim(),
-        email: document.getElementById('f_email').value.trim().toUpperCase(),
-        kin: document.getElementById('f_kin').value.trim(),
-        aadhaar: document.getElementById('f_aadhaar').value.trim(),
-        idType: document.getElementById('f_idType').value.trim().toUpperCase(),
-        permStreet: document.getElementById('f_permStreet').value.trim().toUpperCase(),
-        permDist: document.getElementById('f_permDist').value.trim().toUpperCase(),
-        permState: document.getElementById('f_permState').value.trim().toUpperCase(),
-        permPin: document.getElementById('f_permPin').value.trim(),
-        permProof: document.getElementById('f_permProof').value.trim().toUpperCase(),
-        presStreet: document.getElementById('f_presStreet').value.trim().toUpperCase(),
-        presDist: document.getElementById('f_presDist').value.trim().toUpperCase(),
-        presState: document.getElementById('f_presState').value.trim().toUpperCase(),
-        presPin: document.getElementById('f_presPin').value.trim(),
-        org: document.getElementById('f_org').value.trim().toUpperCase(),
-        desig: document.getElementById('f_desig').value.trim().toUpperCase(),
-        empNo: document.getElementById('f_empno').value.trim().toUpperCase(),
-        dutyPlace: document.getElementById('f_dutyPlace').value.trim().toUpperCase(),
-        nature: document.getElementById('f_nature').value.trim().toUpperCase(),
-        officeAddr: document.getElementById('f_officeAddr').value.trim().toUpperCase(),
-        avsecDate: document.getElementById('f_avsecDate').value.trim(),
-        avsecLoc: document.getElementById('f_avsecLoc').value.trim().toUpperCase(),
-        avsecInst: document.getElementById('f_avsecInst').value.trim().toUpperCase(),
-        pvcId: document.getElementById('f_pvcId').value.trim().toUpperCase(),
-        pvcDate: document.getElementById('f_pvcDate').value.trim()
+        airport: getVal('f_airport').toUpperCase(),
+        issueCat: getVal('f_issueCat'),
+        name: getVal('f_name').toUpperCase(),
+        father: getVal('f_father').toUpperCase(),
+        mother: getVal('f_mother').toUpperCase(),
+        dob: getVal('f_dob'),
+        blood: getVal('f_blood').toUpperCase(),
+        gender: getVal('f_gender'),
+        mobile: getVal('f_mobile'),
+        email: getVal('f_email').toUpperCase(),
+        kin: getVal('f_kin'),
+        aadhaar: getVal('f_aadhaar'),
+        idType: getVal('f_idType').toUpperCase(),
+        permStreet: getVal('f_permStreet').toUpperCase(),
+        permDist: getVal('f_permDist').toUpperCase(),
+        permState: getVal('f_permState').toUpperCase(),
+        permPin: getVal('f_permPin'),
+        permProof: getVal('f_permProof').toUpperCase(),
+        presStreet: getVal('f_presStreet').toUpperCase(),
+        presDist: getVal('f_presDist').toUpperCase(),
+        presState: getVal('f_presState').toUpperCase(),
+        presPin: getVal('f_presPin'),
+        org: getVal('f_org').toUpperCase(),
+        desig: getVal('f_desig').toUpperCase(),
+        empNo: getVal('f_empno').toUpperCase(),
+        dutyPlace: getVal('f_dutyPlace').toUpperCase(),
+        nature: getVal('f_nature').toUpperCase(),
+        officeAddr: getVal('f_officeAddr').toUpperCase(),
+        avsecDate: getVal('f_avsecDate'),
+        avsecLoc: getVal('f_avsecLoc').toUpperCase(),
+        avsecInst: getVal('f_avsecInst').toUpperCase(),
+        pvcId: getVal('f_pvcId').toUpperCase(),
+        pvcDate: getVal('f_pvcDate')
       };
     }
 
     // Vector checkmark drawer
     function drawCheck(page, x, y) {
       const { rgb } = PDFLib;
-      page.drawLine({ start: { x: x, y: y + 2.5 }, end: { x: x + 2.5, y: y }, thickness: 1.5, color: rgb(0,0,0) });
-      page.drawLine({ start: { x: x + 2.5, y: y }, end: { x: x + 6.5, y: y + 6.5 }, thickness: 1.5, color: rgb(0,0,0) });
+      page.drawLine({ start: { x: x, y: y + 2.5 }, end: { x: x + 2.5, y: y }, thickness: 1.4, color: rgb(0,0,0) });
+      page.drawLine({ start: { x: x + 2.5, y: y }, end: { x: x + 6.5, y: y + 6.5 }, thickness: 1.4, color: rgb(0,0,0) });
     }
 
     // MAIN RE-CALIBRATED PDF STAMPING PROCESSOR
@@ -503,10 +518,10 @@
       const page2 = pages[1] || page1;
 
       // ==========================================
-      // PAGE 1: FULLY CALIBRATED COORDINATES
+      // PAGE 1: EXACT CALIBRATED COORDINATES
       // ==========================================
 
-      // 1. Reference Id box (Lowered to sit inside the box)
+      // 1. Reference Id box (Centered inside the box)
       page1.drawText(data.refId, { x: 220, y: 674, size: 8.5, font });
 
       // 2a. Type (Centered inside printed checkboxes)
@@ -567,19 +582,19 @@
       page1.drawText(data.kin, { x: 154, y: 162, size: 7.5, font });
       page1.drawText(data.idType, { x: 424, y: 162, size: 7.2, font });
 
-      // 4b. Existing AEP (Shifted into exact row lines)
+      // 4b. Existing AEP
       page1.drawText("NIL", { x: 75, y: 137, size: 7.5, font: fontNorm });
       page1.drawText("NIL", { x: 320, y: 137, size: 7.5, font: fontNorm });
       page1.drawText("HYD", { x: 480, y: 137, size: 7.5, font: fontNorm });
 
-      // 5a. Permanent Address (Lowered into rows)
+      // 5a. Permanent Address
       page1.drawText(data.permStreet, { x: 154, y: 98, size: 6.8, font: fontNorm });
       page1.drawText(data.permDist, { x: 154, y: 82, size: 6.8, font: fontNorm });
       page1.drawText(data.permState, { x: 154, y: 66, size: 6.8, font: fontNorm });
       page1.drawText(data.permPin, { x: 154, y: 50, size: 6.8, font: fontNorm });
       page1.drawText(data.permProof, { x: 185, y: 34, size: 6.8, font });
 
-      // 5b. Present Address (Lowered into rows)
+      // 5b. Present Address
       page1.drawText(data.presStreet, { x: 424, y: 98, size: 6.8, font: fontNorm });
       page1.drawText(data.presDist, { x: 424, y: 82, size: 6.8, font: fontNorm });
       page1.drawText(data.presState, { x: 424, y: 66, size: 6.8, font: fontNorm });
@@ -599,7 +614,7 @@
       // PAGE 2: FULLY CALIBRATED COORDINATES
       // ==========================================
 
-      // 6. Employment Details (Lowered into box centers)
+      // 6. Employment Details
       page1.drawText("", { x: 0, y: 0, size: 1, font }); // touch
       page2.drawText(data.org, { x: 154, y: 748, size: 7.8, font });
       page2.drawText(data.desig, { x: 432, y: 748, size: 7.8, font });
@@ -612,7 +627,7 @@
 
       page2.drawText(data.officeAddr, { x: 154, y: 690, size: 6.2, font: fontNorm });
 
-      // 7. Disclosures (No) (Moved up to align with checkboxes)
+      // 7. Disclosures (No)
       drawCheck(page2, 435, 665);
       drawCheck(page2, 435, 628);
       drawCheck(page2, 435, 591);
@@ -675,7 +690,7 @@
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        const empNo = document.getElementById('f_empno').value.trim() || 'AEP';
+        const empNo = getVal('f_empno') || 'AEP';
         a.download = `Filled_BCAS_AEP_Application_${empNo.replace(/\s+/g, '_')}.pdf`;
         document.body.appendChild(a);
         a.click();
