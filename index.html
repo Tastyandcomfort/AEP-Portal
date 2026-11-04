@@ -1,232 +1,754 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AEP Portal</title>
-    <!-- Tailwind CSS Engine -->
-    <script src="https://tailwindcss.com"></script>
-    <style>
-        /* San Francisco Font Stack Stacked for authentic Apple rendering */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            letter-spacing: -0.011em;
-        }
-        .apple-nav-blur {
-            background-color: rgba(255, 255, 255, 0.72);
-            backdrop-filter: saturate(180%) blur(20px);
-            -webkit-backdrop-filter: saturate(180%) blur(20px);
-        }
-        .apple-btn-active {
-            color: #ffffff !important;
-            background-color: #0071e3 !important;
-        }
-        .apple-transition {
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .apple-card-shadow {
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>AEP Portal | Aerodrome Entry Permit Workspace</title>
+  
+  <meta name="theme-color" content="#f5f5f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+  <!-- Tailwind CSS Engine -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    /* San Francisco Font Stack & Apple Glass Styling */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: -0.012em;
+    }
+
+    .apple-glass-nav {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: saturate(180%) blur(25px);
+      -webkit-backdrop-filter: saturate(180%) blur(25px);
+    }
+
+    .apple-card {
+      background: #ffffff;
+      border: 1px solid rgba(210, 210, 215, 0.45);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      border-radius: 20px;
+    }
+
+    .apple-btn-active {
+      background-color: #0071e3 !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(0, 113, 227, 0.35);
+    }
+
+    .apple-input {
+      background: #fbfbfd;
+      border: 1px solid #d2d2d7;
+      border-radius: 12px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .apple-input:focus {
+      outline: none;
+      background: #ffffff;
+      border-color: #0071e3;
+      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+    }
+
+    /* Print Preview Optimizations */
+    @media print {
+      body * { visibility: hidden; }
+      #printable-aep-card, #printable-aep-card * { visibility: visible; }
+      #printable-aep-card {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        border: 2px solid #000;
+      }
+      .no-print { display: none !important; }
+    }
+  </style>
 </head>
 <body class="bg-[#f5f5f7] text-[#1d1d1f] min-h-screen flex flex-col antialiased">
 
-    <!-- Fixed Premium Apple Glass Header Navbar -->
-    <nav class="fixed top-0 left-0 right-0 h-14 apple-nav-blur border-b border-[#d2d2d7]/50 z-50 apple-transition">
-        <div class="max-w-5xl mx-auto h-full px-8 flex justify-between items-center">
-            <div class="flex items-center space-x-2 cursor-pointer group" onclick="switchTab('form')">
-                <span class="text-base font-semibold tracking-tight text-[#1d1d1f] group-hover:opacity-70 transition-opacity">AEP Workspace</span>
-            </div>
-            
-            <!-- Segmented Control Style Tab Bar -->
-            <div class="flex p-0.5 bg-[#e8e8ed] rounded-full border border-[#d2d2d7]/30">
-                <button onclick="switchTab('form')" id="btn-form" class="tab-btn apple-btn-active text-xs font-medium text-[#515154] px-4 py-1.5 rounded-full apple-transition focus:outline-none">Form Filling</button>
-                <button onclick="switchTab('avsec')" id="btn-avsec" class="tab-btn text-xs font-medium text-[#515154] px-4 py-1.5 rounded-full apple-transition focus:outline-none">AVSEC</button>
-                <button onclick="switchTab('pvc')" id="btn-pvc" class="tab-btn text-xs font-medium text-[#515154] px-4 py-1.5 rounded-full apple-transition focus:outline-none">PVC</button>
-                <button onclick="switchTab('passport')" id="btn-passport" class="tab-btn text-xs font-medium text-[#515154] px-4 py-1.5 rounded-full apple-transition focus:outline-none">Passport</button>
-            </div>
+  <!-- Fixed Apple Glass Navigation -->
+  <header class="fixed top-0 left-0 right-0 h-16 apple-glass-nav border-b border-[#d2d2d7]/50 z-50 transition-all no-print">
+    <div class="max-w-7xl mx-auto h-full px-6 flex justify-between items-center">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('split-form')">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0071e3] to-[#42a5f5] flex items-center justify-center text-white shadow-sm">
+          <i class="fa-solid fa-plane-departure text-sm"></i>
         </div>
-    </nav>
+        <div>
+          <span class="text-base font-semibold tracking-tight block leading-tight">AEP Workspace</span>
+          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Airport Authority Operations</span>
+        </div>
+      </div>
 
-    <!-- Main Workspace Container -->
-    <main class="flex-1 max-w-4xl w-full mx-auto px-8 pt-28 pb-20">
+      <!-- Segmented Pill Controls -->
+      <div class="flex items-center space-x-1 p-1 bg-[#e8e8ed] rounded-full border border-[#d2d2d7]/40">
+        <button id="btn-nav-form" onclick="switchView('split-form')" class="px-5 py-1.5 rounded-full text-xs font-semibold text-[#515154] apple-btn-active transition-all focus:outline-none">
+          <i class="fa-solid fa-file-pen mr-1.5"></i> Form &amp; Live Deck
+        </button>
+        <button id="btn-nav-search" onclick="switchView('universal-search')" class="px-5 py-1.5 rounded-full text-xs font-semibold text-[#515154] hover:text-[#1d1d1f] transition-all focus:outline-none">
+          <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Universal Registry
+        </button>
+      </div>
+
+      <!-- Live Sync Status Pill -->
+      <div class="hidden md:flex items-center space-x-2 text-xs font-medium text-[#86868b] bg-white/70 px-3 py-1.5 rounded-full border border-[#d2d2d7]/40 shadow-xs">
+        <span class="w-2 h-2 rounded-full bg-[#34c759] animate-pulse"></span>
+        <span id="sync-status-indicator">Google Cloud Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 pt-24 pb-20">
+
+    <!-- VIEW 1: SPLIT DECK (FORM + LIVE OFFICIAL PREVIEW) -->
+    <div id="view-split-deck" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2 no-print">
+        <div>
+          <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-[#1d1d1f]">AEP Processing Desk</h1>
+          <p class="text-sm md:text-base text-[#86868b] mt-1">Complete credential details to instantly generate verified dossiers and synchronize with Google Drive &amp; Sheets.</p>
+        </div>
         
-        <!-- MODULE FRAMEWORK: Form Filling View -->
-        <div id="form-view" class="tab-content apple-transition">
-            <header class="mb-10">
-                <h2 class="text-4xl font-bold tracking-tight text-[#1d1d1f] mb-2">Aerodrome Entry Permit</h2>
-                <p class="text-lg text-[#86868b] font-normal">Automate digital aviation credential forms perfectly optimized for terminal access.</p>
-            </header>
+        <!-- Action Toolbar -->
+        <div class="flex items-center space-x-2">
+          <button onclick="clearFormFields()" class="px-4 py-2 bg-white text-[#86868b] hover:text-[#1d1d1f] text-xs font-semibold rounded-xl border border-[#d2d2d7]/70 shadow-xs hover:border-[#86868b] transition-all">
+            <i class="fa-solid fa-arrow-rotate-left mr-1"></i> Reset
+          </button>
+          <button onclick="triggerPrintPass()" class="px-4 py-2 bg-[#1d1d1f] hover:bg-black text-white text-xs font-semibold rounded-xl shadow-sm transition-all">
+            <i class="fa-solid fa-print mr-1.5"></i> Print Dossier
+          </button>
+        </div>
+      </div>
+
+      <!-- Master Split Deck Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- LEFT COLUMN: FORM CONTROLS & UPLOAD MATRIX (7 cols) -->
+        <div class="lg:col-span-7 space-y-5 no-print">
+          <form id="aepMasterForm" onsubmit="handleFormSubmission(event)" class="space-y-5">
             
-            <div class="bg-white p-12 rounded-2xl border border-[#d2d2d7]/40 apple-card-shadow text-center">
-                <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#f5f5f7] text-[#0071e3] mb-5">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://w3.org">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
+            <!-- SECTION 1: PERSONNEL & AIRLINE BASELINE -->
+            <div class="apple-card p-6 md:p-8 space-y-4">
+              <div class="flex items-center space-x-2 border-b border-[#f5f5f7] pb-3">
+                <span class="w-6 h-6 rounded-lg bg-[#e3f2fd] text-[#0071e3] flex items-center justify-center text-xs font-bold">1</span>
+                <h3 class="text-base font-semibold text-[#1d1d1f]">Personnel &amp; Airline Baseline</h3>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Employee ID *</label>
+                  <input type="text" id="inp-empid" required placeholder="e.g. IGA72835" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
                 </div>
-                <h3 class="text-2xl font-semibold text-[#1d1d1f] mb-3">Interactive Workspace Setup Ready</h3>
-                <p class="text-base text-[#86868b] max-w-lg mx-auto leading-relaxed">Dynamic field mappings matched to your application parameters will render form modules instantly here.</p>
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Full Name (As on Passport) *</label>
+                  <input type="text" id="inp-name" required placeholder="e.g. MUSHTAQ MOHAMMED" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Department *</label>
+                  <select id="inp-dept" required onchange="updateLivePreview()" class="w-full px-3.5 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]">
+                    <option value="SECURITY">SECURITY</option>
+                    <option value="GROUND_OPS">GROUND OPERATIONS</option>
+                    <option value="INFLIGHT">IN-FLIGHT SERVICES</option>
+                    <option value="ENGINEERING">ENGINEERING &amp; AOG</option>
+                    <option value="CARGO">CARGO &amp; LOGISTICS</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Designation *</label>
+                  <input type="text" id="inp-desig" required placeholder="e.g. EXECUTIVE - SECURITY" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Airport Base Station *</label>
+                  <input type="text" id="inp-station" required placeholder="e.g. HYD / RGIA" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Date of Birth</label>
+                  <input type="date" id="inp-dob" oninput="updateLivePreview()" class="w-full px-3.5 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Blood Group</label>
+                  <input type="text" id="inp-blood" placeholder="e.g. O+ve" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Company / Entity</label>
+                  <input type="text" id="inp-org" value="INTERGLOBE AVIATION LTD" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
+                </div>
+              </div>
             </div>
+
+            <!-- SECTION 2: AVSEC, PVC & IDENTITY CREDENTIALS -->
+            <div class="apple-card p-6 md:p-8 space-y-4">
+              <div class="flex items-center space-x-2 border-b border-[#f5f5f7] pb-3">
+                <span class="w-6 h-6 rounded-lg bg-[#e8f5e9] text-[#2e7d32] flex items-center justify-center text-xs font-bold">2</span>
+                <h3 class="text-base font-semibold text-[#1d1d1f]">Aviation Security Clearances &amp; IDs</h3>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">AVSEC Training Type &amp; Date *</label>
+                  <input type="text" id="inp-avsec-desc" required placeholder="e.g. Initial Security (02/AUG/2023)" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">ASTI Center / Instructor Signature</label>
+                  <input type="text" id="inp-avsec-inst" placeholder="e.g. ARCHANA DASH / INDIGO ASTI" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">PVC Serial No. *</label>
+                  <input type="text" id="inp-pvc-no" required placeholder="e.g. TP 88793" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">PVC Issue Date</label>
+                  <input type="date" id="inp-pvc-issue" oninput="updateLivePreview()" class="w-full px-3.5 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">PVC Expiry Date *</label>
+                  <input type="date" id="inp-pvc-expiry" required oninput="updateLivePreview()" class="w-full px-3.5 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Passport / Aadhaar UID *</label>
+                  <input type="text" id="inp-passport-no" required placeholder="e.g. Z5948301 / UIDAI Valid" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-semibold uppercase text-[#1d1d1f]" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Official Corporate Email</label>
+                  <input type="email" id="inp-email" placeholder="e.g. mushtaq.ismail@goindigo.in" oninput="updateLivePreview()" class="w-full px-4 py-2.5 apple-input text-sm font-medium text-[#1d1d1f]" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Permanent Address</label>
+                <textarea id="inp-address" rows="2" placeholder="Complete postal address verified by police authorities" oninput="updateLivePreview()" class="w-full px-4 py-2 apple-input text-sm font-medium text-[#1d1d1f]"></textarea>
+              </div>
+            </div>
+
+            <!-- SECTION 3: OPERATIONAL ACCESS ZONES -->
+            <div class="apple-card p-6 md:p-8 space-y-4">
+              <div class="flex items-center space-x-2 border-b border-[#f5f5f7] pb-3">
+                <span class="w-6 h-6 rounded-lg bg-[#fff3e0] text-[#e65100] flex items-center justify-center text-xs font-bold">3</span>
+                <h3 class="text-base font-semibold text-[#1d1d1f]">Terminal &amp; Airside Zone Clearance</h3>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-medium">
+                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
+                  <input type="checkbox" id="zone-T" checked onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
+                  <span>Terminal (T)</span>
+                </label>
+                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
+                  <input type="checkbox" id="zone-SHA" checked onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
+                  <span>Security Hold (SHA)</span>
+                </label>
+                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
+                  <input type="checkbox" id="zone-A" checked onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
+                  <span>Apron Area (A)</span>
+                </label>
+                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
+                  <input type="checkbox" id="zone-BHA" checked onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
+                  <span>Baggage Area (BHA)</span>
+                </label>
+                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
+                  <input type="checkbox" id="zone-C" onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
+                  <span>Cargo Complex (C)</span>
+                </label>
+                <label class="flex items-center space-x-2 p-2.5 bg-[#f5f5f7] rounded-xl cursor-pointer hover:bg-[#e8e8ed]">
+                  <input type="checkbox" id="zone-ATC" onchange="updateLivePreview()" class="w-4 h-4 text-[#0071e3] rounded" />
+                  <span>ATC Tower (ATC)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- SECTION 4: DOCUMENT ATTACHMENTS (DRIVE SYNC READY) -->
+            <div class="apple-card p-6 md:p-8 space-y-4">
+              <div class="flex items-center space-x-2 border-b border-[#f5f5f7] pb-3">
+                <span class="w-6 h-6 rounded-lg bg-[#ede7f6] text-[#512da8] flex items-center justify-center text-xs font-bold">4</span>
+                <h3 class="text-base font-semibold text-[#1d1d1f]">Document Attachments &amp; Photo</h3>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">Official Passport Photo</label>
+                  <input type="file" id="file-photo" accept="image/*" onchange="handlePhotoUpload(this)" class="w-full text-xs text-[#86868b] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white hover:file:bg-[#0077ed] cursor-pointer" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#86868b] uppercase tracking-wider mb-1.5">PVC Certificate Copy (PDF/JPG)</label>
+                  <input type="file" id="file-pvc" accept=".pdf,image/*" class="w-full text-xs text-[#86868b] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white hover:file:bg-[#0077ed] cursor-pointer" />
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBMIT BUTTON DECK -->
+            <div class="pt-2">
+              <button type="submit" id="btn-submit-form" class="w-full py-4 bg-[#0071e3] hover:bg-[#0077ed] active:scale-[0.99] text-white text-base font-semibold rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>Submit &amp; Append to Google Sheet Registry</span>
+              </button>
+              <p class="text-[11px] text-center text-[#86868b] mt-2">Data routes directly to your company Google Spreadsheet categorized by Department and Designation.</p>
+            </div>
+          </form>
         </div>
 
-        <!-- MODULE FRAMEWORK: Universal Registry Search Window -->
-        <div id="search-view" class="tab-content hidden opacity-0 apple-transition transform translate-y-3">
-            <header class="mb-10">
-                <h2 id="search-title" class="text-4xl font-bold tracking-tight text-[#1d1d1f] mb-2">Verification Registry</h2>
-                <p class="text-lg text-[#86868b] font-normal">Securely query infrastructure databases directly from terminal processing access clusters.</p>
-            </header>
+        <!-- RIGHT COLUMN: AUTHENTIC LIVE AEP PASS PREVIEW (5 cols) -->
+        <div class="lg:col-span-5 sticky top-24 space-y-4">
+          <div class="flex items-center justify-between px-1 no-print">
+            <span class="text-xs font-bold tracking-wider text-[#86868b] uppercase">Live Pass Preview (Auto-Synced)</span>
+            <span class="text-[11px] font-semibold text-[#34c759] flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#34c759]"></span> Live Keystroke Sync
+            </span>
+          </div>
+
+          <!-- Printable Official AEP Pass Component -->
+          <div id="printable-aep-card" class="bg-white rounded-3xl border-2 border-[#1d1d1f] shadow-xl overflow-hidden relative">
             
-            <!-- Apple Style Search Field Wrapper -->
-            <div class="bg-white p-6 rounded-2xl border border-[#d2d2d7]/40 apple-card-shadow mb-8">
-                <div class="flex space-x-3">
-                    <div class="relative flex-1">
-                        <input type="text" id="empIdInput" placeholder="Employee ID (e.g., IGA72835)" class="w-full px-5 py-3.5 bg-[#f5f5f7] border border-[#d2d2d7] rounded-xl text-base text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 transition-all font-medium">
-                    </div>
-                    <button onclick="executeSearch()" class="bg-[#0071e3] text-white text-base font-medium px-8 py-3.5 rounded-xl hover:bg-[#0077ed] active:scale-[0.98] transition-all tracking-tight shadow-sm">Search</button>
-                </div>
-                <p id="error-msg" class="hidden text-sm text-[#ff3b30] mt-3 font-medium px-1 flex items-center gap-1.5"></p>
+            <!-- Pass Top Aviation Header Strip -->
+            <div class="bg-[#1d1d1f] text-white px-6 py-4 flex justify-between items-center border-b border-[#333]">
+              <div>
+                <span class="text-[10px] uppercase font-bold tracking-widest text-[#0071e3] block">CIVIL AVIATION SECURITY</span>
+                <h4 class="text-sm font-extrabold tracking-tight">AERODROME ENTRY PERMIT</h4>
+              </div>
+              <span id="prev-station" class="text-xs font-black bg-white/10 px-2.5 py-1 rounded-md text-amber-300">HYD</span>
             </div>
 
-            <!-- Sleek Profile Verification Card View -->
-            <div id="result-box" class="hidden bg-white rounded-2xl border border-[#d2d2d7]/40 apple-card-shadow overflow-hidden apple-transition">
-                <div class="bg-[#f5f5f7] px-8 py-4 border-b border-[#d2d2d7]/40 flex justify-between items-center">
-                    <span class="text-xs font-bold tracking-widest text-[#86868b] uppercase">Secured Verification Dossier</span>
-                    <span class="text-xs font-bold tracking-tight bg-[#e3f2fd] text-[#0071e3] px-3 py-1 rounded-full border border-[#0071e3]/10">VERIFIED MATCH</span>
+            <div class="p-6 space-y-5 bg-gradient-to-b from-white to-[#fafafa]">
+              <!-- Main Identity Row -->
+              <div class="flex space-x-4 items-start">
+                <div class="w-24 h-28 bg-[#f5f5f7] border-2 border-dashed border-[#d2d2d7] rounded-2xl overflow-hidden flex items-center justify-center flex-shrink-0 relative">
+                  <img id="prev-photo" src="" alt="Personnel Photo" class="w-full h-full object-cover hidden" />
+                  <div id="prev-photo-fallback" class="text-center text-[#86868b] p-2">
+                    <i class="fa-solid fa-user text-2xl mb-1 text-[#d2d2d7]"></i>
+                    <span class="text-[9px] block uppercase font-bold">Photo</span>
+                  </div>
                 </div>
-                <div class="p-8">
-                    <!-- Essential Metadata Header Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm mb-8 pb-6 border-b border-[#f5f5f7]">
-                        <div class="space-y-1">
-                            <span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Full Name</span>
-                            <span id="res-name" class="text-2xl font-bold tracking-tight text-[#1d1d1f]"></span>
-                        </div>
-                        <div class="space-y-1">
-                            <span class="text-xs font-semibold text-[#86868b] uppercase tracking-wider block">Corporate ID & Station Assignment</span>
-                            <span id="res-id-desc" class="text-base font-semibold text-[#515154]"></span>
-                        </div>
-                    </div>
-                    <!-- Module Variable Custom Attribute Fields -->
-                    <div id="module-data" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-sm"></div>
+
+                <div class="flex-1 space-y-1">
+                  <span id="prev-org" class="text-[10px] font-bold text-[#86868b] tracking-wider uppercase block">INTERGLOBE AVIATION LTD</span>
+                  <h3 id="prev-name" class="text-lg font-black text-[#1d1d1f] leading-tight">MUSHTAQ MOHAMMED</h3>
+                  <p id="prev-desig" class="text-xs font-semibold text-[#515154]">EXECUTIVE - SECURITY</p>
+                  
+                  <div class="pt-2 flex items-center space-x-2">
+                    <span class="text-[10px] font-bold bg-[#e3f2fd] text-[#0071e3] px-2 py-0.5 rounded">ID: <span id="prev-empid">IGA72835</span></span>
+                    <span class="text-[10px] font-bold bg-[#f5f5f7] text-[#515154] px-2 py-0.5 rounded">BG: <span id="prev-blood">O+VE</span></span>
+                  </div>
                 </div>
+              </div>
+
+              <!-- Terminal Access Matrix Badges -->
+              <div class="space-y-1.5 pt-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">Authorized Operational Zones</span>
+                <div id="prev-zones-container" class="flex flex-wrap gap-1.5">
+                  <span class="text-[11px] font-black bg-[#1d1d1f] text-white px-2.5 py-1 rounded-lg">T</span>
+                  <span class="text-[11px] font-black bg-[#1d1d1f] text-white px-2.5 py-1 rounded-lg">SHA</span>
+                  <span class="text-[11px] font-black bg-[#1d1d1f] text-white px-2.5 py-1 rounded-lg">A</span>
+                  <span class="text-[11px] font-black bg-[#1d1d1f] text-white px-2.5 py-1 rounded-lg">BHA</span>
+                </div>
+              </div>
+
+              <!-- Compliance Audit Table -->
+              <div class="bg-[#f5f5f7] rounded-2xl p-3.5 space-y-2 border border-[#d2d2d7]/50 text-xs">
+                <div class="flex justify-between items-center">
+                  <span class="text-[#86868b] font-medium">Police Verification (PVC):</span>
+                  <span id="prev-pvc" class="font-bold text-[#1d1d1f]">TP 88793 (Active)</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-[#86868b] font-medium">AVSEC Clearance:</span>
+                  <span id="prev-avsec" class="font-bold text-[#1d1d1f]">Certified Asti</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-[#86868b] font-medium">Identity / Passport:</span>
+                  <span id="prev-passport" class="font-bold text-[#1d1d1f]">VALID</span>
+                </div>
+              </div>
+
+              <!-- Pass Footer & Barcode Tracker -->
+              <div class="pt-3 border-t border-[#f5f5f7] flex justify-between items-end">
+                <div>
+                  <span class="text-[9px] text-[#86868b] uppercase font-bold block">Digital Tracking Token</span>
+                  <code id="prev-token" class="text-xs font-mono font-bold text-[#0071e3]">AEP-2026-IGA72835</code>
+                </div>
+                <div class="text-right">
+                  <span class="text-[9px] text-[#86868b] uppercase font-bold block">Issuing Authority</span>
+                  <span class="text-[10px] font-semibold text-[#1d1d1f]">BCAS / RDCA</span>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
 
-    </main>
+      </div>
+    </div>
 
-    <script>
-        let currentTab = 'form';
+    <!-- VIEW 2: UNIVERSAL REGISTRY & RECORD SEARCH -->
+    <div id="view-universal-search" class="hidden space-y-6">
+      <div class="mb-4">
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-[#1d1d1f]">AEP Universal Registry</h2>
+        <p class="text-sm md:text-base text-[#86868b] mt-1">Directly query personnel database across all airport departments, designation ranks, and security credentials.</p>
+      </div>
 
-        // Local Live Data Nodes directly mapped to your Indigo AEP Form Attachment file values
-        const localDatabase = {
-            "IGA72835": {
-                id: "IGA72835",
-                name: "MUSHTAQ MOHAMMED",
-                designation: "EXECUTIVE - SECURITY",
-                org: "INTERGLOBE AVIATION LTD",
-                avsec: {
-                    type: "Initial Security Training",
-                    date: "02 / AUG / 2023",
-                    location: "BLR - BENGALURU",
-                    instructor: "ARCHANA DASH / INDIGO ASTI"
-                },
-                pvc: {
-                    status: "Cleared & Approved",
-                    certificateNo: "TP 88793",
-                    courtCase: "No Pending Records Found",
-                    address: "H.NO 20-170/1/1, RB NAGAR, RANGAREDDY, TELANGANA - 501218"
-                },
-                passport: {
-                    number: "INDIAN PASSPORT DATA VALID", 
-                    nationality: "INDIAN NATIONAL",
-                    expiryDate: "26 / SEP / 2053",
-                    email: "MUSHTAQ.ISMAIL@GOINDIGO.IN"
-                }
-            }
+      <!-- Apple Spotlight Style Search Input -->
+      <div class="apple-card p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-[#86868b]">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="text" id="queryEmployeeInput" placeholder="Search by Employee ID, Name, Passport, or PVC No..." onkeypress="if(event.key === 'Enter') executeUniversalSearch()" class="w-full pl-11 pr-4 py-3.5 apple-input text-base text-[#1d1d1f] font-medium placeholder-[#86868b]" />
+          </div>
+          <button onclick="executeUniversalSearch()" class="px-8 py-3.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-base font-semibold rounded-xl shadow-sm transition-all flex items-center justify-center space-x-2">
+            <span>Query Database</span>
+          </button>
+        </div>
+
+        <!-- Quick Filter Pills -->
+        <div class="flex flex-wrap items-center gap-2 pt-1 text-xs">
+          <span class="text-[#86868b] font-semibold mr-1">Filter by Department:</span>
+          <button onclick="filterByDept('ALL')" class="px-3 py-1 bg-[#e8e8ed] rounded-full font-medium hover:bg-[#d2d2d7]">All</button>
+          <button onclick="filterByDept('SECURITY')" class="px-3 py-1 bg-white border border-[#d2d2d7] rounded-full font-medium hover:border-[#0071e3]">Security</button>
+          <button onclick="filterByDept('GROUND_OPS')" class="px-3 py-1 bg-white border border-[#d2d2d7] rounded-full font-medium hover:border-[#0071e3]">Ground Ops</button>
+          <button onclick="filterByDept('ENGINEERING')" class="px-3 py-1 bg-white border border-[#d2d2d7] rounded-full font-medium hover:border-[#0071e3]">Engineering</button>
+        </div>
+      </div>
+
+      <!-- Search Feedback Messages -->
+      <div id="search-alert-box" class="hidden p-4 rounded-2xl text-sm font-medium"></div>
+
+      <!-- Dossier Profile Result Window -->
+      <div id="search-result-dossier" class="hidden apple-card overflow-hidden">
+        <div class="bg-[#f5f5f7] px-8 py-4 border-b border-[#d2d2d7]/50 flex justify-between items-center">
+          <span class="text-xs font-bold tracking-widest text-[#86868b] uppercase">Verified BCAS Credential File</span>
+          <span id="dossier-status-pill" class="text-xs font-bold px-3 py-1 rounded-full bg-[#e8f5e9] text-[#2e7d32] border border-[#2e7d32]/20">
+            🟢 CLEARANCE ACTIVE
+          </span>
+        </div>
+
+        <div class="p-8 space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-[#f5f5f7] pb-6">
+            <div>
+              <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block mb-1">Personnel Information</span>
+              <h3 id="dossier-name" class="text-2xl font-bold text-[#1d1d1f]"></h3>
+              <p id="dossier-meta" class="text-sm font-medium text-[#515154] mt-0.5"></p>
+            </div>
+            <div class="space-y-1 md:text-right">
+              <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Station &amp; Division</span>
+              <span id="dossier-station-badge" class="inline-block text-base font-bold text-[#0071e3] bg-[#e3f2fd] px-3 py-1 rounded-lg"></span>
+            </div>
+          </div>
+
+          <div id="dossier-details-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+            <!-- Dynamic compliance attributes injected here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ===================================================
+       CLIENT-SIDE CONTROLLER & GOOGLE SHEETS WEBHOOK
+       =================================================== -->
+  <script>
+    // Config: Paste your deployed Google Apps Script Web App URL here
+    const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby-YOUR-DEPLOYED-URL-HERE/exec";
+
+    // Local in-memory seed dataset (mapped directly to your Indigo AEP records)
+    const localDatabase = {
+      "IGA72835": {
+        empId: "IGA72835",
+        name: "MUSHTAQ MOHAMMED",
+        designation: "EXECUTIVE - SECURITY",
+        department: "SECURITY",
+        station: "HYD / RGIA",
+        dob: "1995-04-12",
+        bloodGroup: "O+VE",
+        org: "INTERGLOBE AVIATION LTD",
+        avsecDesc: "Initial Security Training (02/AUG/2023)",
+        avsecInst: "ARCHANA DASH / INDIGO ASTI",
+        pvcNo: "TP 88793",
+        pvcIssue: "2023-08-10",
+        pvcExpiry: "2027-08-09",
+        passportNo: "Z5948301 - INDIAN NATIONAL",
+        email: "MUSHTAQ.ISMAIL@GOINDIGO.IN",
+        address: "H.NO 20-170/1/1, RB NAGAR, RANGAREDDY, TELANGANA - 501218",
+        zones: ["T", "SHA", "A", "BHA"]
+      }
+    };
+
+    let uploadedPhotoBase64 = "";
+
+    // Tab switcher between Split-Deck and Universal Search
+    function switchView(viewName) {
+      const splitDeck = document.getElementById('view-split-deck');
+      const searchDeck = document.getElementById('view-universal-search');
+      const btnForm = document.getElementById('btn-nav-form');
+      const btnSearch = document.getElementById('btn-nav-search');
+
+      if (viewName === 'split-form') {
+        splitDeck.classList.remove('hidden');
+        searchDeck.classList.add('hidden');
+        btnForm.classList.add('apple-btn-active');
+        btnSearch.classList.remove('apple-btn-active');
+      } else {
+        splitDeck.classList.add('hidden');
+        searchDeck.classList.remove('hidden');
+        btnSearch.classList.add('apple-btn-active');
+        btnForm.classList.remove('apple-btn-active');
+      }
+    }
+
+    // Photo input encoder with instant preview
+    function handlePhotoUpload(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedPhotoBase64 = e.target.result;
+          const img = document.getElementById('prev-photo');
+          const fallback = document.getElementById('prev-photo-fallback');
+          img.src = uploadedPhotoBase64;
+          img.classList.remove('hidden');
+          fallback.classList.add('hidden');
         };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
 
-        function switchTab(tabName) {
-            currentTab = tabName;
-            
-            // Manage clean UI active style states transitions
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('apple-btn-active', 'text-white'));
-            document.getElementById(`btn-${tabName}`).classList.add('apple-btn-active');
+    // Live keystroke synchronization engine
+    function updateLivePreview() {
+      const empid = document.getElementById('inp-empid').value.trim().toUpperCase() || "IGA72835";
+      const name = document.getElementById('inp-name').value.trim().toUpperCase() || "MUSHTAQ MOHAMMED";
+      const desig = document.getElementById('inp-desig').value.trim().toUpperCase() || "EXECUTIVE - SECURITY";
+      const org = document.getElementById('inp-org').value.trim().toUpperCase() || "INTERGLOBE AVIATION LTD";
+      const station = document.getElementById('inp-station').value.trim().toUpperCase() || "HYD";
+      const blood = document.getElementById('inp-blood').value.trim().toUpperCase() || "O+VE";
+      const pvcNo = document.getElementById('inp-pvc-no').value.trim().toUpperCase() || "TP 88793";
+      const avsec = document.getElementById('inp-avsec-desc').value.trim() || "Certified Asti";
+      const passport = document.getElementById('inp-passport-no').value.trim().toUpperCase() || "VALID";
 
-            const formView = document.getElementById('form-view');
-            const searchView = document.getElementById('search-view');
+      document.getElementById('prev-empid').innerText = empid;
+      document.getElementById('prev-name').innerText = name;
+      document.getElementById('prev-desig').innerText = desig;
+      document.getElementById('prev-org').innerText = org;
+      document.getElementById('prev-station').innerText = station.substring(0, 4);
+      document.getElementById('prev-blood').innerText = blood;
+      document.getElementById('prev-pvc').innerText = pvcNo;
+      document.getElementById('prev-avsec').innerText = avsec;
+      document.getElementById('prev-passport').innerText = passport;
+      document.getElementById('prev-token').innerText = `AEP-2026-${empid}`;
 
-            document.getElementById('result-box').classList.add('hidden');
-            document.getElementById('error-msg').classList.add('hidden');
-            document.getElementById('empIdInput').value = '';
+      // Recalculate operational zones
+      const zones = [];
+      ['T', 'SHA', 'A', 'BHA', 'C', 'ATC'].forEach(z => {
+        const chk = document.getElementById(`zone-${z}`);
+        if (chk && chk.checked) zones.push(z);
+      });
 
-            if (tabName === 'form') {
-                searchView.classList.add('hidden', 'opacity-0', 'translate-y-3');
-                formView.classList.remove('hidden');
-            } else {
-                formView.classList.add('hidden');
-                searchView.classList.remove('hidden');
-                document.getElementById('search-title').innerText = `${tabName.toUpperCase()} Registry`;
-                setTimeout(() => searchView.classList.remove('opacity-0', 'translate-y-3'), 30);
-            }
+      const container = document.getElementById('prev-zones-container');
+      if (zones.length > 0) {
+        container.innerHTML = zones.map(z => `<span class="text-[11px] font-black bg-[#1d1d1f] text-white px-2.5 py-1 rounded-lg">${z}</span>`).join('');
+      } else {
+        container.innerHTML = `<span class="text-[10px] text-red-500 font-bold">No Terminal Zones Selected</span>`;
+      }
+    }
+
+    // Reset Form Fields
+    function clearFormFields() {
+      document.getElementById('aepMasterForm').reset();
+      uploadedPhotoBase64 = "";
+      document.getElementById('prev-photo').classList.add('hidden');
+      document.getElementById('prev-photo-fallback').classList.remove('hidden');
+      updateLivePreview();
+    }
+
+    // Print Pass Dossier
+    function triggerPrintPass() {
+      window.print();
+    }
+
+    // Google Sheets Form Submission & Categorization
+    async function handleFormSubmission(event) {
+      event.preventDefault();
+      const submitBtn = document.getElementById('btn-submit-form');
+      const syncStatus = document.getElementById('sync-status-indicator');
+
+      const payload = {
+        empId: document.getElementById('inp-empid').value.trim().toUpperCase(),
+        name: document.getElementById('inp-name').value.trim().toUpperCase(),
+        department: document.getElementById('inp-dept').value,
+        designation: document.getElementById('inp-desig').value.trim().toUpperCase(),
+        station: document.getElementById('inp-station').value.trim().toUpperCase(),
+        dob: document.getElementById('inp-dob').value,
+        bloodGroup: document.getElementById('inp-blood').value.trim().toUpperCase(),
+        org: document.getElementById('inp-org').value.trim().toUpperCase(),
+        avsecDesc: document.getElementById('inp-avsec-desc').value.trim(),
+        avsecInst: document.getElementById('inp-avsec-inst').value.trim(),
+        pvcNo: document.getElementById('inp-pvc-no').value.trim().toUpperCase(),
+        pvcIssue: document.getElementById('inp-pvc-issue').value,
+        pvcExpiry: document.getElementById('inp-pvc-expiry').value,
+        passportNo: document.getElementById('inp-passport-no').value.trim().toUpperCase(),
+        email: document.getElementById('inp-email').value.trim(),
+        address: document.getElementById('inp-address').value.trim(),
+        zones: ['T', 'SHA', 'A', 'BHA', 'C', 'ATC'].filter(z => document.getElementById(`zone-${z}`)?.checked),
+        photoData: uploadedPhotoBase64
+      };
+
+      // 1. Cache to local memory immediately
+      localDatabase[payload.empId] = payload;
+
+      // 2. Synchronize to Google Sheets Cloud Webhook
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Uploading to Google Sheets &amp; Drive...</span>`;
+      syncStatus.innerText = "Syncing...";
+
+      try {
+        if (GOOGLE_SCRIPT_WEBAPP_URL.includes("YOUR-DEPLOYED-URL-HERE")) {
+          // Simulation mode if Webhook URL is not yet swapped
+          setTimeout(() => {
+            alert(`✅ AEP Dossier Saved!\n\nRecord for ${payload.name} (${payload.empId}) successfully registered locally and categorized under department '${payload.department}'.`);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Submit &amp; Append to Google Sheet Registry</span>`;
+            syncStatus.innerText = "Google Cloud Ready";
+          }, 800);
+          return;
         }
 
-        function executeSearch() {
-            const empIdInput = document.getElementById('empIdInput').value;
-            const resBox = document.getElementById('result-box');
-            const errorMsg = document.getElementById('error-msg');
-            const modDiv = document.getElementById('module-data');
+        const response = await fetch(GOOGLE_SCRIPT_WEBAPP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
 
-            resBox.classList.add('hidden');
-            errorMsg.classList.add('hidden');
-
-            if (!empIdInput.trim()) return;
-
-            const targetKey = empIdInput.toUpperCase().trim();
-            const record = localDatabase[targetKey];
-
-            if (!record) {
-                errorMsg.innerText = "Employee ID profile entry record configuration could not be found.";
-                errorMsg.classList.remove('hidden');
-                return;
-            }
-
-            // Set global header attributes inside container elements
-            document.getElementById('res-name').innerText = record.name;
-            document.getElementById('res-id-desc').innerText = `${record.id} — ${record.designation} at ${record.org}`;
-
-            let detailHtml = '';
-            const dataFields = record[currentTab.toLowerCase()];
-
-            if (currentTab === 'avsec') {
-                detailHtml = `
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Training Type</span><span class="text-base text-[#1d1d1f] font-semibold">${dataFields.type}</span></div>
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Completion Date</span><span class="text-base text-[#1d1d1f] font-semibold">${dataFields.date}</span></div>
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Airport Base Station</span><span class="text-base text-[#1d1d1f] font-semibold">${dataFields.location}</span></div>
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Authorized Instructor Signature</span><span class="text-base text-[#1d1d1f] font-semibold">${dataFields.instructor}</span></div>
-                `;
-            } else if (currentTab === 'pvc') {
-                detailHtml = `
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Verification Verdict</span><span class="text-base font-bold text-[#34c759]">${dataFields.status}</span></div>
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Certificate Serial ID</span><span class="text-base text-[#1d1d1f] font-semibold">${dataFields.certificateNo}</span></div>
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Legal Proceedings Counter</span><span class="text-base text-[#1d1d1f] font-semibold">${dataFields.courtCase}</span></div>
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Registered Permanent Address</span><span class="text-sm text-[#515154] font-medium leading-relaxed block">${dataFields.address}</span></div>
-                `;
-            } else if (currentTab === 'passport') {
-                detailHtml = `
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Document Audit Status</span><span class="text-base text-[#1d1d1f] font-semibold">${dataFields.number}</span></div>
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Nationality Class</span><span class="text-base text-[#1d1d1f] font-semibold">${dataFields.nationality}</span></div>
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Expiration Date Config</span><span class="text-base text-[#1d1d1f] font-semibold">${dataFields.expiryDate}</span></div>
-                    <div class="space-y-1"><span class="text-xs font-bold text-[#86868b] uppercase tracking-wider block">Verified Corporate Mail Contact</span><span class="text-base text-[#0071e3] font-semibold break-all">${dataFields.email}</span></div>
-                `;
-            }
-
-            modDiv.innerHTML = detailHtml;
-            resBox.classList.remove('hidden');
+        const result = await response.json();
+        if (result.status === "success") {
+          alert(`✅ Success: AEP Application for ${payload.name} has been synced to Google Sheet and Drive.`);
+        } else {
+          throw new Error(result.message || "Failed to commit record to spreadsheet.");
         }
-    </script>
+      } catch (error) {
+        console.warn("Google Sync Notice:", error);
+        alert(`Record committed to active workspace memory. Note: Ensure your Google Web App URL is published to sync live spreadsheets.`);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Submit &amp; Append to Google Sheet Registry</span>`;
+        syncStatus.innerText = "Google Cloud Ready";
+      }
+    }
+
+    // Universal Registry Search Logic
+    function executeUniversalSearch() {
+      const query = document.getElementById('queryEmployeeInput').value.trim().toUpperCase();
+      const alertBox = document.getElementById('search-alert-box');
+      const dossierBox = document.getElementById('search-result-dossier');
+
+      alertBox.classList.add('hidden');
+      dossierBox.classList.add('hidden');
+
+      if (!query) {
+        alertBox.className = "p-4 rounded-2xl bg-amber-50 text-amber-800 border border-amber-200 text-sm";
+        alertBox.innerText = "Please input an Employee ID, Full Name, Passport, or PVC Number to query.";
+        alertBox.classList.remove('hidden');
+        return;
+      }
+
+      // Query across local memory cache
+      let match = localDatabase[query];
+      if (!match) {
+        match = Object.values(localDatabase).find(item => 
+          item.name.includes(query) ||
+          item.pvcNo === query ||
+          item.passportNo.includes(query)
+        );
+      }
+
+      if (!match) {
+        alertBox.className = "p-4 rounded-2xl bg-red-50 text-red-800 border border-red-200 text-sm";
+        alertBox.innerText = `No AEP registration file found matching "${query}". Verify employee credentials.`;
+        alertBox.classList.remove('hidden');
+        return;
+      }
+
+      // Check PVC validity status
+      const isExpired = match.pvcExpiry && new Date(match.pvcExpiry) < new Date();
+      const statusPill = document.getElementById('dossier-status-pill');
+
+      if (isExpired) {
+        statusPill.className = "text-xs font-bold px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-200";
+        statusPill.innerText = "🔴 PVC EXPIRED - ACCESS SUSPENDED";
+      } else {
+        statusPill.className = "text-xs font-bold px-3 py-1 rounded-full bg-[#e8f5e9] text-[#2e7d32] border border-[#2e7d32]/20";
+        statusPill.innerText = "🟢 CLEARANCE VALID";
+      }
+
+      document.getElementById('dossier-name').innerText = match.name;
+      document.getElementById('dossier-meta').innerText = `${match.empId} • ${match.designation} (${match.org})`;
+      document.getElementById('dossier-station-badge').innerText = `${match.station} • ${match.department}`;
+
+      const grid = document.getElementById('dossier-details-grid');
+      grid.innerHTML = `
+        <div class="space-y-1">
+          <span class="text-xs font-bold text-[#86868b] uppercase">AVSEC Certification</span>
+          <p class="font-semibold text-[#1d1d1f]">${match.avsecDesc || 'N/A'}</p>
+          <small class="text-[#86868b]">${match.avsecInst || 'Asti Verified'}</small>
+        </div>
+        <div class="space-y-1">
+          <span class="text-xs font-bold text-[#86868b] uppercase">Police Verification (PVC)</span>
+          <p class="font-semibold text-[#1d1d1f]">Cert No: ${match.pvcNo}</p>
+          <small class="text-[#86868b]">Valid till: ${match.pvcExpiry || 'Pending'}</small>
+        </div>
+        <div class="space-y-1">
+          <span class="text-xs font-bold text-[#86868b] uppercase">Identity &amp; Nationality</span>
+          <p class="font-semibold text-[#1d1d1f]">${match.passportNo}</p>
+          <small class="text-[#86868b]">${match.email || 'No email logged'}</small>
+        </div>
+        <div class="space-y-1 md:col-span-2">
+          <span class="text-xs font-bold text-[#86868b] uppercase">Registered Address</span>
+          <p class="font-medium text-[#515154] text-xs">${match.address || 'Address unrecorded'}</p>
+        </div>
+        <div class="space-y-1">
+          <span class="text-xs font-bold text-[#86868b] uppercase">Terminal Access Matrix</span>
+          <div class="flex flex-wrap gap-1 mt-1">
+            ${(match.zones || []).map(z => `<span class="bg-[#1d1d1f] text-white px-2 py-0.5 rounded text-[10px] font-bold">${z}</span>`).join('')}
+          </div>
+        </div>
+      `;
+
+      dossierBox.classList.remove('hidden');
+    }
+
+    function filterByDept(deptName) {
+      if (deptName === 'ALL') {
+        document.getElementById('queryEmployeeInput').value = '';
+        executeUniversalSearch();
+      } else {
+        const item = Object.values(localDatabase).find(d => d.department === deptName);
+        if (item) {
+          document.getElementById('queryEmployeeInput').value = item.empId;
+          executeUniversalSearch();
+        } else {
+          alert(`No registered candidates found under department '${deptName}'.`);
+        }
+      }
+    }
+
+    // Initialize initial pass preview
+    document.addEventListener("DOMContentLoaded", () => {
+      updateLivePreview();
+    });
+  </script>
 </body>
 </html>
-
-
-    
