@@ -168,11 +168,21 @@
         </button>
       </div>
 
-      <!-- 1-Click Guaranteed Print -->
-      <button onclick="printOfficialAEP()" class="px-5 py-2.5 bg-[#1d1d1f] hover:bg-black active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-2">
-        <i class="fa-solid fa-print"></i>
-        <span>Print Official Application (A4)</span>
-      </button>
+      <!-- Actions -->
+      <div class="flex items-center space-x-2">
+        <!-- Direct Template Loader Button -->
+        <label class="px-3.5 py-2 bg-white text-[#0071e3] border border-[#0071e3]/40 hover:bg-[#e3f2fd] text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer flex items-center space-x-1.5" title="Click to choose clean Page 1 & Page 2 images once">
+          <i class="fa-solid fa-image"></i>
+          <span>Attach Template Scans</span>
+          <input type="file" multiple accept="image/*" onchange="uploadDirectTemplates(this)" class="hidden" />
+        </label>
+        
+        <!-- 1-Click Guaranteed Print -->
+        <button onclick="printOfficialAEP()" class="px-5 py-2.5 bg-[#1d1d1f] hover:bg-black active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-2">
+          <i class="fa-solid fa-print"></i>
+          <span>Print Official Application (A4)</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -186,7 +196,7 @@
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 no-print">
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-[#1d1d1f]">Official BCAS AEPAF Form Processing</h1>
-          <p class="text-sm text-[#86868b] mt-1">The form template is an actual physical document image. It is physically impossible for the browser to strip it during print!</p>
+          <p class="text-sm text-[#86868b] mt-1">If the official template scan isn't appearing behind the text, click <b>"Attach Template Scans"</b> in the top bar and select the 2 page scans once.</p>
         </div>
         
         <div class="flex items-center space-x-2">
@@ -487,8 +497,8 @@
                  ============================================== -->
             <div id="page-1" class="official-page-wrapper">
               
-              <!-- THE PHYSICAL TEMPLATE IMAGE: BROWSER WILL NEVER REMOVE THIS! -->
-              <img src="bcas_page1.png" alt="Official BCAS Page 1" class="base-template-img" onerror="this.src='https://via.placeholder.com/794x1123/ffffff/000000?text=Please+Place+bcas_page1.png+in+repo'" />
+              <!-- Real DOM Image (Unstrippable by browser print engines) -->
+              <img id="tpl-img-1" src="bcas_page1.png" alt="Official BCAS Page 1" class="base-template-img" />
 
               <!-- Top-Right Passport Photograph Placement -->
               <div id="ov-photo-box" style="position: absolute; top: 3.5%; right: 5.8%; width: 27.5mm; height: 35.5mm; overflow: hidden; background: transparent; display: flex; align-items: center; justify-content: center; z-index: 2;">
@@ -570,8 +580,8 @@
                  ============================================== -->
             <div id="page-2" class="official-page-wrapper">
               
-              <!-- THE PHYSICAL TEMPLATE IMAGE: BROWSER WILL NEVER REMOVE THIS! -->
-              <img src="bcas_page2.png" alt="Official BCAS Page 2" class="base-template-img" onerror="this.src='https://via.placeholder.com/794x1123/ffffff/000000?text=Please+Place+bcas_page2.png+in+repo'" />
+              <!-- Real DOM Image (Unstrippable by browser print engines) -->
+              <img id="tpl-img-2" src="bcas_page2.png" alt="Official BCAS Page 2" class="base-template-img" />
 
               <!-- 6. Employment Details -->
               <div id="ov-org" class="field-overlay" style="top: 7.6%; left: 24%;">INTERGLOBE AVIATION LTD</div>
@@ -718,6 +728,27 @@
     };
 
     let photoDataURL = "";
+
+    // Upload & Lock Clean Templates Directly from Device
+    function uploadDirectTemplates(input) {
+      if (input.files && input.files.length > 0) {
+        Array.from(input.files).forEach((file, index) => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const dataUrl = e.target.result;
+            if (index === 0) {
+              document.getElementById('tpl-img-1').src = dataUrl;
+              try { localStorage.setItem('aep_tpl_1', dataUrl); } catch(err) {}
+            } else if (index === 1) {
+              document.getElementById('tpl-img-2').src = dataUrl;
+              try { localStorage.setItem('aep_tpl_2', dataUrl); } catch(err) {}
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+        alert("✅ Official Templates Loaded! They are now locked behind the text and ready to print.");
+      }
+    }
 
     function switchView(tab) {
       document.getElementById('view-entry').classList.toggle('hidden', tab !== 'entry');
@@ -917,8 +948,14 @@
       printOfficialAEP();
     }
 
-    // Auto-boot with Mushtaq Mohammed's official record
+    // Auto-boot with Mushtaq Mohammed's official record & cached templates
     document.addEventListener("DOMContentLoaded", () => {
+      // Check if user cached template scans previously
+      const savedTpl1 = localStorage.getItem('aep_tpl_1');
+      const savedTpl2 = localStorage.getItem('aep_tpl_2');
+      if (savedTpl1) document.getElementById('tpl-img-1').src = savedTpl1;
+      if (savedTpl2) document.getElementById('tpl-img-2').src = savedTpl2;
+
       loadSampleMushtaqData();
       syncOverlay();
     });
