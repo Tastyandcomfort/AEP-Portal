@@ -12,7 +12,7 @@
   <!-- FontAwesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- VERIFIED ACTIVE CDN (v1.17.1 on Cloudflare with jsDelivr Fallback) -->
+  <!-- Multi-CDN Fallback (v1.17.1 verified on Cloudflare & jsDelivr) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" 
           onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';"></script>
 
@@ -46,7 +46,7 @@
     }
     .pdf-preview-frame {
       width: 100%;
-      height: 820px;
+      height: 840px;
       border-radius: 16px;
       border: 1px solid #d2d2d7;
       background: #525659;
@@ -55,7 +55,7 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
-  <!-- Apple Glass Navigation Bar -->
+  <!-- Navigation Bar -->
   <header class="fixed top-0 left-0 right-0 h-16 apple-glass-nav border-b border-[#d2d2d7]/60 z-50">
     <div class="max-w-7xl mx-auto h-full px-6 flex justify-between items-center">
       <div class="flex items-center space-x-3">
@@ -64,7 +64,7 @@
         </div>
         <div>
           <span class="text-base font-semibold tracking-tight block leading-tight">BCAS AEP Form Engine</span>
-          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Official Stamping System</span>
+          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Calibrated Coordinate Stamping</span>
         </div>
       </div>
 
@@ -86,15 +86,6 @@
   <!-- MAIN WORKSPACE -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 pt-24 pb-20">
 
-    <!-- Status Alert Bar -->
-    <div id="status-bar" class="mb-6 p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs flex justify-between items-center">
-      <div class="flex items-center space-x-2">
-        <i id="status-icon" class="fa-solid fa-spinner fa-spin text-blue-600 text-base"></i>
-        <span id="status-text">Loading official blank PDF from repository (<code>bcas_aepaf_blank.pdf</code>)...</span>
-      </div>
-    </div>
-
-    <!-- MAIN FORM GRID -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
 
       <!-- LEFT COLUMN: INPUT CONTROLS (5 COLS) -->
@@ -192,7 +183,7 @@
           </div>
 
           <!-- SECTION 4: APPLICANT IDENTITY & PHOTO -->
-          <div class="apple-card p-6 md:p-8 space-y-4">
+          <div class="apple-card p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
               <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Section 4</span>
               <span class="text-xs font-semibold text-[#86868b]">Applicant Credentials</span>
@@ -203,7 +194,7 @@
               <input type="text" id="f_name" required value="MUSHTAQ MOHAMMED" oninput="debounceRefresh()" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="grid grid-cols-2 gap-3 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Father's Name *</label>
                 <input type="text" id="f_father" required value="ISMAIL MOHAMMED" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase" />
@@ -255,7 +246,7 @@
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Passport Photograph (Embeds in top-right box)</label>
+              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Passport Photo (Embeds in top-right box)</label>
               <input type="file" accept="image/jpeg,image/png" onchange="handlePhotoUpload(this)" class="w-full text-xs text-[#86868b] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer" />
             </div>
           </div>
@@ -270,7 +261,7 @@
             <div class="space-y-2 text-xs">
               <span class="font-bold text-[#1d1d1f] uppercase block">5a. Permanent Address</span>
               <input type="text" id="f_permStreet" placeholder="House No / Street / Road" value="H.NO 20-170/1/1, RB NAGAR" oninput="debounceRefresh()" class="w-full p-2.5 apple-input uppercase font-medium" />
-              <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+              <div class="grid grid-cols-4 gap-2">
                 <input type="text" id="f_permDist" placeholder="District" value="RANGAREDDY" oninput="debounceRefresh()" class="p-2.5 apple-input uppercase" />
                 <input type="text" id="f_permState" placeholder="State" value="TELANGANA" oninput="debounceRefresh()" class="p-2.5 apple-input uppercase" />
                 <input type="text" id="f_permPin" placeholder="Pin" value="501218" oninput="debounceRefresh()" class="p-2.5 apple-input" />
@@ -281,7 +272,7 @@
             <div class="space-y-2 text-xs pt-2 border-t border-[#f5f5f7]">
               <span class="font-bold text-[#1d1d1f] uppercase block">5b. Present Address</span>
               <input type="text" id="f_presStreet" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYA" oninput="debounceRefresh()" class="w-full p-2.5 apple-input uppercase font-medium" />
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <div class="grid grid-cols-3 gap-2">
                 <input type="text" id="f_presDist" placeholder="District" value="THANE/NEW MUMBAI" oninput="debounceRefresh()" class="p-2.5 apple-input uppercase" />
                 <input type="text" id="f_presState" placeholder="State" value="MAHARASHTRA" oninput="debounceRefresh()" class="p-2.5 apple-input uppercase" />
                 <input type="text" id="f_presPin" placeholder="Pin" value="400709" oninput="debounceRefresh()" class="p-2.5 apple-input" />
@@ -296,7 +287,7 @@
               <span class="text-xs font-semibold text-[#86868b]">Airport Employment Unit</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="grid grid-cols-2 gap-3 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Organization *</label>
                 <input type="text" id="f_org" value="INTERGLOBE AVIATION LTD" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase" />
@@ -307,7 +298,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="grid grid-cols-3 gap-3 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Employee No. *</label>
                 <input type="text" id="f_empno" value="IGA 72835" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase text-[#0071e3]" />
@@ -335,7 +326,7 @@
               <span class="text-xs font-semibold text-[#86868b]">AVSEC Training &amp; PVC</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="grid grid-cols-2 gap-3 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Training Date</label>
                 <input type="text" id="f_avsecDate" value="02/08/2023" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold" />
@@ -351,7 +342,7 @@
               <input type="text" id="f_avsecInst" value="ARCHANA DASH / INDIGO ASTI" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase" />
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2 border-t border-[#f5f5f7]">
+            <div class="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-[#f5f5f7]">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Serial ID</label>
                 <input type="text" id="f_pvcId" value="TP 88793" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase text-[#2e7d32]" />
@@ -363,7 +354,6 @@
             </div>
           </div>
 
-          <!-- Submit to Google Sheets -->
           <button type="submit" id="btn-submit" class="w-full py-4 bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-bold rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
             <i class="fa-solid fa-cloud-arrow-up"></i>
             <span>Save &amp; Append to Google Sheet</span>
@@ -380,7 +370,6 @@
           </button>
         </div>
 
-        <!-- Embedded PDF Iframe -->
         <iframe id="pdf-preview-frame" class="pdf-preview-frame" src=""></iframe>
       </div>
 
@@ -404,7 +393,6 @@
       debounceTimer = setTimeout(refreshPdfPreview, 350);
     }
 
-    // Direct, reliable repository fetch
     async function loadBlankPdf() {
       if (blankPdfBytes) return blankPdfBytes;
 
@@ -484,14 +472,13 @@
       };
     }
 
-    // Vector checkmark drawer (Zero font encoding crashes)
     function drawCheck(page, x, y) {
       const { rgb } = PDFLib;
       page.drawLine({ start: { x: x - 1, y: y + 3 }, end: { x: x + 2, y }, thickness: 1.5, color: rgb(0,0,0) });
       page.drawLine({ start: { x: x + 2, y }, end: { x: x + 6, y: y + 7 }, thickness: 1.5, color: rgb(0,0,0) });
     }
 
-    // Main PDF Stamping Processor
+    // Main PDF Stamping Processor with Exact Box Calibration
     async function buildOfficialStampedPdfBlob() {
       if (typeof PDFLib === 'undefined') {
         throw new Error("PDFLib library is loading or blocked by network. Please wait a moment and try again.");
@@ -513,110 +500,146 @@
       const page1 = pages[0];
       const page2 = pages[1] || page1;
 
-      // PAGE 1 STAMPING (Calibrated to official form coordinates)
-      page1.drawText(data.refId, { x: 215, y: 690, size: 9, font });
+      // ==========================================
+      // PAGE 1: EXACT RE-CALIBRATED COORDINATES
+      // ==========================================
 
-      if (data.type === 'Permanent') drawCheck(page1, 172, 642);
-      if (data.type === 'Temporary') drawCheck(page1, 390, 642);
+      // 1. Reference Id box
+      page1.drawText(data.refId, { x: 355, y: 694, size: 9, font });
 
-      if (data.category === 'Operational') drawCheck(page1, 172, 592);
-      if (data.category === 'Protocol') drawCheck(page1, 172, 574);
+      // 2a. Type
+      if (data.type === 'Permanent') drawCheck(page1, 169, 634);
+      if (data.type.includes('Temporary')) drawCheck(page1, 391, 634);
+      if (data.type === '1Day') drawCheck(page1, 169, 615);
+      if (data.type === '1-7Days') drawCheck(page1, 237, 615);
+      if (data.type === '3Months') drawCheck(page1, 315, 615);
+      if (data.type === '6Months') drawCheck(page1, 391, 615);
 
-      if (data.zones.includes('A')) drawCheck(page1, 172, 531);
-      if (data.zones.includes('D')) drawCheck(page1, 247, 531);
-      if (data.zones.includes('T')) drawCheck(page1, 317, 531);
-      if (data.zones.includes('Si')) drawCheck(page1, 390, 531);
-      if (data.zones.includes('Sd')) drawCheck(page1, 452, 531);
-      if (data.zones.includes('P')) drawCheck(page1, 520, 531);
-      if (data.zones.includes('B')) drawCheck(page1, 172, 512);
-      if (data.zones.includes('F')) drawCheck(page1, 247, 512);
+      // 2b. Category
+      if (data.category === 'Operational') drawCheck(page1, 169, 583);
+      if (data.category === 'Protocol') drawCheck(page1, 169, 565);
+      if (data.category === 'ForeignNational') drawCheck(page1, 169, 547);
+      if (data.category === 'GovtSecurity') drawCheck(page1, 391, 583);
+      if (data.category === 'Infra') drawCheck(page1, 391, 565);
+      if (data.category === 'ToolOfTrade') drawCheck(page1, 391, 547);
 
-      drawCheck(page1, 172, 488);
-      page1.drawText(data.airport, { x: 250, y: 488, size: 8.5, font });
+      // 2c. Zones
+      if (data.zones.includes('A')) drawCheck(page1, 169, 540);
+      if (data.zones.includes('D')) drawCheck(page1, 244, 540);
+      if (data.zones.includes('T')) drawCheck(page1, 316, 540);
+      if (data.zones.includes('Si')) drawCheck(page1, 392, 540);
+      if (data.zones.includes('Sd')) drawCheck(page1, 456, 540);
+      if (data.zones.includes('P')) drawCheck(page1, 524, 540);
+      if (data.zones.includes('B')) drawCheck(page1, 169, 521);
+      if (data.zones.includes('F')) drawCheck(page1, 244, 521);
 
-      drawCheck(page1, 204, 386); // All terminals
-      drawCheck(page1, 390, 367); // Fresh
-      drawCheck(page1, 172, 345); // Appointment
+      // 2d. Airport
+      drawCheck(page1, 169, 495);
+      page1.drawText(data.airport, { x: 245, y: 493, size: 8, font });
 
-      if (data.gender === 'Male') drawCheck(page1, 204, 295);
-      if (data.gender === 'Female') drawCheck(page1, 265, 295);
+      // 2e. Terminal
+      drawCheck(page1, 201, 389); // All
 
-      page1.drawText(data.name, { x: 155, y: 280, size: 8.5, font });
-      page1.drawText(data.aadhaar, { x: 425, y: 280, size: 8.5, font });
+      // 3. Issue Category
+      drawCheck(page1, 391, 371); // Fresh
+      drawCheck(page1, 169, 346); // Appointment order
 
-      page1.drawText(data.father, { x: 155, y: 263, size: 8.5, font });
-      page1.drawText(data.mother, { x: 425, y: 263, size: 8.5, font });
+      // 4. Details of Applicant
+      if (data.gender === 'Male') drawCheck(page1, 201, 260);
+      if (data.gender === 'Female') drawCheck(page1, 265, 260);
 
-      page1.drawText(data.dob, { x: 155, y: 246, size: 8.5, font });
-      page1.drawText(data.blood, { x: 425, y: 246, size: 8.5, font });
+      // SECTION 4 TABLE ROWS (DROPPED INTO EXACT CELLS)
+      page1.drawText(data.name, { x: 150, y: 242, size: 8, font });
+      page1.drawText(data.aadhaar, { x: 418, y: 242, size: 8, font });
 
-      page1.drawText(data.mobile, { x: 155, y: 229, size: 8.5, font });
-      page1.drawText(data.email, { x: 425, y: 222, size: 7.5, font });
+      page1.drawText(data.father, { x: 150, y: 225, size: 8, font });
+      page1.drawText(data.mother, { x: 418, y: 225, size: 8, font });
 
-      page1.drawText(data.mobile, { x: 155, y: 212, size: 8.5, font });
-      page1.drawText(data.idType, { x: 425, y: 208, size: 8, font });
+      page1.drawText(data.dob, { x: 150, y: 207, size: 8, font });
+      page1.drawText(data.blood, { x: 418, y: 209, size: 8, font });
+      page1.drawText(data.gender.toUpperCase(), { x: 418, y: 196, size: 8, font });
 
-      page1.drawText("NIL", { x: 100, y: 191, size: 8.5, font: fontNorm });
-      page1.drawText("NIL", { x: 320, y: 191, size: 8.5, font: fontNorm });
-      page1.drawText("HYD", { x: 470, y: 191, size: 8.5, font: fontNorm });
+      page1.drawText(data.mobile, { x: 150, y: 190, size: 8, font });
+      page1.drawText(data.email, { x: 418, y: 183, size: 7, font });
 
-      page1.drawText(data.permStreet, { x: 155, y: 160, size: 7.5, font: fontNorm });
-      page1.drawText(data.permDist, { x: 155, y: 142, size: 7.5, font: fontNorm });
-      page1.drawText(data.permState, { x: 155, y: 124, size: 7.5, font: fontNorm });
-      page1.drawText(data.permPin, { x: 155, y: 106, size: 7.5, font: fontNorm });
-      page1.drawText(data.permProof, { x: 180, y: 92, size: 7.5, font });
+      page1.drawText(data.mobile, { x: 150, y: 173, size: 8, font });
+      page1.drawText(data.idType, { x: 418, y: 170, size: 7.5, font });
 
-      page1.drawText(data.presStreet, { x: 425, y: 160, size: 7.5, font: fontNorm });
-      page1.drawText(data.presDist, { x: 425, y: 142, size: 7.5, font: fontNorm });
-      page1.drawText(data.presState, { x: 425, y: 124, size: 7.5, font: fontNorm });
-      page1.drawText(data.presPin, { x: 425, y: 106, size: 7.5, font: fontNorm });
+      // 4b. Existing AEP
+      page1.drawText("NIL", { x: 80, y: 143, size: 8, font: fontNorm });
+      page1.drawText("NIL", { x: 270, y: 143, size: 8, font: fontNorm });
+      page1.drawText("HYD", { x: 485, y: 143, size: 8, font: fontNorm });
 
-      // Embed Photograph
+      // 5a. Permanent Address
+      page1.drawText(data.permStreet, { x: 150, y: 107, size: 7, font: fontNorm });
+      page1.drawText(data.permDist, { x: 150, y: 91, size: 7, font: fontNorm });
+      page1.drawText(data.permState, { x: 150, y: 75, size: 7, font: fontNorm });
+      page1.drawText(data.permPin, { x: 150, y: 59, size: 7, font: fontNorm });
+      page1.drawText(data.permProof, { x: 180, y: 43, size: 7, font });
+
+      // 5b. Present Address
+      page1.drawText(data.presStreet, { x: 418, y: 107, size: 7, font: fontNorm });
+      page1.drawText(data.presDist, { x: 418, y: 91, size: 7, font: fontNorm });
+      page1.drawText(data.presState, { x: 418, y: 75, size: 7, font: fontNorm });
+      page1.drawText(data.presPin, { x: 418, y: 59, size: 7, font: fontNorm });
+
+      // Embed Photograph in exact top right box
       if (photoBytes) {
         try {
           const img = await pdfDoc.embedJpg(photoBytes).catch(async () => await pdfDoc.embedPng(photoBytes));
-          page1.drawImage(img, { x: 480, y: 695, width: 98, height: 120 });
+          page1.drawImage(img, { x: 477, y: 686, width: 100, height: 128 });
         } catch (e) {
-          console.warn("Photo embedding note:", e);
+          console.warn("Photo embedding notice:", e);
         }
       }
 
-      // PAGE 2 STAMPING
-      page1.drawText("", { x: 0, y: 0, size: 1, font });
-      page2.drawText(data.org, { x: 155, y: 765, size: 8.5, font });
-      page2.drawText(data.desig, { x: 430, y: 765, size: 8.5, font });
+      // ==========================================
+      // PAGE 2: EXACT RE-CALIBRATED COORDINATES
+      // ==========================================
 
-      page2.drawText(data.empNo, { x: 155, y: 747, size: 8.5, font });
-      page2.drawText(data.dutyPlace, { x: 430, y: 747, size: 8.5, font });
+      // 6. Employment Details
+      page1.drawText("", { x: 0, y: 0, size: 1, font }); // touch
+      page2.drawText(data.org, { x: 150, y: 758, size: 8, font });
+      page2.drawText(data.desig, { x: 425, y: 758, size: 8, font });
 
-      page2.drawText(data.nature, { x: 155, y: 729, size: 8.5, font });
-      page2.drawText("26/09/2053", { x: 430, y: 729, size: 8.5, font });
+      page2.drawText(data.empNo, { x: 150, y: 739, size: 8.5, font });
+      page2.drawText(data.dutyPlace, { x: 425, y: 739, size: 8, font });
 
-      page2.drawText(data.officeAddr, { x: 155, y: 711, size: 7, font: fontNorm });
+      page2.drawText(data.nature, { x: 150, y: 721, size: 8, font });
+      page2.drawText("26/09/2053", { x: 425, y: 721, size: 8, font });
 
-      drawCheck(page2, 435, 686);
-      drawCheck(page2, 435, 651);
-      drawCheck(page2, 435, 616);
+      page2.drawText(data.officeAddr, { x: 150, y: 703, size: 6.5, font: fontNorm });
 
-      drawCheck(page2, 290, 585);
+      // 7. Disclosures (No)
+      drawCheck(page2, 432, 673);
+      drawCheck(page2, 432, 636);
+      drawCheck(page2, 432, 599);
 
-      drawCheck(page2, 120, 549);
-      drawCheck(page2, 195, 549);
-      drawCheck(page2, 265, 549);
+      // 8. Rejections (No)
+      drawCheck(page2, 286, 566);
 
-      page2.drawText("INDIAN NATIONAL (NOT APPLICABLE)", { x: 100, y: 440, size: 8, font });
+      // 9. Previous Zones
+      drawCheck(page2, 118, 527);
+      drawCheck(page2, 190, 527);
+      drawCheck(page2, 257, 527);
 
-      page2.drawText(data.avsecDate, { x: 155, y: 395, size: 8.5, font });
-      page2.drawText(data.avsecLoc, { x: 400, y: 395, size: 8.5, font });
-      drawCheck(page2, 75, 375);
-      page2.drawText(data.avsecInst, { x: 265, y: 355, size: 8, font });
+      // 10. Foreign Nationals
+      page2.drawText("INDIAN NATIONAL (NOT APPLICABLE)", { x: 150, y: 432, size: 7.5, font });
 
+      // 11. AVSEC Training
+      page2.drawText(data.avsecDate, { x: 150, y: 388, size: 8, font });
+      page2.drawText(data.avsecLoc, { x: 395, y: 388, size: 8, font });
+      drawCheck(page2, 73, 370); // Initial
+      page2.drawText(data.avsecInst, { x: 260, y: 349, size: 7.5, font });
+
+      // PVC Stamp Line
       page2.drawText(`Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, { x: 160, y: 290, size: 8, font });
 
-      page2.drawText("HYD", { x: 100, y: 165, size: 8.5, font });
-      page2.drawText("04/11/2026", { x: 100, y: 147, size: 8.5, font });
-      page2.drawText(data.org, { x: 400, y: 165, size: 8, font });
-      page2.drawText("SECURITY DEPT", { x: 400, y: 147, size: 8, font });
+      // Signatures
+      page2.drawText("HYD", { x: 90, y: 177, size: 8.5, font });
+      page2.drawText("04/11/2026", { x: 90, y: 156, size: 8, font });
+      page2.drawText(data.org, { x: 360, y: 177, size: 7.5, font });
+      page2.drawText("SECURITY DEPT", { x: 410, y: 132, size: 7.5, font });
 
       const stampedBytes = await pdfDoc.save();
       return new Blob([stampedBytes], { type: "application/pdf" });
@@ -635,7 +658,6 @@
       }
     }
 
-    // Guaranteed Download with Try/Catch/Finally
     async function generateAndDownloadOfficialPdf() {
       const btn = document.getElementById('btn-download');
       const originalText = btn.innerHTML;
@@ -669,7 +691,6 @@
       }
     }
 
-    // Guaranteed Print with Try/Catch/Finally
     async function generateAndPrintOfficialPdf() {
       const btn = document.getElementById('btn-print');
       const originalText = btn.innerHTML;
@@ -698,7 +719,6 @@
       }
     }
 
-    // Google Sheets Submission
     async function handleGSheetSubmit(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-submit');
@@ -709,7 +729,7 @@
       const data = collectData();
 
       try {
-        if (!GOOGLE_SCRIPT_WEBAPP_URL.includes("YOUR-DEPLOYED-URL-HERE")) {
+        if (!GOOGLE_SCRIPT_WEBAPP_URL.includes("https://script.google.com/macros/s/AKfycbw-50wDrmCSvKL--F1jCuZuMuj8x5abEqR69poR-LTkT-_2VAWkeESp3iAGuXi6x9pP/exec")) {
           await fetch(GOOGLE_SCRIPT_WEBAPP_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -725,13 +745,10 @@
       }
     }
 
-    // Boot: Load PDF and render initial preview
     document.addEventListener("DOMContentLoaded", async () => {
       try {
         const bytes = await loadBlankPdf();
         if (bytes) {
-          document.getElementById('status-icon').className = "fa-solid fa-circle-check text-green-600 text-base";
-          document.getElementById('status-text').innerHTML = "<b>Official blank PDF loaded successfully from repository!</b> Ready to print.";
           refreshPdfPreview();
         }
       } catch (e) {
