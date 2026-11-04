@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>AEP Official Application Portal | BCAS Form Stamping Engine</title>
+  <title>AEP Official Application Portal | BCAS PDF Stamping Engine</title>
   
   <meta name="theme-color" content="#f5f5f7" />
 
@@ -11,6 +12,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- pdf-lib official client-side engine -->
+  <script src="https://unpkg.com/pdf-lib@1.17.9/dist/pdf-lib.min.js"></script>
 
   <style>
     body {
@@ -46,140 +49,45 @@
       box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
     }
 
-    /* ===================================================
-       100% EXACT PHYSICAL TEMPLATE A4 CONTAINER
-       =================================================== */
-    .official-page-wrapper {
-      width: 210mm;
-      height: 297mm;
-      min-height: 297mm;
-      max-height: 297mm;
-      position: relative;
-      margin: 0 auto 30px auto;
-      background-color: #ffffff;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.18);
-      box-sizing: border-box;
-      overflow: hidden;
-    }
-
-    /* THE REAL SCANNED FORM TEMPLATE IMAGE */
-    .base-template-img {
-      position: absolute;
-      top: 0;
-      left: 0;
+    /* Embedded PDF Live Frame */
+    .pdf-preview-frame {
       width: 100%;
-      height: 100%;
-      object-fit: fill;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    /* TYPED FIELD OVERLAYS */
-    .field-overlay {
-      position: absolute;
-      color: #000000;
-      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      line-height: 1.1;
-      white-space: nowrap;
-      text-transform: uppercase;
-      z-index: 5;
-      pointer-events: none;
-    }
-
-    .check-stamp {
-      position: absolute;
-      color: #000000;
-      font-size: 14px;
-      font-weight: 900;
-      font-family: Arial, sans-serif;
-      line-height: 1;
-      z-index: 5;
-      pointer-events: none;
-    }
-
-    /* ===================================================
-       PRINT RULES: FORCES BOTH SCANNED PAGES & TEXT TO PRINT
-       =================================================== */
-    @media print {
-      body * {
-        visibility: hidden !important;
-      }
-      #print-wrapper, #print-wrapper * {
-        visibility: visible !important;
-      }
-      #print-wrapper {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 210mm !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        display: block !important;
-      }
-      .official-page-wrapper {
-        page-break-after: always !important;
-        break-after: page !important;
-        page-break-inside: avoid !important;
-        margin: 0 !important;
-        width: 210mm !important;
-        height: 297mm !important;
-        box-shadow: none !important;
-        border: none !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      .base-template-img {
-        visibility: visible !important;
-        display: block !important;
-        width: 100% !important;
-        height: 100% !important;
-      }
-      .no-print {
-        display: none !important;
-      }
-      @page {
-        size: A4 portrait;
-        margin: 0;
-      }
+      height: 820px;
+      border-radius: 16px;
+      border: 1px solid #d2d2d7;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      background: #525659;
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
   <!-- Apple Glass Navigation Bar -->
-  <header class="fixed top-0 left-0 right-0 h-16 apple-glass-nav border-b border-[#d2d2d7]/50 z-50 no-print">
+  <header class="fixed top-0 left-0 right-0 h-16 apple-glass-nav border-b border-[#d2d2d7]/50 z-50">
     <div class="max-w-7xl mx-auto h-full px-6 flex justify-between items-center">
       <div class="flex items-center space-x-3 cursor-pointer">
         <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0071e3] to-[#42a5f5] flex items-center justify-center text-white shadow-xs">
-          <i class="fa-solid fa-stamp text-sm"></i>
+          <i class="fa-solid fa-file-pdf text-sm"></i>
         </div>
         <div>
-          <span class="text-base font-semibold tracking-tight block leading-tight">BCAS Form Stamping Engine</span>
-          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Exact 1:1 Official Stamped A4 Proforma</span>
+          <span class="text-base font-semibold tracking-tight block leading-tight">BCAS Official PDF Stamping Engine</span>
+          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Native PDF Injection &bull; 0% Formatting Shift</span>
         </div>
       </div>
 
       <!-- Actions -->
       <div class="flex items-center space-x-2">
-        <!-- Template Upload Inputs (Stored in IndexedDB) -->
-        <label class="px-3.5 py-2 bg-white text-[#0071e3] border border-[#0071e3]/40 hover:bg-[#e3f2fd] text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer flex items-center space-x-1.5" title="Click to load Page 1 Scan once">
-          <i class="fa-solid fa-file-image"></i>
-          <span>Attach Page 1 Scan</span>
-          <input type="file" accept="image/*" onchange="storeTemplateImage(this, 1)" class="hidden" />
-        </label>
-        
-        <label class="px-3.5 py-2 bg-white text-[#0071e3] border border-[#0071e3]/40 hover:bg-[#e3f2fd] text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer flex items-center space-x-1.5" title="Click to load Page 2 Scan once">
-          <i class="fa-solid fa-file-image"></i>
-          <span>Attach Page 2 Scan</span>
-          <input type="file" accept="image/*" onchange="storeTemplateImage(this, 2)" class="hidden" />
+        <!-- Attach/Select Blank Official PDF Button -->
+        <label class="px-3.5 py-2 bg-white text-[#0071e3] border border-[#0071e3]/40 hover:bg-[#e3f2fd] text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer flex items-center space-x-1.5" title="Click to attach your blank official 2-page PDF">
+          <i class="fa-solid fa-file-import"></i>
+          <span id="btn-attach-text">Attach Blank Official PDF</span>
+          <input type="file" accept="application/pdf" onchange="loadCustomBlankPdf(this)" class="hidden" />
         </label>
 
-        <!-- 1-Click Guaranteed Print -->
-        <button onclick="printOfficialAEP()" class="px-5 py-2.5 bg-[#1d1d1f] hover:bg-black active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-2">
+        <!-- 1-Click Generate & Print Official PDF -->
+        <button onclick="stampAndPrintPDF()" class="px-5 py-2.5 bg-[#1d1d1f] hover:bg-black active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-2">
           <i class="fa-solid fa-print"></i>
-          <span>Print Official Application (A4)</span>
+          <span>Print Filled Official PDF</span>
         </button>
       </div>
     </div>
@@ -191,19 +99,19 @@
     <div class="space-y-6">
 
       <!-- Status Banner -->
-      <div id="template-status-banner" class="no-print p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex justify-between items-center">
+      <div id="pdf-status-banner" class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs flex justify-between items-center">
         <div class="flex items-center space-x-2">
-          <i class="fa-solid fa-circle-info text-amber-600 text-base"></i>
-          <span><b>Setup Notice:</b> If the scanned form is not showing behind the text, click <b>"Attach Page 1 Scan"</b> and <b>"Attach Page 2 Scan"</b> above to load your scanned sheets. They will stay permanently saved in your browser.</span>
+          <i class="fa-solid fa-circle-check text-blue-600 text-base"></i>
+          <span><b>Official PDF Stamping Engine Ready:</b> Put <code>bcas_aepaf_blank.pdf</code> in your repo, or click <b>"Attach Blank Official PDF"</b> to select the file from your computer. Your typed text, checkmarks, and photo will be stamped onto the official PDF at the proper coordinates.</span>
         </div>
-        <button onclick="document.getElementById('template-status-banner').style.display='none'" class="text-amber-700 font-bold ml-4">✕</button>
+        <button onclick="document.getElementById('pdf-status-banner').style.display='none'" class="text-blue-700 font-bold ml-4">✕</button>
       </div>
 
       <!-- Action Toolbar -->
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 no-print">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
         <div>
-          <h1 class="text-3xl font-bold tracking-tight text-[#1d1d1f]">Official BCAS AEPAF Form Processing</h1>
-          <p class="text-sm text-[#86868b] mt-1">Data entered on the left is positioned onto the official form on the right.</p>
+          <h1 class="text-3xl font-bold tracking-tight text-[#1d1d1f]">Official BCAS AEPAF Application Generator</h1>
+          <p class="text-sm text-[#86868b] mt-1">Stamps data directly onto the official Government of India PDF without using HTML recreation tables.</p>
         </div>
         
         <div class="flex items-center space-x-2">
@@ -216,8 +124,8 @@
       <!-- Split Deck Grid -->
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
 
-        <!-- LEFT COLUMN: INPUT CONTROLS (5 COLS - NO PRINT) -->
-        <div class="xl:col-span-5 space-y-4 no-print">
+        <!-- LEFT COLUMN: INPUT CONTROLS (5 COLS) -->
+        <div class="xl:col-span-5 space-y-4">
           <form id="bcasForm" class="space-y-4">
             
             <!-- SECTION 1, 2, 3 -->
@@ -229,13 +137,13 @@
 
               <div>
                 <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">1. AEP Reference ID *</label>
-                <input type="text" id="inp-ref" required value="HYD/2026/AEP/72835" oninput="syncOverlay()" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
+                <input type="text" id="inp-ref" required value="HYD/2026/AEP/72835" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
               </div>
 
               <div class="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">2a. Type</label>
-                  <select id="inp-type" onchange="syncOverlay()" class="w-full p-2 apple-input font-medium">
+                  <select id="inp-type" class="w-full p-2 apple-input font-medium">
                     <option value="Permanent" selected>Permanent</option>
                     <option value="Temporary">Temporary (1-30 Days)</option>
                     <option value="1Day">1 Day</option>
@@ -243,7 +151,7 @@
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">2b. Category</label>
-                  <select id="inp-category" onchange="syncOverlay()" class="w-full p-2 apple-input font-medium">
+                  <select id="inp-category" class="w-full p-2 apple-input font-medium">
                     <option value="Operational" selected>Operational</option>
                     <option value="Protocol">Protocol</option>
                   </select>
@@ -255,35 +163,35 @@
                 <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1.5">2c. Operational Zones</label>
                 <div class="grid grid-cols-4 gap-2 text-xs font-bold">
                   <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                    <input type="checkbox" id="chk-zone-A" checked onchange="syncOverlay()" class="rounded text-[#0071e3]" />
+                    <input type="checkbox" id="chk-zone-A" checked class="rounded text-[#0071e3]" />
                     <span>A (Apron)</span>
                   </label>
                   <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                    <input type="checkbox" id="chk-zone-D" checked onchange="syncOverlay()" class="rounded text-[#0071e3]" />
+                    <input type="checkbox" id="chk-zone-D" checked class="rounded text-[#0071e3]" />
                     <span>D (Domestic)</span>
                   </label>
                   <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                    <input type="checkbox" id="chk-zone-T" checked onchange="syncOverlay()" class="rounded text-[#0071e3]" />
+                    <input type="checkbox" id="chk-zone-T" checked class="rounded text-[#0071e3]" />
                     <span>T (Terminal)</span>
                   </label>
                   <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                    <input type="checkbox" id="chk-zone-B" onchange="syncOverlay()" class="rounded text-[#0071e3]" />
+                    <input type="checkbox" id="chk-zone-B" class="rounded text-[#0071e3]" />
                     <span>B (Baggage)</span>
                   </label>
                   <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                    <input type="checkbox" id="chk-zone-P" onchange="syncOverlay()" class="rounded text-[#0071e3]" />
+                    <input type="checkbox" id="chk-zone-P" class="rounded text-[#0071e3]" />
                     <span>P (Perimeter)</span>
                   </label>
                   <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                    <input type="checkbox" id="chk-zone-F" onchange="syncOverlay()" class="rounded text-[#0071e3]" />
+                    <input type="checkbox" id="chk-zone-F" class="rounded text-[#0071e3]" />
                     <span>F (Freight)</span>
                   </label>
                   <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                    <input type="checkbox" id="chk-zone-Si" onchange="syncOverlay()" class="rounded text-[#0071e3]" />
+                    <input type="checkbox" id="chk-zone-Si" class="rounded text-[#0071e3]" />
                     <span>Si (Intl Sec)</span>
                   </label>
                   <label class="flex items-center space-x-1.5 p-1.5 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                    <input type="checkbox" id="chk-zone-Sd" onchange="syncOverlay()" class="rounded text-[#0071e3]" />
+                    <input type="checkbox" id="chk-zone-Sd" class="rounded text-[#0071e3]" />
                     <span>Sd (Dom Sec)</span>
                   </label>
                 </div>
@@ -292,11 +200,11 @@
               <div class="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">2d. Airport Name</label>
-                  <input type="text" id="inp-airport" value="RGIA - HYD" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase" />
+                  <input type="text" id="inp-airport" value="RGIA - HYD" class="w-full p-2 apple-input font-bold uppercase" />
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">3. Issue Category</label>
-                  <select id="inp-issue-type" onchange="syncOverlay()" class="w-full p-2 apple-input font-medium">
+                  <select id="inp-issue-type" class="w-full p-2 apple-input font-medium">
                     <option value="Fresh" selected>Fresh (Appointment Order)</option>
                     <option value="Re-Issue">Re-Issue (Expired/Transfer)</option>
                   </select>
@@ -313,32 +221,32 @@
 
               <div>
                 <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Applicant Full Name *</label>
-                <input type="text" id="inp-name" required value="MUSHTAQ MOHAMMED" oninput="syncOverlay()" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
+                <input type="text" id="inp-name" required value="MUSHTAQ MOHAMMED" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
               </div>
 
               <div class="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Father's Name *</label>
-                  <input type="text" id="inp-father" required value="ISMAIL MOHAMMED" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase" />
+                  <input type="text" id="inp-father" required value="ISMAIL MOHAMMED" class="w-full p-2 apple-input font-bold uppercase" />
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Mother's Name *</label>
-                  <input type="text" id="inp-mother" required value="SAPHIA ISMAIL" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase" />
+                  <input type="text" id="inp-mother" required value="SAPHIA ISMAIL" class="w-full p-2 apple-input font-bold uppercase" />
                 </div>
               </div>
 
               <div class="grid grid-cols-3 gap-3 text-xs">
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Date of Birth</label>
-                  <input type="text" id="inp-dob" value="27/09/1993" placeholder="DD/MM/YYYY" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold" />
+                  <input type="text" id="inp-dob" value="27/09/1993" placeholder="DD/MM/YYYY" class="w-full p-2 apple-input font-bold" />
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Blood Group</label>
-                  <input type="text" id="inp-blood" value="A+" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase" />
+                  <input type="text" id="inp-blood" value="A+" class="w-full p-2 apple-input font-bold uppercase" />
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Gender</label>
-                  <select id="inp-gender" onchange="syncOverlay()" class="w-full p-2 apple-input font-bold">
+                  <select id="inp-gender" class="w-full p-2 apple-input font-bold">
                     <option value="Male" selected>Male</option>
                     <option value="Female">Female</option>
                   </select>
@@ -348,28 +256,28 @@
               <div class="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Mobile No *</label>
-                  <input type="text" id="inp-mobile" value="9036488263" oninput="syncOverlay()" class="w-full p-2 apple-input font-semibold" />
+                  <input type="text" id="inp-mobile" value="9036488263" class="w-full p-2 apple-input font-semibold" />
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">E-mail *</label>
-                  <input type="email" id="inp-email" value="MUSHTAQ.ISMAIL@GOINDIGO.IN" oninput="syncOverlay()" class="w-full p-2 apple-input font-semibold uppercase" />
+                  <input type="email" id="inp-email" value="MUSHTAQ.ISMAIL@GOINDIGO.IN" class="w-full p-2 apple-input font-semibold uppercase" />
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Aadhaar Card No (12 digits) *</label>
-                  <input type="text" id="inp-aadhaar" value="9772 0313 2804" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold" />
+                  <input type="text" id="inp-aadhaar" value="9772 0313 2804" class="w-full p-2 apple-input font-bold" />
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Type of ID Proof</label>
-                  <input type="text" id="inp-id-type" value="INDIAN PASSPORT" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase" />
+                  <input type="text" id="inp-id-type" value="INDIAN PASSPORT" class="w-full p-2 apple-input font-bold uppercase" />
                 </div>
               </div>
 
               <div>
                 <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Passport Photo (Stamps into top-right box)</label>
-                <input type="file" accept="image/*" onchange="handlePhoto(this)" class="w-full text-xs text-[#86868b] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer" />
+                <input type="file" accept="image/*" onchange="handlePhotoUpload(this)" class="w-full text-xs text-[#86868b] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer" />
               </div>
             </div>
 
@@ -382,22 +290,22 @@
 
               <div class="space-y-2 text-xs">
                 <span class="font-bold text-[#1d1d1f] uppercase block">5a. Permanent Address</span>
-                <input type="text" id="inp-perm-street" placeholder="House No / Street / Road" value="H.NO 20-170/1/1, RB NAGAR" oninput="syncOverlay()" class="w-full p-2 apple-input uppercase font-medium" />
+                <input type="text" id="inp-perm-street" placeholder="House No / Street / Road" value="H.NO 20-170/1/1, RB NAGAR" class="w-full p-2 apple-input uppercase font-medium" />
                 <div class="grid grid-cols-3 gap-2">
-                  <input type="text" id="inp-perm-dist" placeholder="District" value="RANGAREDDY" oninput="syncOverlay()" class="p-2 apple-input uppercase" />
-                  <input type="text" id="inp-perm-state" placeholder="State" value="TELANGANA" oninput="syncOverlay()" class="p-2 apple-input uppercase" />
-                  <input type="text" id="inp-perm-pin" placeholder="Pin" value="501218" oninput="syncOverlay()" class="p-2 apple-input" />
+                  <input type="text" id="inp-perm-dist" placeholder="District" value="RANGAREDDY" class="p-2 apple-input uppercase" />
+                  <input type="text" id="inp-perm-state" placeholder="State" value="TELANGANA" class="p-2 apple-input uppercase" />
+                  <input type="text" id="inp-perm-pin" placeholder="Pin" value="501218" class="p-2 apple-input" />
                 </div>
-                <input type="text" id="inp-perm-proof" placeholder="Proof Type" value="ELECTRICITY BILL" oninput="syncOverlay()" class="w-full p-2 apple-input uppercase font-bold" />
+                <input type="text" id="inp-perm-proof" placeholder="Proof Type" value="ELECTRICITY BILL" class="w-full p-2 apple-input uppercase font-bold" />
               </div>
 
               <div class="space-y-2 text-xs pt-2 border-t border-[#f5f5f7]">
                 <span class="font-bold text-[#1d1d1f] uppercase block">5b. Present Address</span>
-                <input type="text" id="inp-pres-street" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYA" oninput="syncOverlay()" class="w-full p-2 apple-input uppercase font-medium" />
+                <input type="text" id="inp-pres-street" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYA" class="w-full p-2 apple-input uppercase font-medium" />
                 <div class="grid grid-cols-3 gap-2">
-                  <input type="text" id="inp-pres-dist" placeholder="District" value="THANE/NEW MUMBAI" oninput="syncOverlay()" class="p-2 apple-input uppercase" />
-                  <input type="text" id="inp-pres-state" placeholder="State" value="MAHARASHTRA" oninput="syncOverlay()" class="p-2 apple-input uppercase" />
-                  <input type="text" id="inp-pres-pin" placeholder="Pin" value="400709" oninput="syncOverlay()" class="p-2 apple-input" />
+                  <input type="text" id="inp-pres-dist" placeholder="District" value="THANE/NEW MUMBAI" class="p-2 apple-input uppercase" />
+                  <input type="text" id="inp-pres-state" placeholder="State" value="MAHARASHTRA" class="p-2 apple-input uppercase" />
+                  <input type="text" id="inp-pres-pin" placeholder="Pin" value="400709" class="p-2 apple-input" />
                 </div>
               </div>
             </div>
@@ -412,32 +320,32 @@
               <div class="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Organization *</label>
-                  <input type="text" id="inp-org" value="INTERGLOBE AVIATION LTD" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase" />
+                  <input type="text" id="inp-org" value="INTERGLOBE AVIATION LTD" class="w-full p-2 apple-input font-bold uppercase" />
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Designation *</label>
-                  <input type="text" id="inp-desig" value="EXECUTIVE - SECURITY" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase" />
+                  <input type="text" id="inp-desig" value="EXECUTIVE - SECURITY" class="w-full p-2 apple-input font-bold uppercase" />
                 </div>
               </div>
 
               <div class="grid grid-cols-3 gap-3 text-xs">
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Employee No. *</label>
-                  <input type="text" id="inp-empno" value="IGA 72835" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase text-[#0071e3]" />
+                  <input type="text" id="inp-empno" value="IGA 72835" class="w-full p-2 apple-input font-bold uppercase text-[#0071e3]" />
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Place of Duty *</label>
-                  <input type="text" id="inp-duty-place" value="RGIA - HYD" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase" />
+                  <input type="text" id="inp-duty-place" value="RGIA - HYD" class="w-full p-2 apple-input font-bold uppercase" />
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">Nature of Duty</label>
-                  <input type="text" id="inp-nature" value="SECURITY SERVICES" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase" />
+                  <input type="text" id="inp-nature" value="SECURITY SERVICES" class="w-full p-2 apple-input font-bold uppercase" />
                 </div>
               </div>
 
               <div class="text-xs">
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Airport Terminal Office Address</label>
-                <textarea id="inp-office-addr" rows="2" oninput="syncOverlay()" class="w-full p-2 apple-input uppercase font-medium">AO-06, E- LEVEL OFFICES, PASSANGER TERMINAL BUILDING, RGIA, HYD, TELANGANA -500108.</textarea>
+                <textarea id="inp-office-addr" rows="2" class="w-full p-2 apple-input uppercase font-medium">AO-06, E- LEVEL OFFICES, PASSANGER TERMINAL BUILDING, RGIA, HYD, TELANGANA -500108.</textarea>
               </div>
             </div>
 
@@ -451,191 +359,44 @@
               <div class="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Date</label>
-                  <input type="text" id="inp-avsec-date" value="02/08/2023" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold" />
+                  <input type="text" id="inp-avsec-date" value="02/08/2023" class="w-full p-2 apple-input font-bold" />
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Location</label>
-                  <input type="text" id="inp-avsec-loc" value="BLR - BENGALURU" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase" />
+                  <input type="text" id="inp-avsec-loc" value="BLR - BENGALURU" class="w-full p-2 apple-input font-bold uppercase" />
                 </div>
               </div>
 
               <div class="text-xs">
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Instructor &amp; ASTI Center</label>
-                <input type="text" id="inp-avsec-inst" value="ARCHANA DASH / INDIGO ASTI" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase" />
+                <input type="text" id="inp-avsec-inst" value="ARCHANA DASH / INDIGO ASTI" class="w-full p-2 apple-input font-bold uppercase" />
               </div>
 
               <div class="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-[#f5f5f7]">
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Serial ID</label>
-                  <input type="text" id="inp-pvc-id" value="TP 88793" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold uppercase text-[#2e7d32]" />
+                  <input type="text" id="inp-pvc-id" value="TP 88793" class="w-full p-2 apple-input font-bold uppercase text-[#2e7d32]" />
                 </div>
                 <div>
                   <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Date</label>
-                  <input type="text" id="inp-pvc-date" value="12/SEP/2023" oninput="syncOverlay()" class="w-full p-2 apple-input font-bold" />
+                  <input type="text" id="inp-pvc-date" value="12/SEP/2023" class="w-full p-2 apple-input font-bold" />
                 </div>
               </div>
             </div>
           </form>
         </div>
 
-        <!-- RIGHT COLUMN: 100% AUTHENTIC DOCUMENT PRINT TARGET -->
+        <!-- RIGHT COLUMN: LIVE PDF VIEW (7 COLS) -->
         <div class="xl:col-span-7 space-y-4">
-          <div class="flex items-center justify-between px-2 no-print">
-            <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider">Official 2-Page Print Stamping View</span>
-            <span class="text-xs font-bold text-[#34c759] flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-[#34c759] animate-pulse"></span> 100% Authentic Proforma Target
-            </span>
+          <div class="flex items-center justify-between px-2">
+            <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider">Live Injected Official PDF View</span>
+            <button onclick="renderStampedPDFPreview()" class="text-xs font-bold text-[#0071e3] hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-arrows-rotate"></i> Refresh PDF Preview
+            </button>
           </div>
 
-          <!-- PRINT CONTAINER WRAPPER -->
-          <div id="print-wrapper">
-
-            <!-- ==============================================
-                 PAGE 1: EXACT CALIBRATED OVERLAY ON SCANNED FORM
-                 ============================================== -->
-            <div id="page-1" class="official-page-wrapper">
-              
-              <!-- REAL TEMPLATE IMAGE (Loaded from IndexedDB) -->
-              <img id="tpl-img-1" alt="Page 1 Form" class="base-template-img" />
-
-              <!-- Top-Right Passport Photograph Placement -->
-              <div id="ov-photo-box" style="position: absolute; top: 5.1%; left: 79.8%; width: 16.2%; height: 14.5%; overflow: hidden; background: transparent; display: flex; align-items: center; justify-content: center; z-index: 6;">
-                <img id="ov-photo-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
-              </div>
-
-              <!-- 1. AEP Application Reference Id -->
-              <div id="ov-ref" class="field-overlay" style="top: 18.2%; left: 35.5%; width: 34%;">HYD/2026/AEP/72835</div>
-
-              <!-- 2a. Permit Type Checkmarks -->
-              <div id="ov-chk-perm" class="check-stamp" style="top: 24.2%; left: 29.2%;">✓</div>
-
-              <!-- 2b. Category Checkmarks -->
-              <div id="ov-chk-op" class="check-stamp" style="top: 29.8%; left: 29.2%;">✓</div>
-
-              <!-- 2c. Operational Zones Checkmarks -->
-              <div id="ov-chk-zA" class="check-stamp" style="top: 37.0%; left: 29.2%;">✓</div>
-              <div id="ov-chk-zD" class="check-stamp" style="top: 37.0%; left: 41.8%;">✓</div>
-              <div id="ov-chk-zT" class="check-stamp" style="top: 37.0%; left: 53.0%;">✓</div>
-              <div id="ov-chk-zSi" class="check-stamp" style="top: 37.0%; left: 65.5%; display:none;">✓</div>
-              <div id="ov-chk-zSd" class="check-stamp" style="top: 37.0%; left: 75.8%; display:none;">✓</div>
-              <div id="ov-chk-zP" class="check-stamp" style="top: 37.0%; left: 87.0%; display:none;">✓</div>
-
-              <div id="ov-chk-zB" class="check-stamp" style="top: 39.3%; left: 29.2%; display:none;">✓</div>
-              <div id="ov-chk-zF" class="check-stamp" style="top: 39.3%; left: 41.8%; display:none;">✓</div>
-
-              <!-- 2d. Airport -->
-              <div id="ov-chk-single-airport" class="check-stamp" style="top: 42.4%; left: 29.2%;">✓</div>
-              <div id="ov-airport-text" class="field-overlay" style="top: 42.0%; left: 42.0%;">RGIA - HYD</div>
-
-              <!-- 2e. Terminal -->
-              <div id="ov-chk-term-all" class="check-stamp" style="top: 54.1%; left: 34.4%;">✓</div>
-
-              <!-- 3. Issue Category -->
-              <div id="ov-chk-fresh" class="check-stamp" style="top: 57.0%; left: 65.5%;">✓</div>
-              <div id="ov-chk-fresh-appt" class="check-stamp" style="top: 59.8%; left: 29.0%;">✓</div>
-
-              <!-- 4. Details of Applicant -->
-              <div id="ov-chk-gender-male" class="check-stamp" style="top: 69.8%; left: 34.4%;">✓</div>
-              <div id="ov-chk-gender-female" class="check-stamp" style="top: 69.8%; left: 44.8%; display:none;">✓</div>
-
-              <div id="ov-name" class="field-overlay" style="top: 71.3%; left: 16.5%; width: 42%;">MUSHTAQ MOHAMMED</div>
-              <div id="ov-aadhaar" class="field-overlay" style="top: 72.2%; left: 70.0%; width: 25.5%;">9772 0313 2804</div>
-
-              <div id="ov-father" class="field-overlay" style="top: 73.5%; left: 25.5%; width: 32.5%;">ISMAIL MOHAMMED</div>
-              <div id="ov-mother" class="field-overlay" style="top: 74.4%; left: 70.0%; width: 25.5%;">SAPHIA ISMAIL</div>
-
-              <div id="ov-dob" class="field-overlay" style="top: 75.8%; left: 25.5%; width: 21.0%;">27/09/1993</div>
-              <div id="ov-gender-text" class="field-overlay" style="top: 76.8%; left: 70.0%; width: 25.5%;">MALE</div>
-
-              <div id="ov-mobile" class="field-overlay" style="top: 78.0%; left: 25.5%; width: 25.8%;">9036488263</div>
-              <div id="ov-email" class="field-overlay" style="top: 78.9%; left: 70.0%; width: 25.5%; font-size: 8.5px;">MUSHTAQ.ISMAIL@GOINDIGO.IN</div>
-
-              <div id="ov-kin-mobile" class="field-overlay" style="top: 80.2%; left: 25.5%; width: 25.8%;">9036488263</div>
-              <div id="ov-id-type" class="field-overlay" style="top: 81.1%; left: 70.0%; width: 25.5%;">INDIAN PASSPORT</div>
-
-              <!-- 4b. Existing AEP -->
-              <div id="ov-exist-no" class="field-overlay" style="top: 83.3%; left: 11.5%; width: 31.5%;">NIL</div>
-              <div id="ov-exist-valid" class="field-overlay" style="top: 83.3%; left: 55.0%; width: 14.5%;">NIL</div>
-              <div id="ov-exist-place" class="field-overlay" style="top: 83.3%; left: 81.5%; width: 14.0%;">HYD</div>
-
-              <!-- 5. Residential Address -->
-              <!-- 5a. Permanent Address (Left column) -->
-              <div id="ov-perm-street" class="field-overlay" style="top: 87.8%; left: 26.0%; width: 25.8%; font-size: 8.5px;">H.NO 20-170/1/1, RB NAGAR</div>
-              <div id="ov-perm-dist" class="field-overlay" style="top: 90.0%; left: 26.0%; width: 25.8%;">RANGAREDDY</div>
-              <div id="ov-perm-state" class="field-overlay" style="top: 92.2%; left: 26.0%; width: 25.8%;">TELANGANA</div>
-              <div id="ov-perm-pin" class="field-overlay" style="top: 94.4%; left: 26.0%; width: 25.8%;">501218</div>
-              <div id="ov-perm-proof" class="field-overlay" style="top: 95.8%; left: 30.5%; width: 21.3%;">ELECTRICITY BILL</div>
-
-              <!-- 5b. Present Address (Right column) -->
-              <div id="ov-pres-street" class="field-overlay" style="top: 87.8%; left: 69.8%; width: 25.8%; font-size: 8.5px;">303/A, SEC 6, VISHAVARDAYA</div>
-              <div id="ov-pres-dist" class="field-overlay" style="top: 90.0%; left: 69.8%; width: 25.8%;">THANE/NEW MUMBAI</div>
-              <div id="ov-pres-state" class="field-overlay" style="top: 92.2%; left: 69.8%; width: 25.8%;">MAHARASHTRA</div>
-              <div id="ov-pres-pin" class="field-overlay" style="top: 94.4%; left: 69.8%; width: 25.8%;">400709</div>
-            </div>
-
-            <!-- ==============================================
-                 PAGE 2: EXACT CALIBRATED OVERLAY ON SCANNED FORM
-                 ============================================== -->
-            <div id="page-2" class="official-page-wrapper">
-              
-              <!-- REAL TEMPLATE IMAGE (Loaded from IndexedDB) -->
-              <img id="tpl-img-2" alt="Page 2 Form" class="base-template-img" />
-
-              <!-- 6. Employment Details -->
-              <div id="ov-org" class="field-overlay" style="top: 7.7%; left: 25.5%; width: 26.8%;">INTERGLOBE AVIATION LTD</div>
-              <div id="ov-desig" class="field-overlay" style="top: 7.7%; left: 71.0%; width: 23.5%;">EXECUTIVE - SECURITY</div>
-
-              <div id="ov-empno" class="field-overlay" style="top: 10.4%; left: 25.5%; width: 26.8%;">IGA 72835</div>
-              <div id="ov-duty-place" class="field-overlay" style="top: 10.4%; left: 71.0%; width: 23.5%;">RGIA - HYD</div>
-
-              <div id="ov-nature" class="field-overlay" style="top: 12.8%; left: 25.5%; width: 26.8%;">SECURITY SERVICES</div>
-              <div id="ov-retire" class="field-overlay" style="top: 12.8%; left: 71.0%; width: 23.5%;">26/09/2053</div>
-
-              <div id="ov-office-addr" class="field-overlay" style="top: 15.2%; left: 25.5%; width: 69.0%; font-size: 8px;">
-                AO-06, E- LEVEL OFFICES, PASSANGER TERMINAL BUILDING, RGIA, HYD, TELANGANA -500108.
-              </div>
-
-              <!-- 7. Disclosures Checkmarks (NO) -->
-              <div class="check-stamp" style="top: 19.3%; left: 73.0%;">✓</div>
-              <div class="check-stamp" style="top: 23.6%; left: 73.0%;">✓</div>
-              <div class="check-stamp" style="top: 28.0%; left: 73.0%;">✓</div>
-
-              <!-- 8. Rejection Checkmark (NO) -->
-              <div class="check-stamp" style="top: 32.3%; left: 49.3%;">✓</div>
-
-              <!-- 9. Previous Zones -->
-              <div class="check-stamp" style="top: 36.6%; left: 20.8%;">✓</div>
-              <div class="check-stamp" style="top: 36.6%; left: 33.0%;">✓</div>
-              <div class="check-stamp" style="top: 36.6%; left: 45.2%;">✓</div>
-
-              <!-- 10. Foreign Nationals -->
-              <div class="field-overlay" style="top: 46.5%; left: 11.5%; font-size: 8px; color: #555;">
-                NOT APPLICABLE (INDIAN NATIONAL)
-              </div>
-
-              <!-- 11. AVSEC Training Details -->
-              <div id="ov-avsec-date" class="field-overlay" style="top: 59.5%; left: 25.5%; width: 17.5%;">02/08/2023</div>
-              <div id="ov-avsec-loc" class="field-overlay" style="top: 59.5%; left: 66.0%; width: 26.0%;">BLR - BENGALURU</div>
-
-              <div class="check-stamp" style="top: 61.8%; left: 13.2%;">✓</div>
-
-              <div id="ov-avsec-inst" class="field-overlay" style="top: 63.8%; left: 44.0%; width: 48.0%;">ARCHANA DASH / INDIGO ASTI</div>
-
-              <!-- Police Verification Stamp -->
-              <div id="ov-pvc-line" class="field-overlay" style="top: 70.8%; left: 11.5%; font-size: 9.5px;">
-                PVC CERT NO: <b>TP 88793</b> &bull; DATE: <b>12/SEP/2023</b> &bull; STATUS: <b>CLEARED &amp; APPROVED</b>
-              </div>
-
-              <!-- Signatures & Location -->
-              <div id="ov-sign-place" class="field-overlay" style="top: 83.2%; left: 17.0%;">HYD</div>
-              <div id="ov-sign-date" class="field-overlay" style="top: 85.6%; left: 17.0%;">04/11/2026</div>
-
-              <div id="ov-auth-sign-org" class="field-overlay" style="top: 86.8%; left: 61.0%; font-size: 9px;">
-                INTERGLOBE AVIATION LTD / SECURITY
-              </div>
-            </div>
-
-          </div>
+          <!-- The Live PDF Embed Canvas -->
+          <iframe id="pdf-preview-embed" class="pdf-preview-frame" src=""></iframe>
         </div>
 
       </div>
@@ -644,11 +405,14 @@
   </main>
 
   <!-- ===================================================
-       INDEXEDDB PERMANENT TEMPLATE STORAGE ENGINE
-       =================================================== */
+       INDEXEDDB STORAGE & DIRECT PDF STAMPING CONTROLLER
+       =================================================== -->
   <script>
-    const DB_NAME = "AEP_Template_DB";
-    const STORE_NAME = "templates";
+    const DB_NAME = "AEP_PDF_Template_DB";
+    const STORE_NAME = "pdf_blobs";
+
+    let blankPdfBytes = null;
+    let photoBytes = null;
 
     function openDB() {
       return new Promise((resolve, reject) => {
@@ -659,138 +423,303 @@
       });
     }
 
-    async function saveImageToDB(key, dataUrl) {
+    async function savePdfToDB(arrayBuffer) {
       const db = await openDB();
       return new Promise((resolve, reject) => {
         const tx = db.transaction(STORE_NAME, "readwrite");
-        tx.objectStore(STORE_NAME).put(dataUrl, key);
+        tx.objectStore(STORE_NAME).put(arrayBuffer, "blank_official_pdf");
         tx.oncomplete = () => resolve();
         tx.onerror = () => reject(tx.error);
       });
     }
 
-    async function getImageFromDB(key) {
+    async function getPdfFromDB() {
       const db = await openDB();
       return new Promise((resolve, reject) => {
         const tx = db.transaction(STORE_NAME, "readonly");
-        const req = tx.objectStore(STORE_NAME).get(key);
+        const req = tx.objectStore(STORE_NAME).get("blank_official_pdf");
         req.onsuccess = () => resolve(req.result);
         req.onerror = () => reject(req.error);
       });
     }
 
-    // Stores Scanned Image permanently and locks to preview
-    async function storeTemplateImage(input, pageNumber) {
+    // Load from local file picker
+    async function loadCustomBlankPdf(input) {
       if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-          const dataUrl = e.target.result;
-          await saveImageToDB(`page_${pageNumber}`, dataUrl);
-          document.getElementById(`tpl-img-${pageNumber}`).src = dataUrl;
-          document.getElementById('template-status-banner').style.display = 'none';
-          alert(`✅ Page ${pageNumber} Scanned Form Saved! It is now permanently locked into your portal.`);
-        };
-        reader.readAsDataURL(input.files[0]);
+        const file = input.files[0];
+        const arrayBuffer = await file.arrayBuffer();
+        blankPdfBytes = new Uint8Array(arrayBuffer);
+        await savePdfToDB(blankPdfBytes);
+        document.getElementById('btn-attach-text').innerText = "Official PDF Attached ✓";
+        document.getElementById('pdf-status-banner').style.display = 'none';
+        alert("✅ Official Blank PDF Attached! It is now permanently saved. Stamping live...");
+        renderStampedPDFPreview();
       }
     }
 
-    // Auto-load template from IndexedDB on startup
-    async function loadTemplatesFromDB() {
-      try {
-        const p1 = await getImageFromDB("page_1");
-        const p2 = await getImageFromDB("page_2");
-        if (p1) {
-          document.getElementById('tpl-img-1').src = p1;
-        }
-        if (p2) {
-          document.getElementById('tpl-img-2').src = p2;
-        }
-        if (p1 && p2) {
-          document.getElementById('template-status-banner').style.display = 'none';
-        }
-      } catch (err) {
-        console.warn("Template DB init:", err);
-      }
-    }
-
-    let photoDataURL = "";
-
-    function handlePhoto(input) {
+    // Photo processor
+    function handlePhotoUpload(input) {
       if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
-          photoDataURL = e.target.result;
-          const img = document.getElementById('ov-photo-img');
-          img.src = photoDataURL;
-          img.style.display = 'block';
+          photoBytes = new Uint8Array(e.target.result);
+          renderStampedPDFPreview();
         };
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsArrayBuffer(input.files[0]);
       }
     }
 
-    function syncOverlay() {
-      // Page 1
-      document.getElementById('ov-ref').innerText = document.getElementById('inp-ref').value;
-      document.getElementById('ov-name').innerText = document.getElementById('inp-name').value.toUpperCase();
-      document.getElementById('ov-aadhaar').innerText = document.getElementById('inp-aadhaar').value;
-      document.getElementById('ov-father').innerText = document.getElementById('inp-father').value.toUpperCase();
-      document.getElementById('ov-mother').innerText = document.getElementById('inp-mother').value.toUpperCase();
-      document.getElementById('ov-dob').innerText = document.getElementById('inp-dob').value;
-      document.getElementById('ov-mobile').innerText = document.getElementById('inp-mobile').value;
-      document.getElementById('ov-email').innerText = document.getElementById('inp-email').value.toUpperCase();
-      document.getElementById('ov-id-type').innerText = document.getElementById('inp-id-type').value.toUpperCase();
-      document.getElementById('ov-airport-text').innerText = document.getElementById('inp-airport').value.toUpperCase();
-
-      const gender = document.getElementById('inp-gender').value;
-      document.getElementById('ov-chk-gender-male').style.display = gender === 'Male' ? 'block' : 'none';
-      document.getElementById('ov-chk-gender-female').style.display = gender === 'Female' ? 'block' : 'none';
-      document.getElementById('ov-gender-text').innerText = gender.toUpperCase();
-
+    // Pull form data
+    function getFormData() {
+      const zones = [];
       ['A', 'D', 'T', 'B', 'P', 'F', 'Si', 'Sd'].forEach(z => {
-        const chk = document.getElementById(`chk-zone-${z}`);
-        const ov = document.getElementById(`ov-chk-z${z}`);
-        if (chk && ov) ov.style.display = chk.checked ? 'block' : 'none';
+        if (document.getElementById(`chk-zone-${z}`)?.checked) zones.push(z);
       });
 
-      // Addresses
-      document.getElementById('ov-perm-street').innerText = document.getElementById('inp-perm-street').value.toUpperCase();
-      document.getElementById('ov-perm-dist').innerText = document.getElementById('inp-perm-dist').value.toUpperCase();
-      document.getElementById('ov-perm-state').innerText = document.getElementById('inp-perm-state').value.toUpperCase();
-      document.getElementById('ov-perm-pin').innerText = document.getElementById('inp-perm-pin').value;
-      document.getElementById('ov-perm-proof').innerText = document.getElementById('inp-perm-proof').value.toUpperCase();
-
-      document.getElementById('ov-pres-street').innerText = document.getElementById('inp-pres-street').value.toUpperCase();
-      document.getElementById('ov-pres-dist').innerText = document.getElementById('inp-pres-dist').value.toUpperCase();
-      document.getElementById('ov-pres-state').innerText = document.getElementById('inp-pres-state').value.toUpperCase();
-      document.getElementById('ov-pres-pin').innerText = document.getElementById('inp-pres-pin').value;
-
-      // Page 2
-      document.getElementById('ov-org').innerText = document.getElementById('inp-org').value.toUpperCase();
-      document.getElementById('ov-desig').innerText = document.getElementById('inp-desig').value.toUpperCase();
-      document.getElementById('ov-empno').innerText = document.getElementById('inp-empno').value.toUpperCase();
-      document.getElementById('ov-duty-place').innerText = document.getElementById('inp-duty-place').value.toUpperCase();
-      document.getElementById('ov-nature').innerText = document.getElementById('inp-nature').value.toUpperCase();
-      document.getElementById('ov-office-addr').innerText = document.getElementById('inp-office-addr').value.toUpperCase();
-
-      document.getElementById('ov-avsec-date').innerText = document.getElementById('inp-avsec-date').value;
-      document.getElementById('ov-avsec-loc').innerText = document.getElementById('inp-avsec-loc').value.toUpperCase();
-      document.getElementById('ov-avsec-inst').innerText = document.getElementById('inp-avsec-inst').value.toUpperCase();
-      document.getElementById('ov-pvc-line').innerHTML = `PVC CERT NO: <b>${document.getElementById('inp-pvc-id').value.toUpperCase()}</b> &bull; DATE: <b>${document.getElementById('inp-pvc-date').value}</b> &bull; STATUS: <b>CLEARED &amp; APPROVED</b>`;
+      return {
+        refId: document.getElementById('inp-ref').value,
+        type: document.getElementById('inp-type').value,
+        category: document.getElementById('inp-category').value,
+        zones: zones,
+        airport: document.getElementById('inp-airport').value.toUpperCase(),
+        issueType: document.getElementById('inp-issue-type').value,
+        name: document.getElementById('inp-name').value.toUpperCase(),
+        father: document.getElementById('inp-father').value.toUpperCase(),
+        mother: document.getElementById('inp-mother').value.toUpperCase(),
+        dob: document.getElementById('inp-dob').value,
+        blood: document.getElementById('inp-blood').value.toUpperCase(),
+        gender: document.getElementById('inp-gender').value,
+        mobile: document.getElementById('inp-mobile').value,
+        email: document.getElementById('inp-email').value.toUpperCase(),
+        aadhaar: document.getElementById('inp-aadhaar').value,
+        idType: document.getElementById('inp-id-type').value.toUpperCase(),
+        permStreet: document.getElementById('inp-perm-street').value.toUpperCase(),
+        permDist: document.getElementById('inp-perm-dist').value.toUpperCase(),
+        permState: document.getElementById('inp-perm-state').value.toUpperCase(),
+        permPin: document.getElementById('inp-perm-pin').value,
+        permProof: document.getElementById('inp-perm-proof').value.toUpperCase(),
+        presStreet: document.getElementById('inp-pres-street').value.toUpperCase(),
+        presDist: document.getElementById('inp-pres-dist').value.toUpperCase(),
+        presState: document.getElementById('inp-pres-state').value.toUpperCase(),
+        presPin: document.getElementById('inp-pres-pin').value,
+        org: document.getElementById('inp-org').value.toUpperCase(),
+        desig: document.getElementById('inp-desig').value.toUpperCase(),
+        empNo: document.getElementById('inp-empno').value.toUpperCase(),
+        dutyPlace: document.getElementById('inp-duty-place').value.toUpperCase(),
+        nature: document.getElementById('inp-nature').value.toUpperCase(),
+        officeAddr: document.getElementById('inp-office-addr').value.toUpperCase(),
+        avsecDate: document.getElementById('inp-avsec-date').value,
+        avsecLoc: document.getElementById('inp-avsec-loc').value.toUpperCase(),
+        avsecInst: document.getElementById('inp-avsec-inst').value.toUpperCase(),
+        pvcId: document.getElementById('inp-pvc-id').value.toUpperCase(),
+        pvcDate: document.getElementById('inp-pvc-date').value
+      };
     }
 
-    // 1-Click Direct Print: Prints the actual scanned document with typed text
-    function printOfficialAEP() {
-      syncOverlay();
-      window.print();
+    // Vector checkmark drawer inside PDF (NEVER throws font encoding error)
+    function drawCheck(page, x, y) {
+      const { rgb } = PDFLib;
+      page.drawLine({ start: { x: x - 1, y: y + 3 }, end: { x: x + 2, y: y }, thickness: 1.5, color: rgb(0, 0, 0) });
+      page.drawLine({ start: { x: x + 2, y: y }, end: { x: x + 6, y: y + 7 }, thickness: 1.5, color: rgb(0, 0, 0) });
+    }
+
+    // CORE: STAMP DATA ONTO THE AUTHENTIC 2-PAGE PDF
+    async function buildStampedPDFBlob() {
+      const { PDFDocument, rgb, StandardFonts } = PDFLib;
+      const data = getFormData();
+
+      // If user hasn't selected PDF yet, try loading from root repo
+      if (!blankPdfBytes) {
+        try {
+          const res = await fetch('./bcas_aepaf_blank.pdf');
+          if (res.ok) {
+            const arr = await res.arrayBuffer();
+            blankPdfBytes = new Uint8Array(arr);
+          }
+        } catch (e) {}
+      }
+
+      if (!blankPdfBytes) {
+        alert("Please click 'Attach Blank Official PDF' in the top bar to select your official 2-page PDF file once!");
+        return null;
+      }
+
+      // Load original blank PDF
+      const pdfDoc = await PDFDocument.load(blankPdfBytes);
+      const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      const fontNorm = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+      const pages = pdfDoc.getPages();
+      const page1 = pages[0];
+      const page2 = pages[1] || page1;
+
+      const p1H = page1.getHeight();
+      const p2H = page2.getHeight();
+
+      // ==========================================
+      // STAMPING PAGE 1
+      // ==========================================
+
+      // 1. Reference Id
+      page1.drawText(data.refId, { x: 215, y: p1H - 150, size: 9, font });
+
+      // 2a. Type checkmarks
+      if (data.type === 'Permanent') drawCheck(page1, 175, p1H - 200);
+
+      // 2b. Category checkmark
+      if (data.category === 'Operational') drawCheck(page1, 388, p1H - 245);
+
+      // 2c. Operational Zones checkmarks
+      if (data.zones.includes('A')) drawCheck(page1, 175, p1H - 308);
+      if (data.zones.includes('D')) drawCheck(page1, 248, p1H - 308);
+      if (data.zones.includes('T')) drawCheck(page1, 316, p1H - 308);
+
+      // 2d. Airport
+      drawCheck(page1, 175, p1H - 352);
+      page1.drawText(data.airport, { x: 250, y: p1H - 355, size: 9, font });
+
+      // 2e. Terminal
+      drawCheck(page1, 206, p1H - 450);
+
+      // 3. Issue Category
+      drawCheck(page1, 390, p1H - 475);
+      drawCheck(page1, 175, p1H - 498);
+
+      // 4. Details of the Applicant
+      if (data.gender === 'Male') drawCheck(page1, 206, p1H - 582);
+
+      page1.drawText(data.name, { x: 105, y: p1H - 595, size: 9, font });
+      page1.drawText(data.aadhaar, { x: 418, y: p1H - 602, size: 9, font });
+
+      page1.drawText(data.father, { x: 155, y: p1H - 612, size: 8.5, font });
+      page1.drawText(data.mother, { x: 418, y: p1H - 620, size: 8.5, font });
+
+      page1.drawText(data.dob, { x: 155, y: p1H - 632, size: 8.5, font });
+      page1.drawText(data.gender.toUpperCase(), { x: 418, y: p1H - 639, size: 8.5, font });
+
+      page1.drawText(data.mobile, { x: 155, y: p1H - 651, size: 8.5, font });
+      page1.drawText(data.email, { x: 418, y: p1H - 658, size: 8, font });
+
+      page1.drawText(data.mobile, { x: 165, y: p1H - 670, size: 8.5, font });
+      page1.drawText(data.idType, { x: 418, y: p1H - 676, size: 8.5, font });
+
+      // 4b. Existing AEP
+      page1.drawText("NIL", { x: 70, y: p1H - 696, size: 8.5, font: fontNorm });
+      page1.drawText("NIL", { x: 328, y: p1H - 696, size: 8.5, font: fontNorm });
+      page1.drawText("HYD", { x: 486, y: p1H - 696, size: 8.5, font: fontNorm });
+
+      // 5a. Permanent Address
+      page1.drawText(data.permStreet, { x: 155, y: p1H - 733, size: 8, font: fontNorm });
+      page1.drawText(data.permDist, { x: 155, y: p1H - 752, size: 8, font: fontNorm });
+      page1.drawText(data.permState, { x: 155, y: p1H - 770, size: 8, font: fontNorm });
+      page1.drawText(data.permPin, { x: 155, y: p1H - 788, size: 8, font: fontNorm });
+      page1.drawText(data.permProof, { x: 185, y: p1H - 802, size: 8, font });
+
+      // 5b. Present Address
+      page1.drawText(data.presStreet, { x: 418, y: p1H - 733, size: 8, font: fontNorm });
+      page1.drawText(data.presDist, { x: 418, y: p1H - 752, size: 8, font: fontNorm });
+      page1.drawText(data.presState, { x: 418, y: p1H - 770, size: 8, font: fontNorm });
+      page1.drawText(data.presPin, { x: 418, y: p1H - 788, size: 8, font: fontNorm });
+
+      // Embed Photograph in exact top right box
+      if (photoBytes) {
+        try {
+          const img = await pdfDoc.embedJpg(photoBytes).catch(async () => await pdfDoc.embedPng(photoBytes));
+          page1.drawImage(img, { x: 476, y: p1H - 146, width: 98, height: 120 });
+        } catch (e) {}
+      }
+
+      // ==========================================
+      // STAMPING PAGE 2
+      // ==========================================
+
+      // 6. Employment Details
+      page2.drawText(data.org, { x: 150, y: p2H - 64, size: 8.5, font });
+      page2.drawText(data.desig, { x: 425, y: p2H - 64, size: 8.5, font });
+
+      page2.drawText(data.empNo, { x: 150, y: p2H - 86, size: 9, font });
+      page2.drawText(data.dutyPlace, { x: 425, y: p2H - 86, size: 8.5, font });
+
+      page2.drawText(data.nature, { x: 150, y: p2H - 106, size: 8.5, font });
+      page2.drawText("26/09/2053", { x: 425, y: p2H - 106, size: 8.5, font });
+
+      page2.drawText(data.officeAddr, { x: 150, y: p2H - 128, size: 7.5, font: fontNorm });
+
+      // 7. Disclosures (NO checks)
+      drawCheck(page2, 436, p2H - 162);
+      drawCheck(page2, 436, p2H - 198);
+      drawCheck(page2, 436, p2H - 235);
+
+      // 8. Rejection (NO check)
+      drawCheck(page2, 298, p2H - 272);
+
+      // 9. Previous Zones
+      drawCheck(page2, 126, p2H - 308);
+      drawCheck(page2, 198, p2H - 308);
+      drawCheck(page2, 270, p2H - 308);
+
+      // 10. Non-Indian row
+      page2.drawText("INDIAN", { x: 80, y: p2H - 390, size: 8, font });
+      page2.drawText("NOT APPLICABLE", { x: 260, y: p2H - 390, size: 8, font });
+
+      // 11. AVSEC Training
+      page2.drawText(data.avsecDate, { x: 150, y: p2H - 501, size: 8.5, font });
+      page2.drawText(data.avsecLoc, { x: 395, y: p2H - 501, size: 8.5, font });
+      drawCheck(page2, 80, p2H - 520);
+      page2.drawText(data.avsecInst, { x: 265, y: p2H - 539, size: 8, font });
+
+      // PVC Stamp Line
+      page2.drawText(`PVC CERT NO: ${data.pvcId} | DATE: ${data.pvcDate} | STATUS: CLEARED & APPROVED`, { x: 70, y: p2H - 598, size: 8.5, font });
+
+      // Signatures
+      page2.drawText("HYD", { x: 105, y: p2H - 700, size: 8.5, font });
+      page2.drawText("04/11/2026", { x: 105, y: p2H - 720, size: 8.5, font });
+      page2.drawText(data.org + " / SECURITY DEPT", { x: 360, y: p2H - 730, size: 8, font });
+
+      // Compile
+      const stampedPdfBytes = await pdfDoc.save();
+      return new Blob([stampedPdfBytes], { type: "application/pdf" });
+    }
+
+    // Render live into the right-side preview iframe
+    async function renderStampedPDFPreview() {
+      const blob = await buildStampedPDFBlob();
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        document.getElementById('pdf-preview-embed').src = url;
+      }
+    }
+
+    // 1-Click System Printer (Direct from PDF engine)
+    async function stampAndPrintPDF() {
+      const blob = await buildStampedPDFBlob();
+      if (!blob) return;
+
+      const url = URL.createObjectURL(blob);
+      const printIframe = document.createElement('iframe');
+      printIframe.style.display = 'none';
+      printIframe.src = url;
+      document.body.appendChild(printIframe);
+
+      printIframe.onload = function() {
+        printIframe.contentWindow.focus();
+        printIframe.contentWindow.print();
+      };
     }
 
     function loadSampleMushtaqData() {
-      syncOverlay();
+      renderStampedPDFPreview();
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      loadTemplatesFromDB();
-      syncOverlay();
+    // Initialize on start
+    document.addEventListener("DOMContentLoaded", async () => {
+      const cached = await getPdfFromDB();
+      if (cached) {
+        blankPdfBytes = new Uint8Array(cached);
+        document.getElementById('btn-attach-text').innerText = "Official PDF Attached ✓";
+        document.getElementById('pdf-status-banner').style.display = 'none';
+      }
+      renderStampedPDFPreview();
     });
   </script>
 </body>
