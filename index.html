@@ -12,9 +12,8 @@
   <!-- FontAwesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- Multi-CDN Fallback for pdf-lib (Cloudflare -> jsDelivr -> unpkg) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js" 
-          onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.9/dist/pdf-lib.min.js';"></script>
+  <!-- SELF-HOSTED LOCAL ENGINE: ZERO CDN DEPENDENCY -->
+  <script src="pdf-lib.min.js"></script>
 
   <style>
     body {
@@ -44,13 +43,6 @@
       border-color: #0071e3;
       box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
     }
-    .pdf-preview-frame {
-      width: 100%;
-      height: 800px;
-      border-radius: 16px;
-      border: 1px solid #d2d2d7;
-      background: #525659;
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
@@ -64,11 +56,11 @@
         </div>
         <div>
           <span class="text-base font-semibold tracking-tight block leading-tight">BCAS AEP Form Engine</span>
-          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Official Stamping System</span>
+          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Self-Hosted Standalone System</span>
         </div>
       </div>
 
-      <!-- Actions -->
+      <!-- Action Buttons -->
       <div class="flex items-center space-x-2">
         <button onclick="generateAndPrintOfficialPdf()" id="btn-print" class="px-5 py-2.5 bg-[#1d1d1f] hover:bg-black active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5">
           <i class="fa-solid fa-print"></i>
@@ -84,352 +76,323 @@
   </header>
 
   <!-- MAIN WORKSPACE -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 pt-24 pb-20">
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 md:px-6 pt-24 pb-20">
 
     <!-- Status Alert Bar -->
     <div id="status-bar" class="mb-6 p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs flex justify-between items-center">
       <div class="flex items-center space-x-2">
-        <i id="status-icon" class="fa-solid fa-circle-check text-green-600 text-base"></i>
-        <span id="status-text">Official blank PDF loaded successfully from repository! Ready to print.</span>
+        <i id="status-icon" class="fa-solid fa-spinner fa-spin text-blue-600 text-base"></i>
+        <span id="status-text">Checking local PDF engine and blank template...</span>
       </div>
     </div>
 
-    <!-- MAIN FORM GRID -->
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+    <!-- MAIN DATA ENTRY FORM (ALL 11 SECTIONS) -->
+    <form id="aepDataForm" onsubmit="handleGSheetSubmit(event)" class="space-y-6">
 
-      <!-- LEFT COLUMN: INPUT CONTROLS (5 COLS) -->
-      <div class="xl:col-span-5 space-y-4">
-        <form id="aepDataForm" onsubmit="handleGSheetSubmit(event)" class="space-y-4">
-
-          <!-- SECTION 1, 2, 3 -->
-          <div class="apple-card p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
-              <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Sections 1, 2 &amp; 3</span>
-              <span class="text-xs font-semibold text-[#86868b]">Permit Type &amp; Zones</span>
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">1. AEP Reference ID *</label>
-              <input type="text" id="f_refId" required value="HYD/2026/AEP/72835" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 text-xs">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">2a. Type</label>
-                <select id="f_type" class="w-full p-2.5 apple-input font-medium">
-                  <option value="Permanent" selected>Permanent</option>
-                  <option value="Temporary">Temporary (1 to 30 Days)</option>
-                  <option value="1Day">1 Day</option>
-                  <option value="1-7Days">1 - 7 Days</option>
-                  <option value="3Months">3 Months</option>
-                  <option value="6Months">6 Months</option>
-                </select>
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">2b. Category</label>
-                <select id="f_category" class="w-full p-2.5 apple-input font-medium">
-                  <option value="Operational" selected>Operational</option>
-                  <option value="Protocol">Protocol</option>
-                  <option value="ForeignNational">Foreign National</option>
-                  <option value="GovtSecurity">Government Security Agencies</option>
-                  <option value="Infra">Infra</option>
-                  <option value="ToolOfTrade">Tool of Trade</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1.5">2c. Operational Zones</label>
-              <div class="grid grid-cols-4 gap-2 text-xs font-bold">
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_A" checked class="rounded text-[#0071e3]" />
-                  <span>A (Apron)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_D" checked class="rounded text-[#0071e3]" />
-                  <span>D (Domestic)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_T" checked class="rounded text-[#0071e3]" />
-                  <span>T (Terminal)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_Si" class="rounded text-[#0071e3]" />
-                  <span>Si (Sec Intl)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_Sd" class="rounded text-[#0071e3]" />
-                  <span>Sd (Sec Dom)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_P" class="rounded text-[#0071e3]" />
-                  <span>P (Perimeter)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_B" class="rounded text-[#0071e3]" />
-                  <span>B (Baggage)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_F" class="rounded text-[#0071e3]" />
-                  <span>F (Freight)</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">2d. Airport Requested</label>
-                <input type="text" id="f_airport" value="RGIA - HYD" class="w-full p-2.5 apple-input font-bold uppercase" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">3. Issue Category</label>
-                <select id="f_issueCat" class="w-full p-2.5 apple-input font-medium">
-                  <option value="Fresh" selected>Fresh (Appointment Order)</option>
-                  <option value="Re-Issue">Re-Issue (Expired / Promotion)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- SECTION 4: APPLICANT IDENTITY & PHOTO -->
-          <div class="apple-card p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
-              <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Section 4</span>
-              <span class="text-xs font-semibold text-[#86868b]">Applicant Credentials</span>
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Applicant Full Name *</label>
-              <input type="text" id="f_name" required value="MUSHTAQ MOHAMMED" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Father's Name *</label>
-                <input type="text" id="f_father" required value="ISMAIL MOHAMMED" class="w-full p-2.5 apple-input font-bold uppercase" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Mother's Name *</label>
-                <input type="text" id="f_mother" required value="SAPHIA ISMAIL" class="w-full p-2.5 apple-input font-bold uppercase" />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Date of Birth</label>
-                <input type="text" id="f_dob" value="27/09/1993" class="w-full p-2.5 apple-input font-bold" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Blood Group</label>
-                <input type="text" id="f_blood" value="A+" class="w-full p-2.5 apple-input font-bold uppercase" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Gender</label>
-                <select id="f_gender" class="w-full p-2.5 apple-input font-bold">
-                  <option value="Male" selected>Male</option>
-                  <option value="Female">Female</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Mobile No *</label>
-                <input type="text" id="f_mobile" value="9036488263" class="w-full p-2.5 apple-input font-semibold" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">E-mail *</label>
-                <input type="email" id="f_email" value="MUSHTAQ.ISMAIL@GOINDIGO.IN" class="w-full p-2.5 apple-input font-semibold uppercase" />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Next of Kin Mobile</label>
-                <input type="text" id="f_kin" value="9036488263" class="w-full p-2.5 apple-input font-semibold" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Aadhaar No (12 Digits) *</label>
-                <input type="text" id="f_aadhaar" value="9772 0313 2804" class="w-full p-2.5 apple-input font-bold" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Type of ID Proof</label>
-                <input type="text" id="f_idType" value="INDIAN PASSPORT" class="w-full p-2.5 apple-input font-bold uppercase" />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Passport Photograph (Embeds in top-right box)</label>
-              <input type="file" accept="image/jpeg,image/png" onchange="handlePhotoUpload(this)" class="w-full text-xs text-[#86868b] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer" />
-            </div>
-          </div>
-
-          <!-- SECTION 5: RESIDENTIAL ADDRESSES -->
-          <div class="apple-card p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
-              <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Section 5</span>
-              <span class="text-xs font-semibold text-[#86868b]">Residential Addresses</span>
-            </div>
-
-            <div class="space-y-2 text-xs">
-              <span class="font-bold text-[#1d1d1f] uppercase block">5a. Permanent Address</span>
-              <input type="text" id="f_permStreet" placeholder="House No / Street / Road" value="H.NO 20-170/1/1, RB NAGAR" class="w-full p-2.5 apple-input uppercase font-medium" />
-              <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-                <input type="text" id="f_permDist" placeholder="District" value="RANGAREDDY" class="p-2.5 apple-input uppercase" />
-                <input type="text" id="f_permState" placeholder="State" value="TELANGANA" class="p-2.5 apple-input uppercase" />
-                <input type="text" id="f_permPin" placeholder="Pin" value="501218" class="p-2.5 apple-input" />
-                <input type="text" id="f_permProof" placeholder="Proof Type" value="ELECTRICITY BILL" class="p-2.5 apple-input uppercase font-bold" />
-              </div>
-            </div>
-
-            <div class="space-y-2 text-xs pt-2 border-t border-[#f5f5f7]">
-              <span class="font-bold text-[#1d1d1f] uppercase block">5b. Present Address</span>
-              <input type="text" id="f_presStreet" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYA" class="w-full p-2.5 apple-input uppercase font-medium" />
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <input type="text" id="f_presDist" placeholder="District" value="THANE/NEW MUMBAI" class="p-2.5 apple-input uppercase" />
-                <input type="text" id="f_presState" placeholder="State" value="MAHARASHTRA" class="p-2.5 apple-input uppercase" />
-                <input type="text" id="f_presPin" placeholder="Pin" value="400709" class="p-2.5 apple-input" />
-              </div>
-            </div>
-          </div>
-
-          <!-- SECTION 6: EMPLOYMENT DETAILS -->
-          <div class="apple-card p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
-              <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Section 6</span>
-              <span class="text-xs font-semibold text-[#86868b]">Airport Employment Unit</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Organization *</label>
-                <input type="text" id="f_org" value="INTERGLOBE AVIATION LTD" class="w-full p-2.5 apple-input font-bold uppercase" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Designation *</label>
-                <input type="text" id="f_desig" value="EXECUTIVE - SECURITY" class="w-full p-2.5 apple-input font-bold uppercase" />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Employee No. *</label>
-                <input type="text" id="f_empno" value="IGA 72835" class="w-full p-2.5 apple-input font-bold uppercase text-[#0071e3]" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Place of Duty *</label>
-                <input type="text" id="f_dutyPlace" value="RGIA - HYD" class="w-full p-2.5 apple-input font-bold uppercase" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">Nature of Duty</label>
-                <input type="text" id="f_nature" value="SECURITY SERVICES" class="w-full p-2.5 apple-input font-bold uppercase" />
-              </div>
-            </div>
-
-            <div class="text-xs">
-              <label class="block font-semibold text-[#86868b] uppercase mb-1">Airport Terminal Office Address</label>
-              <textarea id="f_officeAddr" rows="2" class="w-full p-2.5 apple-input uppercase font-medium">AO-06, E- LEVEL OFFICES, PASSANGER TERMINAL BUILDING, RGIA, HYD, TELANGANA -500108.</textarea>
-            </div>
-          </div>
-
-          <!-- SECTION 11: AVSEC & PVC -->
-          <div class="apple-card p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
-              <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Section 11</span>
-              <span class="text-xs font-semibold text-[#86868b]">AVSEC Training &amp; PVC</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Training Date</label>
-                <input type="text" id="f_avsecDate" value="02/08/2023" class="w-full p-2.5 apple-input font-bold" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Location</label>
-                <input type="text" id="f_avsecLoc" value="BLR - BENGALURU" class="w-full p-2.5 apple-input font-bold uppercase" />
-              </div>
-            </div>
-
-            <div class="text-xs">
-              <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Instructor &amp; ASTI Center</label>
-              <input type="text" id="f_avsecInst" value="ARCHANA DASH / INDIGO ASTI" class="w-full p-2.5 apple-input font-bold uppercase" />
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2 border-t border-[#f5f5f7]">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Serial ID</label>
-                <input type="text" id="f_pvcId" value="TP 88793" class="w-full p-2.5 apple-input font-bold uppercase text-[#2e7d32]" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Date</label>
-                <input type="text" id="f_pvcDate" value="12/SEP/2023" class="w-full p-2.5 apple-input font-bold" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Submit to Google Sheets -->
-          <button type="submit" id="btn-submit" class="w-full py-4 bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-bold rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Save &amp; Append to Google Sheet</span>
-          </button>
-        </form>
-      </div>
-
-      <!-- RIGHT COLUMN: LIVE EMBEDDED STAMPED PDF (7 COLS) -->
-      <div class="xl:col-span-7 space-y-4 sticky top-24">
-        <div class="flex items-center justify-between px-2">
-          <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider">Live Stamped Official Document</span>
-          <button onclick="refreshPdfPreview()" class="text-xs font-bold text-[#0071e3] hover:underline flex items-center gap-1">
-            <i class="fa-solid fa-arrows-rotate"></i> Refresh Preview
-          </button>
+      <!-- SECTION 1, 2, 3 -->
+      <div class="apple-card p-6 md:p-8 space-y-4">
+        <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+          <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Sections 1, 2 &amp; 3</span>
+          <span class="text-xs font-semibold text-[#86868b]">Permit Type, Operational Zones &amp; Category</span>
         </div>
 
-        <!-- Embedded PDF Iframe -->
-        <iframe id="pdf-preview-frame" class="pdf-preview-frame" src=""></iframe>
+        <div>
+          <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">1. AEP Reference ID *</label>
+          <input type="text" id="f_refId" required value="HYD/2026/AEP/72835" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">2a. Type</label>
+            <select id="f_type" class="w-full p-2.5 apple-input font-medium">
+              <option value="Permanent" selected>Permanent</option>
+              <option value="Temporary">Temporary (1 to 30 Days)</option>
+              <option value="1Day">1 Day</option>
+              <option value="1-7Days">1 - 7 Days</option>
+              <option value="3Months">3 Months</option>
+              <option value="6Months">6 Months</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">2b. Category</label>
+            <select id="f_category" class="w-full p-2.5 apple-input font-medium">
+              <option value="Operational" selected>Operational</option>
+              <option value="Protocol">Protocol</option>
+              <option value="ForeignNational">Foreign National</option>
+              <option value="GovtSecurity">Government Security Agencies</option>
+              <option value="Infra">Infra</option>
+              <option value="ToolOfTrade">Tool of Trade</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1.5">2c. Operational Zones Requested (Check all that apply)</label>
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-xs font-bold">
+            <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
+              <input type="checkbox" id="zone_A" checked class="rounded text-[#0071e3]" />
+              <span>A (Apron)</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
+              <input type="checkbox" id="zone_D" checked class="rounded text-[#0071e3]" />
+              <span>D (Domestic)</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
+              <input type="checkbox" id="zone_T" checked class="rounded text-[#0071e3]" />
+              <span>T (Terminal)</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
+              <input type="checkbox" id="zone_Si" class="rounded text-[#0071e3]" />
+              <span>Si (Sec Intl)</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
+              <input type="checkbox" id="zone_Sd" class="rounded text-[#0071e3]" />
+              <span>Sd (Sec Dom)</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
+              <input type="checkbox" id="zone_P" class="rounded text-[#0071e3]" />
+              <span>P (Perimeter)</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
+              <input type="checkbox" id="zone_B" class="rounded text-[#0071e3]" />
+              <span>B (Baggage)</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
+              <input type="checkbox" id="zone_F" class="rounded text-[#0071e3]" />
+              <span>F (Freight)</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
+              <input type="checkbox" id="zone_Ft" class="rounded text-[#0071e3]" />
+              <span>Ft</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
+              <input type="checkbox" id="zone_Cs" class="rounded text-[#0071e3]" />
+              <span>Cs</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
+              <input type="checkbox" id="zone_I" class="rounded text-[#0071e3]" />
+              <span>I (ATC)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">2d. Airport Requested</label>
+            <input type="text" id="f_airport" value="RGIA - HYD" class="w-full p-2.5 apple-input font-bold uppercase" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">3. Issue Category</label>
+            <select id="f_issueCat" class="w-full p-2.5 apple-input font-medium">
+              <option value="Fresh" selected>Fresh (Appointment / Posting Order)</option>
+              <option value="Re-Issue">Re-Issue (Expired / Promotion / Transfer)</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-    </div>
+      <!-- SECTION 4: APPLICANT IDENTITY & PHOTO -->
+      <div class="apple-card p-6 md:p-8 space-y-4">
+        <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+          <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Section 4</span>
+          <span class="text-xs font-semibold text-[#86868b]">Applicant Credentials &amp; Photo</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Applicant Full Name *</label>
+          <input type="text" id="f_name" required value="MUSHTAQ MOHAMMED" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Father's Name *</label>
+            <input type="text" id="f_father" required value="ISMAIL MOHAMMED" class="w-full p-2.5 apple-input font-bold uppercase" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Mother's Name *</label>
+            <input type="text" id="f_mother" required value="SAPHIA ISMAIL" class="w-full p-2.5 apple-input font-bold uppercase" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Date of Birth (DD/MM/YYYY) *</label>
+            <input type="text" id="f_dob" value="27/09/1993" class="w-full p-2.5 apple-input font-bold" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Blood Group *</label>
+            <input type="text" id="f_blood" value="A+" class="w-full p-2.5 apple-input font-bold uppercase" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Gender *</label>
+            <select id="f_gender" class="w-full p-2.5 apple-input font-bold">
+              <option value="Male" selected>Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Mobile No *</label>
+            <input type="text" id="f_mobile" value="9036488263" class="w-full p-2.5 apple-input font-semibold" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">E-mail *</label>
+            <input type="email" id="f_email" value="MUSHTAQ.ISMAIL@GOINDIGO.IN" class="w-full p-2.5 apple-input font-semibold uppercase" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Next of Kin Mobile</label>
+            <input type="text" id="f_kin" value="9036488263" class="w-full p-2.5 apple-input font-semibold" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Aadhaar Card No (12 Digits) *</label>
+            <input type="text" id="f_aadhaar" value="9772 0313 2804" class="w-full p-2.5 apple-input font-bold" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Type of ID Proof</label>
+            <input type="text" id="f_idType" value="INDIAN PASSPORT" class="w-full p-2.5 apple-input font-bold uppercase" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">Passport Photograph (Will be stamped into 3.5cm x 4.5cm top-right box)</label>
+          <input type="file" accept="image/jpeg,image/png" onchange="handlePhotoUpload(this)" class="w-full text-xs text-[#86868b] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3] file:text-white cursor-pointer" />
+        </div>
+      </div>
+
+      <!-- SECTION 5: RESIDENTIAL ADDRESSES -->
+      <div class="apple-card p-6 md:p-8 space-y-4">
+        <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+          <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Section 5</span>
+          <span class="text-xs font-semibold text-[#86868b]">Residential Addresses</span>
+        </div>
+
+        <div class="space-y-2 text-xs">
+          <span class="font-bold text-[#1d1d1f] uppercase block">5a. Permanent Address</span>
+          <input type="text" id="f_permStreet" placeholder="House No / Street / Road" value="H.NO 20-170/1/1, RB NAGAR" class="w-full p-2.5 apple-input uppercase font-medium" />
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+            <input type="text" id="f_permDist" placeholder="District" value="RANGAREDDY" class="p-2.5 apple-input uppercase" />
+            <input type="text" id="f_permState" placeholder="State" value="TELANGANA" class="p-2.5 apple-input uppercase" />
+            <input type="text" id="f_permPin" placeholder="Pin" value="501218" class="p-2.5 apple-input" />
+            <input type="text" id="f_permProof" placeholder="Address Proof Type" value="ELECTRICITY BILL" class="p-2.5 apple-input uppercase font-bold" />
+          </div>
+        </div>
+
+        <div class="space-y-2 text-xs pt-2 border-t border-[#f5f5f7]">
+          <span class="font-bold text-[#1d1d1f] uppercase block">5b. Present Address</span>
+          <input type="text" id="f_presStreet" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYA" class="w-full p-2.5 apple-input uppercase font-medium" />
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <input type="text" id="f_presDist" placeholder="District" value="THANE/NEW MUMBAI" class="p-2.5 apple-input uppercase" />
+            <input type="text" id="f_presState" placeholder="State" value="MAHARASHTRA" class="p-2.5 apple-input uppercase" />
+            <input type="text" id="f_presPin" placeholder="Pin" value="400709" class="p-2.5 apple-input" />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 6: EMPLOYMENT DETAILS -->
+      <div class="apple-card p-6 md:p-8 space-y-4">
+        <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+          <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Section 6</span>
+          <span class="text-xs font-semibold text-[#86868b]">Airport Employment Unit</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Organization *</label>
+            <input type="text" id="f_org" value="INTERGLOBE AVIATION LTD" class="w-full p-2.5 apple-input font-bold uppercase" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Designation *</label>
+            <input type="text" id="f_desig" value="EXECUTIVE - SECURITY" class="w-full p-2.5 apple-input font-bold uppercase" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Employee No. *</label>
+            <input type="text" id="f_empno" value="IGA 72835" class="w-full p-2.5 apple-input font-bold uppercase text-[#0071e3]" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Place of Duty *</label>
+            <input type="text" id="f_dutyPlace" value="RGIA - HYD" class="w-full p-2.5 apple-input font-bold uppercase" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">Nature of Duty</label>
+            <input type="text" id="f_nature" value="SECURITY SERVICES" class="w-full p-2.5 apple-input font-bold uppercase" />
+          </div>
+        </div>
+
+        <div class="text-xs">
+          <label class="block font-semibold text-[#86868b] uppercase mb-1">Airport Terminal Office Address</label>
+          <textarea id="f_officeAddr" rows="2" class="w-full p-2.5 apple-input uppercase font-medium">AO-06, E- LEVEL OFFICES, PASSANGER TERMINAL BUILDING, RGIA, HYD, TELANGANA -500108.</textarea>
+        </div>
+      </div>
+
+      <!-- SECTION 11: AVSEC TRAINING & POLICE VERIFICATION -->
+      <div class="apple-card p-6 md:p-8 space-y-4">
+        <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
+          <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Section 11</span>
+          <span class="text-xs font-semibold text-[#86868b]">AVSEC Training &amp; PVC</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Training Date</label>
+            <input type="text" id="f_avsecDate" value="02/08/2023" class="w-full p-2.5 apple-input font-bold" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Location</label>
+            <input type="text" id="f_avsecLoc" value="BLR - BENGALURU" class="w-full p-2.5 apple-input font-bold uppercase" />
+          </div>
+        </div>
+
+        <div class="text-xs">
+          <label class="block font-semibold text-[#86868b] uppercase mb-1">AVSEC Instructor &amp; ASTI Center</label>
+          <input type="text" id="f_avsecInst" value="ARCHANA DASH / INDIGO ASTI" class="w-full p-2.5 apple-input font-bold uppercase" />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2 border-t border-[#f5f5f7]">
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Serial ID</label>
+            <input type="text" id="f_pvcId" value="TP 88793" class="w-full p-2.5 apple-input font-bold uppercase text-[#2e7d32]" />
+          </div>
+          <div>
+            <label class="block font-semibold text-[#86868b] uppercase mb-1">PVC Date</label>
+            <input type="text" id="f_pvcDate" value="12/SEP/2023" class="w-full p-2.5 apple-input font-bold" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <button type="button" onclick="generateAndPrintOfficialPdf()" class="flex-1 py-4 bg-[#1d1d1f] hover:bg-black text-white text-sm font-bold rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-print"></i>
+          <span>Print Filled Official PDF</span>
+        </button>
+        <button type="submit" id="btn-submit" class="flex-1 py-4 bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-bold rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Save &amp; Append to Google Sheet</span>
+        </button>
+      </div>
+
+    </form>
 
   </main>
 
   <!-- ===================================================
-       GUARANTEED SCRIPT ENGINE (WITH MULTI-CDN RECOVERY)
+       SELF-HOSTED ZERO-FAIL CONTROLLER
        =================================================== -->
   <script>
     const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby-YOUR-DEPLOYED-URL-HERE/exec";
 
     let blankPdfBytes = null;
     let photoBytes = null;
-    let activePdfUrl = null;
 
-    // Robust dynamic script recovery: guarantees PDFLib is loaded
-    async function ensurePdfLibLoaded() {
-      if (typeof PDFLib !== 'undefined') return true;
-
-      const cdnList = [
-        'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js',
-        'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.9/dist/pdf-lib.min.js',
-        'https://unpkg.com/pdf-lib@1.17.9/dist/pdf-lib.min.js'
-      ];
-
-      for (let url of cdnList) {
-        try {
-          await new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = url;
-            script.onload = () => resolve();
-            script.onerror = () => reject();
-            document.head.appendChild(script);
-          });
-          if (typeof PDFLib !== 'undefined') return true;
-        } catch (e) {
-          console.warn(`CDN ${url} failed to load, trying next...`);
-        }
-      }
-      return typeof PDFLib !== 'undefined';
-    }
-
-    // Load PDF from Repo with Cache-Buster
+    // Load PDF directly from repo
     async function loadBlankPdf() {
       if (blankPdfBytes) return blankPdfBytes;
 
@@ -460,7 +423,6 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           photoBytes = new Uint8Array(e.target.result);
-          refreshPdfPreview();
         };
         reader.readAsArrayBuffer(input.files[0]);
       }
@@ -521,14 +483,13 @@
 
     // Main PDF Stamping Processor
     async function buildOfficialStampedPdfBlob() {
-      const isReady = await ensurePdfLibLoaded();
-      if (!isReady) {
-        throw new Error("Could not load PDF library. Please disable ad-blockers or try another network.");
+      if (typeof PDFLib === 'undefined') {
+        throw new Error("pdf-lib.min.js is not loaded. Please make sure you uploaded pdf-lib.min.js to your GitHub repository root.");
       }
 
       const bytes = await loadBlankPdf();
       if (!bytes) {
-        throw new Error("Could not load 'bcas_aepaf_blank.pdf' from repository.");
+        throw new Error("Could not load 'bcas_aepaf_blank.pdf'. Please ensure it is saved in your GitHub repository.");
       }
 
       const { PDFDocument, rgb, StandardFonts } = PDFLib;
@@ -651,19 +612,6 @@
       return new Blob([stampedBytes], { type: "application/pdf" });
     }
 
-    async function refreshPdfPreview() {
-      try {
-        const blob = await buildOfficialStampedPdfBlob();
-        if (blob) {
-          if (activePdfUrl) URL.revokeObjectURL(activePdfUrl);
-          activePdfUrl = URL.createObjectURL(blob);
-          document.getElementById('pdf-preview-frame').src = activePdfUrl;
-        }
-      } catch (err) {
-        console.warn("Preview deferred:", err.message);
-      }
-    }
-
     // Direct Browser Download
     async function generateAndDownloadOfficialPdf() {
       const btn = document.getElementById('btn-download');
@@ -754,13 +702,22 @@
       }
     }
 
-    // Initial boot
+    // Initial check
     document.addEventListener("DOMContentLoaded", async () => {
       try {
-        await ensurePdfLibLoaded();
+        if (typeof PDFLib === 'undefined') {
+          document.getElementById('status-icon').className = "fa-solid fa-triangle-exclamation text-amber-600 text-base";
+          document.getElementById('status-text').innerHTML = "<b>Missing pdf-lib.min.js:</b> Please add <code>pdf-lib.min.js</code> into your GitHub repository root.";
+          return;
+        }
+
         const bytes = await loadBlankPdf();
         if (bytes) {
-          refreshPdfPreview();
+          document.getElementById('status-icon').className = "fa-solid fa-circle-check text-green-600 text-base";
+          document.getElementById('status-text').innerHTML = "<b>Official blank PDF & Engine loaded successfully!</b> Ready to print.";
+        } else {
+          document.getElementById('status-icon').className = "fa-solid fa-triangle-exclamation text-amber-600 text-base";
+          document.getElementById('status-text').innerHTML = "<b>Notice:</b> Ensure <code>bcas_aepaf_blank.pdf</code> is in your repository root.";
         }
       } catch (e) {
         console.warn("Init notice:", e);
