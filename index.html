@@ -45,7 +45,6 @@
     }
     .pdf-preview-frame {
       width: 100%;
-      height: 840px;
       border-radius: 16px;
       border: 1px solid #d2d2d7;
       background: #525659;
@@ -56,34 +55,34 @@
 
   <!-- Navigation Bar -->
   <header class="fixed top-0 left-0 right-0 h-16 apple-glass-nav border-b border-[#d2d2d7]/60 z-50">
-    <div class="max-w-7xl mx-auto h-full px-6 flex justify-between items-center">
+    <div class="max-w-7xl mx-auto h-full px-4 md:px-6 flex justify-between items-center">
       <div class="flex items-center space-x-3">
         <div class="w-9 h-9 rounded-xl bg-[#0071e3] flex items-center justify-center text-white shadow-xs">
           <i class="fa-solid fa-file-pdf text-sm"></i>
         </div>
         <div>
-          <span class="text-base font-semibold tracking-tight block leading-tight">BCAS AEP Form Engine</span>
+          <span class="text-sm md:text-base font-semibold tracking-tight block leading-tight">BCAS AEP Form Engine</span>
           <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Precision Calibrated Form Mapper</span>
         </div>
       </div>
 
       <!-- Action Buttons -->
       <div class="flex items-center space-x-2">
-        <button type="button" onclick="generateAndPrintOfficialPdf()" id="btn-print" class="px-5 py-2.5 bg-[#1d1d1f] hover:bg-black active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer">
+        <button type="button" onclick="generateAndPrintOfficialPdf()" id="btn-print" class="px-3 md:px-5 py-2 md:py-2.5 bg-[#1d1d1f] hover:bg-black active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer">
           <i class="fa-solid fa-print"></i>
-          <span>Print Filled PDF</span>
+          <span class="hidden sm:inline">Print Filled PDF</span>
         </button>
 
-        <button type="button" onclick="generateAndDownloadOfficialPdf()" id="btn-download" class="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1.5 cursor-pointer">
+        <button type="button" onclick="generateAndDownloadOfficialPdf()" id="btn-download" class="px-3 md:px-5 py-2 md:py-2.5 bg-[#0071e3] hover:bg-[#0077ed] active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1.5 cursor-pointer">
           <i class="fa-solid fa-download"></i>
-          <span>Download Filled PDF</span>
+          <span class="hidden sm:inline">Download Filled PDF</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- MAIN WORKSPACE -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 pt-24 pb-20">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 pt-20 md:pt-24 pb-20">
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
 
@@ -364,8 +363,8 @@
         </form>
       </div>
 
-      <!-- RIGHT COLUMN: LIVE EMBEDDED STAMPED PDF -->
-      <div class="xl:col-span-7 space-y-4 sticky top-24">
+      <!-- RIGHT COLUMN: LIVE EMBEDDED STAMPED PDF (RESPONSIVE) -->
+      <div class="xl:col-span-7 space-y-4 sticky top-20 md:top-24">
         <div class="flex items-center justify-between px-2">
           <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider">Live Stamped Official Document</span>
           <button onclick="refreshPdfPreview()" class="text-xs font-bold text-[#0071e3] hover:underline flex items-center gap-1">
@@ -373,7 +372,7 @@
           </button>
         </div>
 
-        <iframe id="pdf-preview-frame" class="pdf-preview-frame" src=""></iframe>
+        <iframe id="pdf-preview-frame" class="pdf-preview-frame h-[75vh] md:h-[85vh] xl:h-[880px]" src=""></iframe>
       </div>
 
     </div>
@@ -558,14 +557,14 @@
       drawFittedText(page1, data.airport, 280, 494, 90, 7.8, font);
 
       // 4a. Details of Applicant
-      // Left Column (5 rows) - Centered vertically
+      // Left Column (5 rows)
       drawFittedText(page1, data.name, 154, 239, 185, 7.5, font);
       drawFittedText(page1, data.father, 154, 221, 185, 7.5, font);
       drawFittedText(page1, data.dob, 154, 203, 110, 7.5, font);
       drawFittedText(page1, data.mobile, 154, 185, 110, 7.5, font);
       drawFittedText(page1, data.kin, 154, 167, 110, 7.5, font);
 
-      // Right Column (6 rows) - Centered vertically
+      // Right Column (6 rows)
       drawFittedText(page1, data.aadhaar, 426, 240, 140, 7.5, font);
       drawFittedText(page1, data.mother, 426, 225, 140, 7.5, font);
       drawFittedText(page1, data.blood, 426, 210, 140, 7.5, font);
@@ -573,65 +572,65 @@
       drawFittedText(page1, data.email, 426, 180, 140, 6.8, font);
       drawFittedText(page1, data.idType, 426, 165, 140, 7.2, font);
 
-      // 4b. Existing AEP (Centered inside box)
-      drawFittedText(page1, "NIL", 76, 149, 110, 7.5, fontNorm);
-      drawFittedText(page1, "NIL", 272, 149, 110, 7.5, fontNorm);
-      drawFittedText(page1, "HYD", 492, 149, 75, 7.5, fontNorm);
+      // 4b. Existing AEP (Shifted inside input cells)
+      drawFittedText(page1, "NIL", 105, 140, 90, 7.5, fontNorm);
+      drawFittedText(page1, "NIL", 310, 140, 90, 7.5, fontNorm);
+      drawFittedText(page1, "HYD", 492, 140, 75, 7.5, fontNorm);
 
-      // 5. Residential Address: Permanent (Left) & Present (Right)
-      drawFittedText(page1, data.permStreet, 154, 107, 185, 6.8, fontNorm);
-      drawFittedText(page1, data.permDist, 154, 89, 185, 6.8, fontNorm);
-      drawFittedText(page1, data.permState, 154, 71, 185, 6.8, fontNorm);
-      drawFittedText(page1, data.permPin, 154, 53, 185, 6.8, fontNorm);
-      drawFittedText(page1, data.permProof, 184, 41, 160, 7.0, font);
+      // 5. Residential Address: Centered inside table cells
+      drawFittedText(page1, data.permStreet, 154, 100, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permDist, 154, 82, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permState, 154, 64, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permPin, 154, 46, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permProof, 180, 28, 160, 7.0, font);
 
-      drawFittedText(page1, data.presStreet, 426, 107, 140, 6.8, fontNorm);
-      drawFittedText(page1, data.presDist, 426, 89, 140, 6.8, fontNorm);
-      drawFittedText(page1, data.presState, 426, 71, 140, 6.8, fontNorm);
-      drawFittedText(page1, data.presPin, 426, 53, 140, 6.8, fontNorm);
+      drawFittedText(page1, data.presStreet, 426, 100, 140, 6.8, fontNorm);
+      drawFittedText(page1, data.presDist, 426, 82, 140, 6.8, fontNorm);
+      drawFittedText(page1, data.presState, 426, 64, 140, 6.8, fontNorm);
+      drawFittedText(page1, data.presPin, 426, 46, 140, 6.8, fontNorm);
 
       // ==========================================
       // PAGE 1: VECTOR CHECKMARKS
       // ==========================================
 
       // 2a. Type
-      if (data.type === 'Permanent') drawCheck(page1, 171, 627);
-      if (data.type === 'Temporary') drawCheck(page1, 393, 627);
+      if (data.type === 'Permanent') drawCheck(page1, 203, 627);
+      if (data.type === 'Temporary') drawCheck(page1, 425, 627);
       if (data.type === '1Day') drawCheck(page1, 171, 609);
       if (data.type === '1-7Days') drawCheck(page1, 246, 609);
       if (data.type === '3Months') drawCheck(page1, 318, 609);
       if (data.type === '6Months') drawCheck(page1, 393, 609);
 
-      // 2b. Category
-      if (data.category === 'Operational') drawCheck(page1, 171, 582);
-      if (data.category === 'GovtSecurity') drawCheck(page1, 393, 582);
-      if (data.category === 'Protocol') drawCheck(page1, 171, 564);
-      if (data.category === 'Infra') drawCheck(page1, 393, 564);
-      if (data.category === 'ForeignNational') drawCheck(page1, 171, 546);
-      if (data.category === 'ToolOfTrade') drawCheck(page1, 393, 546);
+      // 2b. Category (Box column at X = 203)
+      if (data.category === 'Operational') drawCheck(page1, 203, 582);
+      if (data.category === 'GovtSecurity') drawCheck(page1, 425, 582);
+      if (data.category === 'Protocol') drawCheck(page1, 203, 564);
+      if (data.category === 'Infra') drawCheck(page1, 425, 564);
+      if (data.category === 'ForeignNational') drawCheck(page1, 203, 546);
+      if (data.category === 'ToolOfTrade') drawCheck(page1, 425, 546);
 
       // 2c. Operational Zones
-      if (data.zones.includes('A')) drawCheck(page1, 171, 521);
-      if (data.zones.includes('D')) drawCheck(page1, 246, 521);
-      if (data.zones.includes('T')) drawCheck(page1, 318, 521);
-      if (data.zones.includes('Si')) drawCheck(page1, 393, 521);
-      if (data.zones.includes('Sd')) drawCheck(page1, 458, 521);
+      if (data.zones.includes('A')) drawCheck(page1, 203, 521);
+      if (data.zones.includes('D')) drawCheck(page1, 258, 521);
+      if (data.zones.includes('T')) drawCheck(page1, 328, 521);
+      if (data.zones.includes('Si')) drawCheck(page1, 398, 521);
+      if (data.zones.includes('Sd')) drawCheck(page1, 472, 521);
       if (data.zones.includes('P')) drawCheck(page1, 526, 521);
-      if (data.zones.includes('B')) drawCheck(page1, 171, 503);
-      if (data.zones.includes('F')) drawCheck(page1, 246, 503);
+      if (data.zones.includes('B')) drawCheck(page1, 203, 503);
+      if (data.zones.includes('F')) drawCheck(page1, 258, 503);
 
       // 2d. Airport
-      drawCheck(page1, 171, 478); // Single Airport
+      drawCheck(page1, 203, 478); // Single Airport
 
       // 2e. Terminal
       drawCheck(page1, 203, 381); // All Terminals
 
       // 3. Issue Category
       if (data.issueCat === 'Fresh') {
-        drawCheck(page1, 393, 356); // Fresh
+        drawCheck(page1, 425, 356); // Fresh
         drawCheck(page1, 171, 336); // Appointment Order
       } else {
-        drawCheck(page1, 490, 356); // Re-Issue
+        drawCheck(page1, 520, 356); // Re-Issue
       }
 
       // 4a. Gender Box
@@ -659,28 +658,28 @@
       drawFittedText(page2, "26/09/2053", 426, 740, 140, 7.6, font);
       drawFittedText(page2, data.officeAddr, 154, 718, 415, 6.2, fontNorm);
 
-      // 7. Security Declarations (No Checkboxes)
-      drawCheck(page2, 438, 672); // Case pending: No
-      drawCheck(page2, 438, 636); // Arrested: No
-      drawCheck(page2, 438, 600); // Punished: No
+      // 7. Security Declarations (No Checkboxes inside box at X = 438)
+      drawCheck(page2, 438, 680); // Case pending: No
+      drawCheck(page2, 438, 644); // Arrested: No
+      drawCheck(page2, 438, 608); // Punished: No
 
       // 8. Previous Rejections
-      drawCheck(page2, 292, 565); // Application rejected: No
-      drawCheck(page2, 292, 547); // Whether Issued: No
+      drawCheck(page2, 292, 573); // Application rejected: No
+      drawCheck(page2, 292, 555); // Whether Issued: No
 
       // 10. Non-Indian Nationals
       drawFittedText(page2, "INDIAN NATIONAL (NOT APPLICABLE)", 160, 468, 300, 7.2, font);
 
-      // 11. AVSEC Training (Centered inside boxes)
+      // 11. AVSEC Training
       drawFittedText(page2, data.avsecDate, 154, 332, 100, 7.8, font);
       drawFittedText(page2, data.avsecLoc, 400, 332, 160, 7.8, font);
-      drawCheck(page2, 73, 330); // Initial Training Checked
+      drawCheck(page2, 73, 315); // Initial Training Checked
       drawFittedText(page2, data.avsecInst, 265, 298, 290, 7.2, font);
-      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 265, 400, 7.2, font);
+      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 274, 400, 7.2, font);
 
-      // Signatures (Centered inside designated boxes)
-      drawFittedText(page2, "HYD", 180, 134, 80, 8, font);
-      drawFittedText(page2, "04/11/2026", 180, 109, 80, 7.5, font);
+      // Signatures
+      drawFittedText(page2, "HYD", 180, 132, 80, 8, font);
+      drawFittedText(page2, "04/11/2026", 180, 107, 80, 7.5, font);
       drawFittedText(page2, data.org, 405, 140, 180, 7.2, font);
       drawFittedText(page2, "SECURITY DEPT", 440, 118, 150, 7.2, font);
 
@@ -694,7 +693,7 @@
         if (blob) {
           if (activePdfUrl) URL.revokeObjectURL(activePdfUrl);
           activePdfUrl = URL.createObjectURL(blob);
-          document.getElementById('pdf-preview-frame').src = activePdfUrl;
+          document.getElementById('pdf-preview-frame').src = activePdfUrl + "#view=FitH";
         }
       } catch (err) {
         console.warn("Preview notice:", err.message);
