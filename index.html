@@ -62,7 +62,7 @@
         </div>
         <div>
           <span class="text-sm md:text-base font-semibold tracking-tight block leading-tight">BCAS AEP Form Engine</span>
-          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Precision Calibrated Form Mapper</span>
+          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">100% Calibrated Precision Mapper</span>
         </div>
       </div>
 
@@ -363,7 +363,7 @@
         </form>
       </div>
 
-      <!-- RIGHT COLUMN: LIVE EMBEDDED STAMPED PDF (RESPONSIVE) -->
+      <!-- RIGHT COLUMN: LIVE EMBEDDED STAMPED PDF -->
       <div class="xl:col-span-7 space-y-4 sticky top-20 md:top-24">
         <div class="flex items-center justify-between px-2">
           <span class="text-xs font-bold text-[#86868b] uppercase tracking-wider">Live Stamped Official Document</span>
@@ -502,7 +502,7 @@
       page.drawText(str, { x, y, size, font });
     }
 
-    // Precision Vector Checkmark centered in square boxes
+    // Precision Vector Checkmark centered in 8x8 pt square boxes
     function drawCheck(page, x, y) {
       const { rgb } = PDFLib;
       page.drawLine({
@@ -572,10 +572,10 @@
       drawFittedText(page1, data.email, 426, 175, 140, 6.8, font);
       drawFittedText(page1, data.idType, 426, 160, 140, 7.2, font);
 
-      // 4b. Existing AEP: Positioned on the line and inside the cell
-      drawFittedText(page1, "NIL", 130, 147, 90, 7.5, fontNorm);
-      drawFittedText(page1, "NIL", 340, 147, 90, 7.5, fontNorm);
-      drawFittedText(page1, "HYD", 505, 147, 75, 7.5, fontNorm);
+      // 4b. Existing AEP: Positioned directly on the line and in the cell
+      drawFittedText(page1, "NIL", 115, 146, 80, 7.5, fontNorm);
+      drawFittedText(page1, "NIL", 335, 146, 80, 7.5, fontNorm);
+      drawFittedText(page1, "HYD", 498, 146, 65, 7.5, fontNorm);
 
       // 5. Residential Address: Vertically centered in boxes
       drawFittedText(page1, data.permStreet, 154, 96, 185, 6.8, fontNorm);
@@ -593,58 +593,57 @@
       // PAGE 1: VECTOR CHECKMARKS
       // ==========================================
 
-      // 2a. Type (Col 1 at X = 140, Col 2 at X = 362)
-      if (data.type === 'Permanent') drawCheck(page1, 200, 580);
-      if (data.type === 'Temporary') drawCheck(page1, 358, 625);
-      if (data.type === '1Day') drawCheck(page1, 140, 611);
-      if (data.type === '1-7Days') drawCheck(page1, 214, 611);
-      if (data.type === '3Months') drawCheck(page1, 288, 611);
-      if (data.type === '6Months') drawCheck(page1, 362, 611);
+      // 2a. Type (Primary column at X = 168, Second at X = 390)
+      if (data.type === 'Permanent') drawCheck(page1, 168, 630);
+      if (data.type === 'Temporary') drawCheck(page1, 390, 630);
+      if (data.type === '1Day') drawCheck(page1, 168, 611);
+      if (data.type === '1-7Days') drawCheck(page1, 246, 611);
+      if (data.type === '3Months') drawCheck(page1, 318, 611);
+      if (data.type === '6Months') drawCheck(page1, 390, 611);
 
-      // 2b. Category (Left column at X = 140, Right at X = 362)
-      if (data.category === 'Operational') drawCheck(page1, 140, 584);
-      if (data.category === 'GovtSecurity') drawCheck(page1, 362, 584);
-      if (data.category === 'Protocol') drawCheck(page1, 140, 566);
-      if (data.category === 'Infra') drawCheck(page1, 362, 566);
-      if (data.category === 'ForeignNational') drawCheck(page1, 140, 548);
-      if (data.category === 'ToolOfTrade') drawCheck(page1, 362, 548);
+      // 2b. Category (Left column at X = 168, Right at X = 390)
+      if (data.category === 'Operational') drawCheck(page1, 168, 584);
+      if (data.category === 'GovtSecurity') drawCheck(page1, 390, 584);
+      if (data.category === 'Protocol') drawCheck(page1, 168, 566);
+      if (data.category === 'Infra') drawCheck(page1, 390, 566);
+      if (data.category === 'ForeignNational') drawCheck(page1, 168, 548);
+      if (data.category === 'ToolOfTrade') drawCheck(page1, 390, 548);
 
-      // 2c. Operational Zones (Boxes at X = 140, 200, 260, 330, 400, 460)
-      if (data.zones.includes('A')) drawCheck(page1, 140, 523);
-      if (data.zones.includes('D')) drawCheck(page1, 200, 523);
-      if (data.zones.includes('T')) drawCheck(page1, 260, 523);
-      if (data.zones.includes('Si')) drawCheck(page1, 330, 523);
-      if (data.zones.includes('Sd')) drawCheck(page1, 400, 523);
-      if (data.zones.includes('P')) drawCheck(page1, 460, 523);
+      // 2c. Operational Zones (Boxes at X = 168, 224, 282, 350, 416, 478)
+      if (data.zones.includes('A')) drawCheck(page1, 168, 523);
+      if (data.zones.includes('D')) drawCheck(page1, 224, 523);
+      if (data.zones.includes('T')) drawCheck(page1, 282, 523);
+      if (data.zones.includes('Si')) drawCheck(page1, 350, 523);
+      if (data.zones.includes('Sd')) drawCheck(page1, 416, 523);
+      if (data.zones.includes('P')) drawCheck(page1, 478, 523);
 
-      if (data.zones.includes('B')) drawCheck(page1, 140, 505);
-      if (data.zones.includes('F')) drawCheck(page1, 200, 505);
-      if (data.zones.includes('Ft')) drawCheck(page1, 260, 505);
-      if (data.zones.includes('Cs')) drawCheck(page1, 330, 505);
-      if (data.zones.includes('I')) drawCheck(page1, 400, 505);
-      if (data.zones.includes('AnyOtherZone')) drawCheck(page1, 430, 505);
+      if (data.zones.includes('B')) drawCheck(page1, 168, 505);
+      if (data.zones.includes('F')) drawCheck(page1, 224, 505);
+      if (data.zones.includes('Ft')) drawCheck(page1, 282, 505);
+      if (data.zones.includes('Cs')) drawCheck(page1, 350, 505);
+      if (data.zones.includes('I')) drawCheck(page1, 416, 505);
+      if (data.zones.includes('AnyOtherZone')) drawCheck(page1, 478, 505);
 
       // 2d. Airport
-      drawCheck(page1, 140, 480); // Single Airport
-      // Additional airport options support
-      if (data.airportOpt === 'AllAirports') drawCheck(page1, 362, 480);
-      if (data.airportOpt === 'AllDomestic') drawCheck(page1, 140, 462);
-      if (data.airportOpt === 'AllIntl') drawCheck(page1, 362, 462);
+      drawCheck(page1, 168, 480); // Single Airport
+      if (data.airportOpt === 'AllAirports') drawCheck(page1, 390, 480);
+      if (data.airportOpt === 'AllDomestic') drawCheck(page1, 168, 462);
+      if (data.airportOpt === 'AllIntl') drawCheck(page1, 390, 462);
 
       // 2e. Terminal
-      drawCheck(page1, 175, 381); // All Terminals
+      drawCheck(page1, 200, 381); // All Terminals
 
       // 3. Issue Category
       if (data.issueCat === 'Fresh') {
-        drawCheck(page1, 362, 356); // Fresh
-        drawCheck(page1, 140, 336); // Appointment Order
+        drawCheck(page1, 390, 356); // Fresh
+        drawCheck(page1, 168, 336); // Appointment Order
       } else {
-        drawCheck(page1, 452, 356); // Re-Issue
+        drawCheck(page1, 485, 356); // Re-Issue
       }
 
       // 4a. Gender Box
-      if (data.gender === 'MALE') drawCheck(page1, 175, 250);
-      if (data.gender === 'FEMALE') drawCheck(page1, 235, 250);
+      if (data.gender === 'MALE') drawCheck(page1, 200, 250);
+      if (data.gender === 'FEMALE') drawCheck(page1, 265, 250);
 
       // Passport Photograph
       if (photoBytes) {
@@ -672,8 +671,8 @@
       drawCheck(page2, 438, 641); // Arrested: No
       drawCheck(page2, 438, 605); // Punished: No
 
-      // 8. Previous Rejections (No Checkboxes)
-      drawCheck(page2, 485, 573); // Application rejected: No
+      // 8. Previous Rejections: No is at X = 292
+      drawCheck(page2, 292, 573); // Application rejected: No
       drawCheck(page2, 292, 555); // Whether Issued: No
 
       // 10. Non-Indian Nationals (Inside cell)
