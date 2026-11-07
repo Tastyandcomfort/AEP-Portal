@@ -443,9 +443,9 @@
       const page1 = pages[0];
       const page2 = pages[1] || page1;
 
-      // ==========================================
-      // PAGE 1: TEXT FIELDS (VERTICALLY CENTERED)
-      // ==========================================
+      // =========================================================================
+      // PAGE 1: TEXT FIELDS (PRECISELY CENTERED, NEVER CROSSING DIVIDER LINES)
+      // =========================================================================
 
       // 1. Reference ID
       drawFittedText(page1, data.refId, 218, 693, 200, 8.5, font);
@@ -453,28 +453,27 @@
       // 2d. Airport Text
       drawFittedText(page1, data.airport, 280, 494, 90, 7.8, font);
 
-      // 4a. Details of Applicant (Centered in cells)
-      // Left Column
+      // 4a. Details of Applicant: Left Column (5 rows)
       drawFittedText(page1, data.name, 154, 237, 185, 7.5, font);
       drawFittedText(page1, data.father, 154, 219, 185, 7.5, font);
-      drawFittedText(page1, data.dob, 154, 201, 110, 7.5, font);
-      drawFittedText(page1, data.mobile, 154, 183, 110, 7.5, font);
-      drawFittedText(page1, data.kin, 154, 165, 110, 7.5, font);
+      drawFittedText(page1, data.dob, 154, 192, 110, 7.5, font);
+      drawFittedText(page1, data.mobile, 154, 174, 110, 7.5, font);
+      drawFittedText(page1, data.kin, 154, 156, 110, 7.5, font);
 
-      // Right Column
-      drawFittedText(page1, data.aadhaar, 426, 237, 140, 7.5, font);
-      drawFittedText(page1, data.mother, 426, 222, 140, 7.5, font);
-      drawFittedText(page1, data.blood, 426, 206, 140, 7.5, font);
-      drawFittedText(page1, data.gender, 426, 191, 140, 7.5, font);
-      drawFittedText(page1, data.email, 426, 175, 140, 6.8, font);
-      drawFittedText(page1, data.idType, 426, 160, 140, 7.2, font);
+      // 4a. Details of Applicant: Right Column (6 rows)
+      drawFittedText(page1, data.aadhaar, 426, 233, 140, 7.5, font);
+      drawFittedText(page1, data.mother, 426, 218, 140, 7.5, font);
+      drawFittedText(page1, data.blood, 426, 203, 140, 7.5, font);
+      drawFittedText(page1, data.gender, 426, 188, 140, 7.5, font);
+      drawFittedText(page1, data.email, 426, 173, 140, 6.8, font);
+      drawFittedText(page1, data.idType, 426, 158, 140, 7.2, font);
 
       // 4b. Existing AEP: Centered on the blank lines and inside Place of Issue box
-      drawFittedText(page1, "NIL", 175, 143, 75, 7.5, fontNorm);
-      drawFittedText(page1, "NIL", 360, 143, 75, 7.5, fontNorm);
-      drawFittedText(page1, "HYD", 500, 143, 65, 7.5, fontNorm);
+      drawFittedText(page1, "NIL", 170, 142, 80, 7.5, fontNorm);
+      drawFittedText(page1, "NIL", 380, 142, 80, 7.5, fontNorm);
+      drawFittedText(page1, "HYD", 525, 142, 60, 7.5, fontNorm);
 
-      // 5. Residential Address: Vertically centered in boxes
+      // 5. Residential Address: Vertically centered in cell boxes
       drawFittedText(page1, data.permStreet, 154, 96, 185, 6.8, fontNorm);
       drawFittedText(page1, data.permDist, 154, 78, 185, 6.8, fontNorm);
       drawFittedText(page1, data.permState, 154, 60, 185, 6.8, fontNorm);
@@ -494,9 +493,9 @@
         } catch (e) {}
       }
 
-      // ==========================================
-      // PAGE 2: TEXT FIELDS (NO CHECKMARKS)
-      // ==========================================
+      // =========================================================================
+      // PAGE 2: TEXT FIELDS (NO CHECKMARKS, PRECISE CELL CENTERING)
+      // =========================================================================
 
       // 6. Employment Details (Centered in cells)
       drawFittedText(page2, data.org, 154, 780, 165, 7.6, font);
@@ -507,18 +506,18 @@
       drawFittedText(page2, "26/09/2053", 426, 738, 140, 7.6, font);
       drawFittedText(page2, data.officeAddr, 154, 718, 415, 6.2, fontNorm);
 
-      // 10. Non-Indian Nationals (Inside cell)
+      // 10. Non-Indian Nationals (Centered in cell)
       drawFittedText(page2, "INDIAN NATIONAL (NOT APPLICABLE)", 160, 458, 300, 7.2, font);
 
-      // 11. AVSEC Training (Centered precisely in cell boxes)
-      drawFittedText(page2, data.avsecDate, 154, 348, 100, 7.8, font);
-      drawFittedText(page2, data.avsecLoc, 400, 348, 160, 7.8, font);
-      drawFittedText(page2, data.avsecInst, 265, 310, 290, 7.2, font);
-      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 282, 400, 7.2, font);
+      // 11. AVSEC Training (Centered inside designated cell boxes)
+      drawFittedText(page2, data.avsecDate, 154, 326, 100, 7.8, font);
+      drawFittedText(page2, data.avsecLoc, 400, 326, 160, 7.8, font);
+      drawFittedText(page2, data.avsecInst, 265, 292, 290, 7.2, font);
+      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 274, 400, 7.2, font);
 
-      // Signatures (Inside Place and Date boxes on left, on signature lines on right)
-      drawFittedText(page2, "HYD", 135, 133, 75, 8, font);
-      drawFittedText(page2, "04/11/2026", 135, 108, 75, 7.5, font);
+      // Signatures (Centered in Place/Date boxes on left, on signature lines on right)
+      drawFittedText(page2, "HYD", 180, 133, 75, 8, font);
+      drawFittedText(page2, "04/11/2026", 180, 108, 75, 7.5, font);
       drawFittedText(page2, data.org, 405, 140, 180, 7.2, font);
       drawFittedText(page2, "SECURITY DEPT", 440, 118, 150, 7.2, font);
 
@@ -555,7 +554,7 @@
         a.style.display = 'none';
         a.href = url;
         const empNo = getVal('f_empno') || 'AEP';
-        a.download = `Filled_BCAS_AEP_Application_${empNo.replace(/\s+/g, '_')}.pdf`;
+        a.download = `Filled_BCAS_AEP_Application_${empNo.replace(/\\s+/g, '_')}.pdf`;
         document.body.appendChild(a);
         a.click();
 
