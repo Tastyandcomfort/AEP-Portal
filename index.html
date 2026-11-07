@@ -502,18 +502,18 @@
       page.drawText(str, { x, y, size, font });
     }
 
-    // Precision Vector Checkmark centered in 8x8 pt square boxes
+    // Precision Vector Checkmark centered in square boxes
     function drawCheck(page, x, y) {
       const { rgb } = PDFLib;
       page.drawLine({
-        start: { x: x + 1.2, y: y + 2.5 },
-        end: { x: x + 3.2, y: y + 0.5 },
+        start: { x: x + 1.2, y: y + 3.2 },
+        end: { x: x + 3.0, y: y + 1.2 },
         thickness: 1.5,
         color: rgb(0, 0, 0)
       });
       page.drawLine({
-        start: { x: x + 3.2, y: y + 1.5 },
-        end: { x: x + 7.5, y: y + 6.5 },
+        start: { x: x + 3.0, y: y + 1.2 },
+        end: { x: x + 6.8, y: y + 6.2 },
         thickness: 1.5,
         color: rgb(0, 0, 0)
       });
@@ -556,21 +556,21 @@
       // 2d. Airport Text
       drawFittedText(page1, data.airport, 280, 494, 90, 7.8, font);
 
-      // 4a. Details of Applicant
-      // Left Column (5 rows)
-      drawFittedText(page1, data.name, 154, 239, 185, 7.5, font);
-      drawFittedText(page1, data.father, 154, 221, 185, 7.5, font);
-      drawFittedText(page1, data.dob, 154, 203, 110, 7.5, font);
-      drawFittedText(page1, data.mobile, 154, 185, 110, 7.5, font);
-      drawFittedText(page1, data.kin, 154, 167, 110, 7.5, font);
+      // 4a. Details of Applicant (Centered in cells)
+      // Left Column
+      drawFittedText(page1, data.name, 154, 237, 185, 7.5, font);
+      drawFittedText(page1, data.father, 154, 219, 185, 7.5, font);
+      drawFittedText(page1, data.dob, 154, 201, 110, 7.5, font);
+      drawFittedText(page1, data.mobile, 154, 183, 110, 7.5, font);
+      drawFittedText(page1, data.kin, 154, 165, 110, 7.5, font);
 
-      // Right Column (6 rows)
-      drawFittedText(page1, data.aadhaar, 426, 240, 140, 7.5, font);
-      drawFittedText(page1, data.mother, 426, 225, 140, 7.5, font);
-      drawFittedText(page1, data.blood, 426, 210, 140, 7.5, font);
-      drawFittedText(page1, data.gender, 426, 195, 140, 7.5, font);
-      drawFittedText(page1, data.email, 426, 180, 140, 6.8, font);
-      drawFittedText(page1, data.idType, 426, 165, 140, 7.2, font);
+      // Right Column
+      drawFittedText(page1, data.aadhaar, 426, 237, 140, 7.5, font);
+      drawFittedText(page1, data.mother, 426, 222, 140, 7.5, font);
+      drawFittedText(page1, data.blood, 426, 206, 140, 7.5, font);
+      drawFittedText(page1, data.gender, 426, 191, 140, 7.5, font);
+      drawFittedText(page1, data.email, 426, 175, 140, 6.8, font);
+      drawFittedText(page1, data.idType, 426, 160, 140, 7.2, font);
 
       // 4b. Existing AEP: Positioned on the line and inside the cell
       drawFittedText(page1, "NIL", 130, 147, 90, 7.5, fontNorm);
@@ -593,53 +593,58 @@
       // PAGE 1: VECTOR CHECKMARKS
       // ==========================================
 
-      // 2a. Type
-      if (data.type === 'Permanent') drawCheck(page1, 171, 630);
-      if (data.type === 'Temporary') drawCheck(page1, 393, 630);
-      if (data.type === '1Day') drawCheck(page1, 171, 611);
-      if (data.type === '1-7Days') drawCheck(page1, 246, 611);
-      if (data.type === '3Months') drawCheck(page1, 318, 611);
-      if (data.type === '6Months') drawCheck(page1, 393, 611);
+      // 2a. Type (Col 1 at X = 140, Col 2 at X = 362)
+      if (data.type === 'Permanent') drawCheck(page1, 140, 630);
+      if (data.type === 'Temporary') drawCheck(page1, 362, 630);
+      if (data.type === '1Day') drawCheck(page1, 140, 611);
+      if (data.type === '1-7Days') drawCheck(page1, 214, 611);
+      if (data.type === '3Months') drawCheck(page1, 288, 611);
+      if (data.type === '6Months') drawCheck(page1, 362, 611);
 
-      // 2b. Category (Left column at X = 171, Right at X = 393)
-      if (data.category === 'Operational') drawCheck(page1, 171, 584);
-      if (data.category === 'GovtSecurity') drawCheck(page1, 393, 584);
-      if (data.category === 'Protocol') drawCheck(page1, 171, 566);
-      if (data.category === 'Infra') drawCheck(page1, 393, 566);
-      if (data.category === 'ForeignNational') drawCheck(page1, 171, 548);
-      if (data.category === 'ToolOfTrade') drawCheck(page1, 393, 548);
+      // 2b. Category (Left column at X = 140, Right at X = 362)
+      if (data.category === 'Operational') drawCheck(page1, 140, 584);
+      if (data.category === 'GovtSecurity') drawCheck(page1, 362, 584);
+      if (data.category === 'Protocol') drawCheck(page1, 140, 566);
+      if (data.category === 'Infra') drawCheck(page1, 362, 566);
+      if (data.category === 'ForeignNational') drawCheck(page1, 140, 548);
+      if (data.category === 'ToolOfTrade') drawCheck(page1, 362, 548);
 
-      // 2c. Operational Zones (Calibrated box coordinates)
-      if (data.zones.includes('A')) drawCheck(page1, 171, 523);
-      if (data.zones.includes('D')) drawCheck(page1, 228, 523);
-      if (data.zones.includes('T')) drawCheck(page1, 295, 523);
-      if (data.zones.includes('Si')) drawCheck(page1, 365, 523);
-      if (data.zones.includes('Sd')) drawCheck(page1, 435, 523);
-      if (data.zones.includes('P')) drawCheck(page1, 495, 523);
+      // 2c. Operational Zones (Boxes at X = 140, 200, 260, 330, 400, 460)
+      if (data.zones.includes('A')) drawCheck(page1, 140, 523);
+      if (data.zones.includes('D')) drawCheck(page1, 200, 523);
+      if (data.zones.includes('T')) drawCheck(page1, 260, 523);
+      if (data.zones.includes('Si')) drawCheck(page1, 330, 523);
+      if (data.zones.includes('Sd')) drawCheck(page1, 400, 523);
+      if (data.zones.includes('P')) drawCheck(page1, 460, 523);
 
-      if (data.zones.includes('B')) drawCheck(page1, 171, 505);
-      if (data.zones.includes('F')) drawCheck(page1, 228, 505);
-      // Ft, Cs, I check support
-      if (data.zones.includes('Ft')) drawCheck(page1, 295, 505);
-      if (data.zones.includes('Cs')) drawCheck(page1, 365, 505);
+      if (data.zones.includes('B')) drawCheck(page1, 140, 505);
+      if (data.zones.includes('F')) drawCheck(page1, 200, 505);
+      if (data.zones.includes('Ft')) drawCheck(page1, 260, 505);
+      if (data.zones.includes('Cs')) drawCheck(page1, 330, 505);
+      if (data.zones.includes('I')) drawCheck(page1, 400, 505);
+      if (data.zones.includes('AnyOtherZone')) drawCheck(page1, 430, 505);
 
       // 2d. Airport
-      drawCheck(page1, 171, 480); // Single Airport
+      drawCheck(page1, 140, 480); // Single Airport
+      // Additional airport options support
+      if (data.airportOpt === 'AllAirports') drawCheck(page1, 362, 480);
+      if (data.airportOpt === 'AllDomestic') drawCheck(page1, 140, 462);
+      if (data.airportOpt === 'AllIntl') drawCheck(page1, 362, 462);
 
       // 2e. Terminal
-      drawCheck(page1, 203, 381); // All Terminals
+      drawCheck(page1, 175, 381); // All Terminals
 
       // 3. Issue Category
       if (data.issueCat === 'Fresh') {
-        drawCheck(page1, 393, 356); // Fresh
-        drawCheck(page1, 171, 336); // Appointment Order
+        drawCheck(page1, 362, 356); // Fresh
+        drawCheck(page1, 140, 336); // Appointment Order
       } else {
-        drawCheck(page1, 495, 356); // Re-Issue
+        drawCheck(page1, 452, 356); // Re-Issue
       }
 
       // 4a. Gender Box
-      if (data.gender === 'MALE') drawCheck(page1, 203, 250);
-      if (data.gender === 'FEMALE') drawCheck(page1, 267, 250);
+      if (data.gender === 'MALE') drawCheck(page1, 175, 250);
+      if (data.gender === 'FEMALE') drawCheck(page1, 235, 250);
 
       // Passport Photograph
       if (photoBytes) {
@@ -653,33 +658,33 @@
       // PAGE 2: TEXT FIELDS & CHECKMARKS
       // ==========================================
 
-      // 6. Employment Details
+      // 6. Employment Details (Centered in cells)
       drawFittedText(page2, data.org, 154, 780, 165, 7.6, font);
       drawFittedText(page2, data.desig, 426, 780, 140, 7.6, font);
       drawFittedText(page2, data.empNo, 154, 760, 165, 7.8, font);
-      drawFittedText(page2, data.dutyPlace, 426, 760, 140, 7.6, font);
+      drawFittedText(page2, data.dutyPlace, 426, 758, 140, 7.6, font);
       drawFittedText(page2, data.nature, 154, 740, 165, 7.6, font);
-      drawFittedText(page2, "26/09/2053", 426, 740, 140, 7.6, font);
+      drawFittedText(page2, "26/09/2053", 426, 738, 140, 7.6, font);
       drawFittedText(page2, data.officeAddr, 154, 718, 415, 6.2, fontNorm);
 
-      // 7. Security Declarations (Boxes at X = 438)
-      drawCheck(page2, 438, 680); // Case pending: No
-      drawCheck(page2, 438, 644); // Arrested: No
-      drawCheck(page2, 438, 608); // Punished: No
+      // 7. Security Declarations (No Checkboxes at X = 438)
+      drawCheck(page2, 438, 677); // Case pending: No
+      drawCheck(page2, 438, 641); // Arrested: No
+      drawCheck(page2, 438, 605); // Punished: No
 
-      // 8. Previous Rejections
-      drawCheck(page2, 292, 573); // Application rejected: No
+      // 8. Previous Rejections (No Checkboxes)
+      drawCheck(page2, 485, 573); // Application rejected: No
       drawCheck(page2, 292, 555); // Whether Issued: No
 
-      // 10. Non-Indian Nationals
-      drawFittedText(page2, "INDIAN NATIONAL (NOT APPLICABLE)", 160, 468, 300, 7.2, font);
+      // 10. Non-Indian Nationals (Inside cell)
+      drawFittedText(page2, "INDIAN NATIONAL (NOT APPLICABLE)", 160, 458, 300, 7.2, font);
 
-      // 11. AVSEC Training
-      drawFittedText(page2, data.avsecDate, 154, 332, 100, 7.8, font);
-      drawFittedText(page2, data.avsecLoc, 400, 332, 160, 7.8, font);
+      // 11. AVSEC Training (Centered in cells)
+      drawFittedText(page2, data.avsecDate, 154, 322, 100, 7.8, font);
+      drawFittedText(page2, data.avsecLoc, 400, 322, 160, 7.8, font);
       drawCheck(page2, 73, 315); // Initial Training Checked
-      drawFittedText(page2, data.avsecInst, 265, 298, 290, 7.2, font);
-      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 274, 400, 7.2, font);
+      drawFittedText(page2, data.avsecInst, 265, 292, 290, 7.2, font);
+      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 268, 400, 7.2, font);
 
       // Signatures
       drawFittedText(page2, "HYD", 180, 132, 80, 8, font);
