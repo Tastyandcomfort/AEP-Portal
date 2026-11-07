@@ -573,9 +573,9 @@
       drawFittedText(page1, data.idType, 426, 160, 140, 7.2, font);
 
       // 4b. Existing AEP: Positioned directly on the line and in the cell
-      drawFittedText(page1, "NIL", 115, 146, 80, 7.5, fontNorm);
-      drawFittedText(page1, "NIL", 335, 146, 80, 7.5, fontNorm);
-      drawFittedText(page1, "HYD", 498, 146, 65, 7.5, fontNorm);
+      drawFittedText(page1, "NIL", 115, 144, 80, 7.5, fontNorm);
+      drawFittedText(page1, "NIL", 335, 144, 80, 7.5, fontNorm);
+      drawFittedText(page1, "HYD", 498, 143, 65, 7.5, fontNorm);
 
       // 5. Residential Address: Vertically centered in boxes
       drawFittedText(page1, data.permStreet, 154, 96, 185, 6.8, fontNorm);
@@ -590,61 +590,61 @@
       drawFittedText(page1, data.presPin, 426, 42, 140, 6.8, fontNorm);
 
       // ==========================================================
-      // PAGE 1: VECTOR CHECKMARKS (CALIBRATED INSIDE [ ] BOXES)
-      // Left Column Axis: X = 185 | Right Column Axis: X = 410
+      // PAGE 1: VECTOR CHECKMARKS (PRECISE INSIDE [ ] BRACKETS)
+      // Left Axis: X = 171 | Right Axis: X = 395
       // ==========================================================
 
       // 2a. Type
-      if (data.type === 'Permanent') drawCheck(page1, 185, 630);
-      if (data.type === 'Temporary') drawCheck(page1, 410, 630);
-      if (data.type === '1Day') drawCheck(page1, 185, 611);
-      if (data.type === '1-7Days') drawCheck(page1, 258, 611);
-      if (data.type === '3Months') drawCheck(page1, 334, 611);
-      if (data.type === '6Months') drawCheck(page1, 410, 611);
+      if (data.type === 'Permanent') drawCheck(page1, 171, 630);
+      if (data.type === 'Temporary') drawCheck(page1, 395, 630);
+      if (data.type === '1Day') drawCheck(page1, 171, 611);
+      if (data.type === '1-7Days') drawCheck(page1, 244, 611);
+      if (data.type === '3Months') drawCheck(page1, 320, 611);
+      if (data.type === '6Months') drawCheck(page1, 395, 611);
 
       // 2b. Category
-      if (data.category === 'Operational') drawCheck(page1, 185, 584);
-      if (data.category === 'GovtSecurity') drawCheck(page1, 410, 584);
-      if (data.category === 'Protocol') drawCheck(page1, 185, 566);
-      if (data.category === 'Infra') drawCheck(page1, 410, 566);
-      if (data.category === 'ForeignNational') drawCheck(page1, 185, 548);
-      if (data.category === 'ToolOfTrade') drawCheck(page1, 410, 548);
+      if (data.category === 'Operational') drawCheck(page1, 171, 584);
+      if (data.category === 'GovtSecurity') drawCheck(page1, 395, 584);
+      if (data.category === 'Protocol') drawCheck(page1, 171, 566);
+      if (data.category === 'Infra') drawCheck(page1, 395, 566);
+      if (data.category === 'ForeignNational') drawCheck(page1, 171, 548);
+      if (data.category === 'ToolOfTrade') drawCheck(page1, 395, 548);
 
-      // 2c. Operational Zones (Boxes at X = 185, 240, 310, 380, 450, 505)
-      if (data.zones.includes('A')) drawCheck(page1, 185, 523);
-      if (data.zones.includes('D')) drawCheck(page1, 240, 523);
-      if (data.zones.includes('T')) drawCheck(page1, 310, 523);
-      if (data.zones.includes('Si')) drawCheck(page1, 380, 523);
-      if (data.zones.includes('Sd')) drawCheck(page1, 450, 523);
-      if (data.zones.includes('P')) drawCheck(page1, 505, 523);
+      // 2c. Operational Zones (Calibrated: 171, 226, 296, 366, 436, 491)
+      if (data.zones.includes('A')) drawCheck(page1, 171, 523);
+      if (data.zones.includes('D')) drawCheck(page1, 226, 523);
+      if (data.zones.includes('T')) drawCheck(page1, 296, 523);
+      if (data.zones.includes('Si')) drawCheck(page1, 366, 523);
+      if (data.zones.includes('Sd')) drawCheck(page1, 436, 523);
+      if (data.zones.includes('P')) drawCheck(page1, 491, 523);
 
-      if (data.zones.includes('B')) drawCheck(page1, 185, 505);
-      if (data.zones.includes('F')) drawCheck(page1, 240, 505);
-      if (data.zones.includes('Ft')) drawCheck(page1, 310, 505);
-      if (data.zones.includes('Cs')) drawCheck(page1, 380, 505);
-      if (data.zones.includes('I')) drawCheck(page1, 450, 505);
-      if (data.zones.includes('AnyOtherZone')) drawCheck(page1, 505, 505);
+      if (data.zones.includes('B')) drawCheck(page1, 171, 505);
+      if (data.zones.includes('F')) drawCheck(page1, 226, 505);
+      if (data.zones.includes('Ft')) drawCheck(page1, 296, 505);
+      if (data.zones.includes('Cs')) drawCheck(page1, 366, 505);
+      if (data.zones.includes('I')) drawCheck(page1, 436, 505);
+      if (data.zones.includes('AnyOtherZone')) drawCheck(page1, 491, 505);
 
       // 2d. Airport
-      drawCheck(page1, 185, 480); // Single Airport
-      if (data.airportOpt === 'AllAirports') drawCheck(page1, 410, 480);
-      if (data.airportOpt === 'AllDomestic') drawCheck(page1, 185, 462);
-      if (data.airportOpt === 'AllIntl') drawCheck(page1, 410, 462);
+      drawCheck(page1, 171, 480); // Single Airport
+      if (data.airportOpt === 'AllAirports') drawCheck(page1, 395, 480);
+      if (data.airportOpt === 'AllDomestic') drawCheck(page1, 171, 462);
+      if (data.airportOpt === 'AllIntl') drawCheck(page1, 395, 462);
 
       // 2e. Terminal
-      drawCheck(page1, 185, 381); // All Terminals
+      drawCheck(page1, 171, 381); // All Terminals
 
       // 3. Issue Category
       if (data.issueCat === 'Fresh') {
-        drawCheck(page1, 410, 356); // Fresh
-        drawCheck(page1, 185, 336); // Appointment Order
+        drawCheck(page1, 395, 356); // Fresh
+        drawCheck(page1, 171, 336); // Appointment Order
       } else {
-        drawCheck(page1, 505, 356); // Re-Issue
+        drawCheck(page1, 490, 356); // Re-Issue
       }
 
       // 4a. Gender Box
-      if (data.gender === 'MALE') drawCheck(page1, 185, 250);
-      if (data.gender === 'FEMALE') drawCheck(page1, 250, 250);
+      if (data.gender === 'MALE') drawCheck(page1, 171, 250);
+      if (data.gender === 'FEMALE') drawCheck(page1, 235, 250);
 
       // Passport Photograph
       if (photoBytes) {
