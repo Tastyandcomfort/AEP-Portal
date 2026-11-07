@@ -63,7 +63,7 @@
         </div>
         <div>
           <span class="text-base font-semibold tracking-tight block leading-tight">BCAS AEP Form Engine</span>
-          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Precision Calibrated Form Mapper</span>
+          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Calibrated Clean-Fill Engine</span>
         </div>
       </div>
 
@@ -274,7 +274,7 @@
 
             <div class="space-y-2 text-xs pt-2 border-t border-[#f5f5f7]">
               <span class="font-bold text-[#1d1d1f] uppercase block">5b. Present Address</span>
-              <input type="text" id="f_presStreet" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYASFASSA" oninput="debounceRefresh()" class="w-full p-2.5 apple-input uppercase font-medium" />
+              <input type="text" id="f_presStreet" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYA" oninput="debounceRefresh()" class="w-full p-2.5 apple-input uppercase font-medium" />
               <div class="grid grid-cols-3 gap-2">
                 <input type="text" id="f_presDist" placeholder="District" value="THANE/NEW MUMBAI" oninput="debounceRefresh()" class="p-2.5 apple-input uppercase" />
                 <input type="text" id="f_presState" placeholder="State" value="MAHARASHTRA" oninput="debounceRefresh()" class="p-2.5 apple-input uppercase" />
@@ -484,7 +484,7 @@
       };
     }
 
-    // Dynamic text fitter: shrinks font so text never overlaps cell borders
+    // Dynamic text fitter: scales down font size so text never exceeds maxW
     function drawFittedText(page, text, x, y, maxW, baseSize, font) {
       if (!text) return;
       let str = String(text).trim();
@@ -503,30 +503,6 @@
       page.drawText(str, { x, y, size, font });
     }
 
-    function getWidgetPageIndex(widget, pdfDoc) {
-      try {
-        const pages = pdfDoc.getPages();
-        const pRef = widget.P();
-        if (pRef) {
-          for (let i = 0; i < pages.length; i++) {
-            if (pages[i].ref === pRef) return i;
-          }
-        }
-        for (let i = 0; i < pages.length; i++) {
-          const annots = pages[i].node.Annots();
-          if (annots) {
-            const arr = annots.asArray();
-            for (let a of arr) {
-              if (a === widget.dict || (a.toString && widget.dict.toString && a.toString() === widget.dict.toString())) {
-                return i;
-              }
-            }
-          }
-        }
-      } catch (e) {}
-      return 0;
-    }
-
     async function buildOfficialStampedPdfBlob() {
       if (typeof PDFLib === 'undefined') {
         throw new Error("PDFLib library is loading.");
@@ -537,263 +513,68 @@
         throw new Error("Could not find 'bcas_aepaf_blank.pdf' in your repository.");
       }
 
-      const { PDFDocument, StandardFonts } = PDFLib;
+      const { PDFDocument, StandardFonts, PDFName } = PDFLib;
       const data = collectData();
 
       const pdfDoc = await PDFDocument.load(bytes);
       const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
       const fontNorm = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-      const form = pdfDoc.getForm();
-      const fields = form.getFields();
-      const filledKeys = new Set();
-
-      // Stage 1: Try filling interactive PDFescape fields if present
-      if (fields && fields.length > 0) {
-        for (const field of fields) {
-          const fieldType = field.constructor.name;
-          const name = field.getName().toLowerCase();
-          const widgets = field.acroField.getWidgets();
-          if (!widgets || widgets.length === 0) continue;
-
-          const rect = widgets[0].getRectangle();
-          const pIndex = getWidgetPageIndex(widgets[0], pdfDoc);
-          const x = rect.x;
-          const y = rect.y;
-
-          if (fieldType.includes('Text')) {
-            let valToSet = null;
-            let key = null;
-
-            // Name-based matching
-            if (name.includes('ref')) { valToSet = data.refId; key = 'refId'; }
-            else if (name.includes('name') && !name.includes('father') && !name.includes('mother')) { valToSet = data.name; key = 'name'; }
-            else if (name.includes('father')) { valToSet = data.father; key = 'father'; }
-            else if (name.includes('mother')) { valToSet = data.mother; key = 'mother'; }
-            else if (name.includes('dob') || name.includes('birth')) { valToSet = data.dob; key = 'dob'; }
-            else if (name.includes('blood')) { valToSet = data.blood; key = 'blood'; }
-            else if (name.includes('gender')) { valToSet = data.gender; key = 'gender'; }
-            else if (name.includes('mobile') && !name.includes('kin')) { valToSet = data.mobile; key = 'mobile'; }
-            else if (name.includes('mail')) { valToSet = data.email; key = 'email'; }
-            else if (name.includes('kin')) { valToSet = data.kin; key = 'kin'; }
-            else if (name.includes('aadhaar') || name.includes('aadhar')) { valToSet = data.aadhaar; key = 'aadhaar'; }
-            else if (name.includes('idtype') || name.includes('proof')) { valToSet = data.idType; key = 'idType'; }
-            else if (name.includes('org')) { valToSet = data.org; key = 'org'; }
-            else if (name.includes('desig')) { valToSet = data.desig; key = 'desig'; }
-            else if (name.includes('emp')) { valToSet = data.empNo; key = 'empNo'; }
-            else if (name.includes('duty') || name.includes('place')) { valToSet = data.dutyPlace; key = 'dutyPlace'; }
-            else if (name.includes('nature')) { valToSet = data.nature; key = 'nature'; }
-            else if (name.includes('office') || name.includes('addr')) { valToSet = data.officeAddr; key = 'officeAddr'; }
-            else if (name.includes('avsec') && name.includes('date')) { valToSet = data.avsecDate; key = 'avsecDate'; }
-            else if (name.includes('loc')) { valToSet = data.avsecLoc; key = 'avsecLoc'; }
-            else if (name.includes('inst')) { valToSet = data.avsecInst; key = 'avsecInst'; }
-
-            // Precise Spatial matching using calibrated box locations
-            if (!valToSet) {
-              if (pIndex === 0) {
-                if (y > 675 && y < 710 && x > 180) { valToSet = data.refId; key = 'refId'; }
-                else if (y > 475 && y < 510 && x > 250) { valToSet = data.airport; key = 'airport'; }
-                // Section 4a: Applicant Details
-                else if (y > 230 && y <= 252 && x < 360) { valToSet = data.name; key = 'name'; }
-                else if (y > 230 && y <= 252 && x >= 360) { valToSet = data.aadhaar; key = 'aadhaar'; }
-                else if (y > 212 && y <= 230 && x < 360) { valToSet = data.father; key = 'father'; }
-                else if (y > 212 && y <= 230 && x >= 360) { valToSet = data.mother; key = 'mother'; }
-                else if (y > 195 && y <= 212 && x < 360) { valToSet = data.dob; key = 'dob'; }
-                else if (y > 195 && y <= 212 && x >= 360) { valToSet = data.blood; key = 'blood'; }
-                else if (y > 178 && y <= 195 && x < 360) { valToSet = data.mobile; key = 'mobile'; }
-                else if (y > 178 && y <= 195 && x >= 360) { valToSet = data.gender; key = 'gender'; }
-                else if (y > 160 && y <= 178 && x < 360) { valToSet = data.kin; key = 'kin'; }
-                else if (y > 160 && y <= 178 && x >= 360) { valToSet = data.email; key = 'email'; }
-                else if (y > 142 && y <= 160 && x >= 360) { valToSet = data.idType; key = 'idType'; }
-                // Section 4b: Existing AEP
-                else if (y > 118 && y <= 138 && x < 180) { valToSet = "NIL"; key = 'aepNo'; }
-                else if (y > 118 && y <= 138 && x >= 180 && x < 380) { valToSet = "NIL"; key = 'aepValid'; }
-                else if (y > 118 && y <= 138 && x >= 380) { valToSet = "HYD"; key = 'aepPlace'; }
-                // Section 5: Residential Address
-                else if (y > 94 && y <= 112 && x < 360) { valToSet = data.permStreet; key = 'permStreet'; }
-                else if (y > 94 && y <= 112 && x >= 360) { valToSet = data.presStreet; key = 'presStreet'; }
-                else if (y > 78 && y <= 94 && x < 360) { valToSet = data.permDist; key = 'permDist'; }
-                else if (y > 78 && y <= 94 && x >= 360) { valToSet = data.presDist; key = 'presDist'; }
-                else if (y > 62 && y <= 78 && x < 360) { valToSet = data.permState; key = 'permState'; }
-                else if (y > 62 && y <= 78 && x >= 360) { valToSet = data.presState; key = 'presState'; }
-                else if (y > 46 && y <= 62 && x < 360) { valToSet = data.permPin; key = 'permPin'; }
-                else if (y > 46 && y <= 62 && x >= 360) { valToSet = data.presPin; key = 'presPin'; }
-                else if (y > 25 && y <= 46 && x < 380) { valToSet = data.permProof; key = 'permProof'; }
-              } else {
-                // Page 2
-                if (y > 766 && y <= 790 && x < 360) { valToSet = data.org; key = 'org'; }
-                else if (y > 766 && y <= 790 && x >= 360) { valToSet = data.desig; key = 'desig'; }
-                else if (y > 748 && y <= 766 && x < 360) { valToSet = data.empNo; key = 'empNo'; }
-                else if (y > 748 && y <= 766 && x >= 360) { valToSet = data.dutyPlace; key = 'dutyPlace'; }
-                else if (y > 730 && y <= 748 && x < 360) { valToSet = data.nature; key = 'nature'; }
-                else if (y > 730 && y <= 748 && x >= 360) { valToSet = "26/09/2053"; key = 'retirement'; }
-                else if (y > 705 && y <= 730) { valToSet = data.officeAddr; key = 'officeAddr'; }
-                else if (y > 335 && y <= 358 && x < 300) { valToSet = data.avsecDate; key = 'avsecDate'; }
-                else if (y > 335 && y <= 358 && x >= 300) { valToSet = data.avsecLoc; key = 'avsecLoc'; }
-                else if (y > 300 && y <= 325) { valToSet = data.avsecInst; key = 'avsecInst'; }
-                else if (y > 132 && y <= 152 && x < 300) { valToSet = "HYD"; key = 'place'; }
-                else if (y > 132 && y <= 152 && x >= 300) { valToSet = data.org; key = 'signName'; }
-                else if (y > 110 && y <= 132 && x < 300) { valToSet = "04/11/2026"; key = 'date'; }
-                else if (y > 110 && y <= 132 && x >= 300) { valToSet = "SECURITY DEPT"; key = 'signDesig'; }
-              }
-            }
-
-            if (valToSet !== null) {
-              try {
-                field.setText(String(valToSet));
-                if (key) filledKeys.add(key);
-              } catch (e) {}
-            }
-          }
-        }
-      }
-
-      // Stage 2: Precision Direct Fill inside every bordered box
+      // CRITICAL FIX: Strip all opaque PDFescape white annotation overlays
+      // This prevents white boxes from physically covering the printed text
       const pages = pdfDoc.getPages();
+      pages.forEach(p => {
+        p.node.delete(PDFName.of('Annots'));
+      });
+      pdfDoc.catalog.delete(PDFName.of('AcroForm'));
+
       const page1 = pages[0];
       const page2 = pages[1] || page1;
 
-      // --- PAGE 1 EXACT BOX FILL ---
+      // ==========================================
+      // PAGE 1: EXACT CALIBRATED COORDINATES
+      // ==========================================
+
       // 1. Reference ID
-      if (!filledKeys.has('refId')) {
-        drawFittedText(page1, data.refId, 218, 693, 200, 8.5, font);
-      }
+      drawFittedText(page1, data.refId, 218, 693, 200, 8.5, font);
+
       // 2d. Airport
-      if (!filledKeys.has('airport')) {
-        drawFittedText(page1, data.airport, 280, 494, 90, 7.8, font);
-      }
+      drawFittedText(page1, data.airport, 280, 494, 90, 7.8, font);
 
-      // 4a. Applicant Details Table (Verified inside cell boxes)
-      if (!filledKeys.has('name')) {
-        drawFittedText(page1, data.name, 146, 242, 200, 7.5, font);
-      }
-      if (!filledKeys.has('aadhaar')) {
-        drawFittedText(page1, data.aadhaar, 418, 242, 150, 7.5, font);
-      }
-      if (!filledKeys.has('father')) {
-        drawFittedText(page1, data.father, 146, 224, 200, 7.5, font);
-      }
-      if (!filledKeys.has('mother')) {
-        drawFittedText(page1, data.mother, 418, 224, 150, 7.5, font);
-      }
-      if (!filledKeys.has('dob')) {
-        drawFittedText(page1, data.dob, 146, 206, 120, 7.5, font);
-      }
-      if (!filledKeys.has('blood')) {
-        drawFittedText(page1, data.blood, 418, 206, 150, 7.5, font);
-      }
-      if (!filledKeys.has('mobile')) {
-        drawFittedText(page1, data.mobile, 146, 188, 120, 7.5, font);
-      }
-      if (!filledKeys.has('gender')) {
-        drawFittedText(page1, data.gender, 418, 188, 150, 7.5, font);
-      }
-      if (!filledKeys.has('kin')) {
-        drawFittedText(page1, data.kin, 146, 170, 120, 7.5, font);
-      }
-      if (!filledKeys.has('email')) {
-        drawFittedText(page1, data.email, 418, 170, 150, 6.8, font);
-      }
-      if (!filledKeys.has('idType')) {
-        drawFittedText(page1, data.idType, 418, 152, 150, 7.2, font);
-      }
+      // 4a. Applicant Details Table
+      // Left Column (5 rows: Name, Father, DOB, Mobile, Kin)
+      drawFittedText(page1, data.name, 154, 236, 185, 7.5, font);
+      drawFittedText(page1, data.father, 154, 218, 185, 7.5, font);
+      drawFittedText(page1, data.dob, 154, 200, 110, 7.5, font);
+      drawFittedText(page1, data.mobile, 154, 182, 110, 7.5, font);
+      drawFittedText(page1, data.kin, 154, 164, 110, 7.5, font);
 
-      // 4b. Existing AEP Details
-      if (!filledKeys.has('aepNo')) {
-        drawFittedText(page1, "NIL", 76, 128, 110, 7.5, fontNorm);
-      }
-      if (!filledKeys.has('aepValid')) {
-        drawFittedText(page1, "NIL", 272, 128, 110, 7.5, fontNorm);
-      }
-      if (!filledKeys.has('aepPlace')) {
-        drawFittedText(page1, "HYD", 492, 128, 75, 7.5, fontNorm);
-      }
+      // Right Column (6 rows: Aadhaar, Mother, Blood, Gender, Email, ID Proof)
+      drawFittedText(page1, data.aadhaar, 426, 238, 140, 7.5, font);
+      drawFittedText(page1, data.mother, 426, 223, 140, 7.5, font);
+      drawFittedText(page1, data.blood, 426, 208, 140, 7.5, font);
+      drawFittedText(page1, data.gender, 426, 193, 140, 7.5, font);
+      drawFittedText(page1, data.email, 426, 178, 140, 6.8, font);
+      drawFittedText(page1, data.idType, 426, 163, 140, 7.2, font);
+
+      // 4b. Existing AEP in Possession
+      drawFittedText(page1, "NIL", 76, 140, 110, 7.5, fontNorm);
+      drawFittedText(page1, "NIL", 272, 140, 110, 7.5, fontNorm);
+      drawFittedText(page1, "HYD", 492, 140, 75, 7.5, fontNorm);
 
       // 5. Residential Address: Permanent (Left) & Present (Right)
-      if (!filledKeys.has('permStreet')) {
-        drawFittedText(page1, data.permStreet, 146, 102, 160, 6.8, fontNorm);
-      }
-      if (!filledKeys.has('permDist')) {
-        drawFittedText(page1, data.permDist, 146, 86, 160, 6.8, fontNorm);
-      }
-      if (!filledKeys.has('permState')) {
-        drawFittedText(page1, data.permState, 146, 70, 160, 6.8, fontNorm);
-      }
-      if (!filledKeys.has('permPin')) {
-        drawFittedText(page1, data.permPin, 146, 54, 160, 6.8, fontNorm);
-      }
-      if (!filledKeys.has('permProof')) {
-        drawFittedText(page1, data.permProof, 184, 35, 160, 7.0, font);
-      }
+      drawFittedText(page1, data.permStreet, 154, 112, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permDist, 154, 94, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permState, 154, 76, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permPin, 154, 58, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permProof, 184, 38, 160, 7.0, font);
 
-      if (!filledKeys.has('presStreet')) {
-        drawFittedText(page1, data.presStreet, 422, 102, 150, 6.8, fontNorm);
-      }
-      if (!filledKeys.has('presDist')) {
-        drawFittedText(page1, data.presDist, 422, 86, 150, 6.8, fontNorm);
-      }
-      if (!filledKeys.has('presState')) {
-        drawFittedText(page1, data.presState, 422, 70, 150, 6.8, fontNorm);
-      }
-      if (!filledKeys.has('presPin')) {
-        drawFittedText(page1, data.presPin, 422, 54, 150, 6.8, fontNorm);
-      }
+      drawFittedText(page1, data.presStreet, 426, 112, 140, 6.8, fontNorm);
+      drawFittedText(page1, data.presDist, 426, 94, 140, 6.8, fontNorm);
+      drawFittedText(page1, data.presState, 426, 76, 140, 6.8, fontNorm);
+      drawFittedText(page1, data.presPin, 426, 58, 140, 6.8, fontNorm);
 
-      // --- PAGE 2 EXACT BOX FILL ---
-      // 6. Employment Details
-      if (!filledKeys.has('org')) {
-        drawFittedText(page2, data.org, 146, 776, 165, 7.6, font);
-      }
-      if (!filledKeys.has('desig')) {
-        drawFittedText(page2, data.desig, 422, 776, 150, 7.6, font);
-      }
-      if (!filledKeys.has('empNo')) {
-        drawFittedText(page2, data.empNo, 146, 758, 165, 7.8, font);
-      }
-      if (!filledKeys.has('dutyPlace')) {
-        drawFittedText(page2, data.dutyPlace, 422, 758, 150, 7.6, font);
-      }
-      if (!filledKeys.has('nature')) {
-        drawFittedText(page2, data.nature, 146, 740, 165, 7.6, font);
-      }
-      if (!filledKeys.has('retirement')) {
-        drawFittedText(page2, "26/09/2053", 422, 740, 150, 7.6, font);
-      }
-      if (!filledKeys.has('officeAddr')) {
-        drawFittedText(page2, data.officeAddr, 146, 718, 425, 6.2, fontNorm);
-      }
-
-      // 10. Non-Indian Nationals
-      drawFittedText(page2, "INDIAN NATIONAL (NOT APPLICABLE)", 160, 468, 300, 7.2, font);
-
-      // 11. AVSEC Training
-      if (!filledKeys.has('avsecDate')) {
-        drawFittedText(page2, data.avsecDate, 146, 345, 100, 7.8, font);
-      }
-      if (!filledKeys.has('avsecLoc')) {
-        drawFittedText(page2, data.avsecLoc, 395, 345, 160, 7.8, font);
-      }
-      if (!filledKeys.has('avsecInst')) {
-        drawFittedText(page2, data.avsecInst, 265, 312, 290, 7.2, font);
-      }
-
-      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 280, 400, 7.2, font);
-
-      // Signatures
-      if (!filledKeys.has('place')) {
-        drawFittedText(page2, "HYD", 110, 142, 130, 8, font);
-      }
-      if (!filledKeys.has('date')) {
-        drawFittedText(page2, "04/11/2026", 110, 120, 130, 7.5, font);
-      }
-      if (!filledKeys.has('signName')) {
-        drawFittedText(page2, data.org, 390, 142, 180, 7.2, font);
-      }
-      if (!filledKeys.has('signDesig')) {
-        drawFittedText(page2, "SECURITY DEPT", 420, 120, 150, 7.2, font);
-      }
-
-      // Passport Photograph
+      // Passport Photograph Stamping
       if (photoBytes) {
         try {
           const img = await pdfDoc.embedJpg(photoBytes).catch(async () => await pdfDoc.embedPng(photoBytes));
@@ -801,9 +582,33 @@
         } catch (e) {}
       }
 
-      try {
-        form.flatten();
-      } catch (e) {}
+      // ==========================================
+      // PAGE 2: EXACT CALIBRATED COORDINATES
+      // ==========================================
+
+      // 6. Employment Details
+      drawFittedText(page2, data.org, 154, 780, 165, 7.6, font);
+      drawFittedText(page2, data.desig, 426, 780, 140, 7.6, font);
+      drawFittedText(page2, data.empNo, 154, 760, 165, 7.8, font);
+      drawFittedText(page2, data.dutyPlace, 426, 760, 140, 7.6, font);
+      drawFittedText(page2, data.nature, 154, 740, 165, 7.6, font);
+      drawFittedText(page2, "26/09/2053", 426, 740, 140, 7.6, font);
+      drawFittedText(page2, data.officeAddr, 154, 718, 415, 6.2, fontNorm);
+
+      // 10. Non-Indian Nationals
+      drawFittedText(page2, "INDIAN NATIONAL (NOT APPLICABLE)", 160, 468, 300, 7.2, font);
+
+      // 11. AVSEC Training
+      drawFittedText(page2, data.avsecDate, 154, 346, 100, 7.8, font);
+      drawFittedText(page2, data.avsecLoc, 400, 346, 160, 7.8, font);
+      drawFittedText(page2, data.avsecInst, 265, 312, 290, 7.2, font);
+      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 280, 400, 7.2, font);
+
+      // Signatures
+      drawFittedText(page2, "HYD", 105, 140, 130, 8, font);
+      drawFittedText(page2, "04/11/2026", 105, 118, 130, 7.5, font);
+      drawFittedText(page2, data.org, 365, 140, 180, 7.2, font);
+      drawFittedText(page2, "SECURITY DEPT", 400, 118, 150, 7.2, font);
 
       const stampedBytes = await pdfDoc.save();
       return new Blob([stampedBytes], { type: "application/pdf" });
