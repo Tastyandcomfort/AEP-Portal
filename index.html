@@ -63,7 +63,7 @@
         </div>
         <div>
           <span class="text-base font-semibold tracking-tight block leading-tight">BCAS AEP Form Engine</span>
-          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Interactive PDFescape Field Mapper</span>
+          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Precision Calibrated Form Mapper</span>
         </div>
       </div>
 
@@ -274,7 +274,7 @@
 
             <div class="space-y-2 text-xs pt-2 border-t border-[#f5f5f7]">
               <span class="font-bold text-[#1d1d1f] uppercase block">5b. Present Address</span>
-              <input type="text" id="f_presStreet" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYA" oninput="debounceRefresh()" class="w-full p-2.5 apple-input uppercase font-medium" />
+              <input type="text" id="f_presStreet" placeholder="House No / Street / Road" value="303/A, SEC 6, VISHAVARDAYASFASSA" oninput="debounceRefresh()" class="w-full p-2.5 apple-input uppercase font-medium" />
               <div class="grid grid-cols-3 gap-2">
                 <input type="text" id="f_presDist" placeholder="District" value="THANE/NEW MUMBAI" oninput="debounceRefresh()" class="p-2.5 apple-input uppercase" />
                 <input type="text" id="f_presState" placeholder="State" value="MAHARASHTRA" oninput="debounceRefresh()" class="p-2.5 apple-input uppercase" />
@@ -398,10 +398,9 @@
 
     function debounceRefresh() {
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(refreshPdfPreview, 300);
+      debounceTimer = setTimeout(refreshPdfPreview, 250);
     }
 
-    // Loads the PDFescape modified PDF with cache-busting
     async function loadBlankPdf() {
       if (blankPdfBytes) return blankPdfBytes;
 
@@ -485,7 +484,25 @@
       };
     }
 
-    // Resolves which page index a widget belongs to
+    // Dynamic text fitter: shrinks font so text never overlaps cell borders
+    function drawFittedText(page, text, x, y, maxW, baseSize, font) {
+      if (!text) return;
+      let str = String(text).trim();
+      let size = baseSize;
+      let textW = font.widthOfTextAtSize(str, size);
+      while (textW > maxW && size > 4.5) {
+        size -= 0.4;
+        textW = font.widthOfTextAtSize(str, size);
+      }
+      if (textW > maxW) {
+        while (font.widthOfTextAtSize(str + '...', size) > maxW && str.length > 3) {
+          str = str.slice(0, -1);
+        }
+        str += '...';
+      }
+      page.drawText(str, { x, y, size, font });
+    }
+
     function getWidgetPageIndex(widget, pdfDoc) {
       try {
         const pages = pdfDoc.getPages();
@@ -512,7 +529,7 @@
 
     async function buildOfficialStampedPdfBlob() {
       if (typeof PDFLib === 'undefined') {
-        throw new Error("PDFLib library is loading. Please wait a moment.");
+        throw new Error("PDFLib library is loading.");
       }
 
       const bytes = await loadBlankPdf();
@@ -529,14 +546,9 @@
 
       const form = pdfDoc.getForm();
       const fields = form.getFields();
-
-      console.log(`[BCAS Form Engine] Found ${fields.length} PDFescape form fields.`);
-
       const filledKeys = new Set();
 
-      // ==============================================================
-      // STAGE 1: FILL INTERACTIVE PDFESCAPE BOXES (ACROFORM MAPPING)
-      // ==============================================================
+      // Stage 1: Try filling interactive PDFescape fields if present
       if (fields && fields.length > 0) {
         for (const field of fields) {
           const fieldType = field.constructor.name;
@@ -553,7 +565,7 @@
             let valToSet = null;
             let key = null;
 
-            // Strategy A: Match by Name (if renamed in PDFescape)
+            // Name-based matching
             if (name.includes('ref')) { valToSet = data.refId; key = 'refId'; }
             else if (name.includes('name') && !name.includes('father') && !name.includes('mother')) { valToSet = data.name; key = 'name'; }
             else if (name.includes('father')) { valToSet = data.father; key = 'father'; }
@@ -573,55 +585,56 @@
             else if (name.includes('nature')) { valToSet = data.nature; key = 'nature'; }
             else if (name.includes('office') || name.includes('addr')) { valToSet = data.officeAddr; key = 'officeAddr'; }
             else if (name.includes('avsec') && name.includes('date')) { valToSet = data.avsecDate; key = 'avsecDate'; }
-            else if (name.includes('loc') || name.includes('location')) { valToSet = data.avsecLoc; key = 'avsecLoc'; }
+            else if (name.includes('loc')) { valToSet = data.avsecLoc; key = 'avsecLoc'; }
             else if (name.includes('inst')) { valToSet = data.avsecInst; key = 'avsecInst'; }
 
-            // Strategy B: Match by Page & Coordinate Box (For default names: Text 1, Text 2, etc.)
+            // Precise Spatial matching using calibrated box locations
             if (!valToSet) {
-              if (pIndex === 0) { // Page 1
-                if (y > 670 && y < 730 && x > 180) { valToSet = data.refId; key = 'refId'; }
-                else if (y > 470 && y < 510 && x > 250) { valToSet = data.airport; key = 'airport'; }
-                // Applicant Details
-                else if (y > 325 && y <= 355 && x < 360) { valToSet = data.name; key = 'name'; }
-                else if (y > 325 && y <= 355 && x >= 360) { valToSet = data.aadhaar; key = 'aadhaar'; }
-                else if (y > 307 && y <= 325 && x < 360) { valToSet = data.father; key = 'father'; }
-                else if (y > 307 && y <= 325 && x >= 360) { valToSet = data.mother; key = 'mother'; }
-                else if (y > 289 && y <= 307 && x < 360) { valToSet = data.dob; key = 'dob'; }
-                else if (y > 289 && y <= 307 && x >= 360) { valToSet = data.blood; key = 'blood'; }
-                else if (y > 271 && y <= 289 && x < 360) { valToSet = data.mobile; key = 'mobile'; }
-                else if (y > 271 && y <= 289 && x >= 360) { valToSet = data.gender; key = 'gender'; }
-                else if (y > 253 && y <= 271 && x < 360) { valToSet = data.kin; key = 'kin'; }
-                else if (y > 253 && y <= 271 && x >= 360) { valToSet = data.email; key = 'email'; }
-                else if (y > 235 && y <= 253 && x >= 360) { valToSet = data.idType; key = 'idType'; }
-                // Existing AEP
-                else if (y > 210 && y <= 235 && x < 180) { valToSet = "NIL"; key = 'aepNo'; }
-                else if (y > 210 && y <= 235 && x >= 180 && x < 380) { valToSet = "NIL"; key = 'aepValid'; }
-                else if (y > 210 && y <= 235 && x >= 380) { valToSet = "HYD"; key = 'aepPlace'; }
-                // Addresses
-                else if (y > 165 && y <= 195 && x < 360) { valToSet = data.permStreet; key = 'permStreet'; }
-                else if (y > 165 && y <= 195 && x >= 360) { valToSet = data.presStreet; key = 'presStreet'; }
-                else if (y > 145 && y <= 165 && x < 360) { valToSet = data.permDist; key = 'permDist'; }
-                else if (y > 145 && y <= 165 && x >= 360) { valToSet = data.presDist; key = 'presDist'; }
-                else if (y > 125 && y <= 145 && x < 360) { valToSet = data.permState; key = 'permState'; }
-                else if (y > 125 && y <= 145 && x >= 360) { valToSet = data.presState; key = 'presState'; }
-                else if (y > 105 && y <= 125 && x < 360) { valToSet = data.permPin; key = 'permPin'; }
-                else if (y > 105 && y <= 125 && x >= 360) { valToSet = data.presPin; key = 'presPin'; }
-                else if (y > 75 && y <= 105 && x < 380) { valToSet = data.permProof; key = 'permProof'; }
-              } else { // Page 2
-                if (y > 775 && y <= 810 && x < 360) { valToSet = data.org; key = 'org'; }
-                else if (y > 775 && y <= 810 && x >= 360) { valToSet = data.desig; key = 'desig'; }
-                else if (y > 755 && y <= 775 && x < 360) { valToSet = data.empNo; key = 'empNo'; }
-                else if (y > 755 && y <= 775 && x >= 360) { valToSet = data.dutyPlace; key = 'dutyPlace'; }
-                else if (y > 735 && y <= 755 && x < 360) { valToSet = data.nature; key = 'nature'; }
-                else if (y > 735 && y <= 755 && x >= 360) { valToSet = "26/09/2053"; key = 'retirement'; }
-                else if (y > 705 && y <= 735) { valToSet = data.officeAddr; key = 'officeAddr'; }
-                else if (y > 345 && y <= 375 && x < 300) { valToSet = data.avsecDate; key = 'avsecDate'; }
-                else if (y > 345 && y <= 375 && x >= 300) { valToSet = data.avsecLoc; key = 'avsecLoc'; }
-                else if (y > 310 && y <= 345) { valToSet = data.avsecInst; key = 'avsecInst'; }
-                else if (y > 155 && y <= 180 && x < 300) { valToSet = "HYD"; key = 'place'; }
-                else if (y > 155 && y <= 180 && x >= 300) { valToSet = data.org; key = 'signName'; }
-                else if (y > 130 && y <= 155 && x < 300) { valToSet = "04/11/2026"; key = 'date'; }
-                else if (y > 130 && y <= 155 && x >= 300) { valToSet = "SECURITY DEPT"; key = 'signDesig'; }
+              if (pIndex === 0) {
+                if (y > 675 && y < 710 && x > 180) { valToSet = data.refId; key = 'refId'; }
+                else if (y > 475 && y < 510 && x > 250) { valToSet = data.airport; key = 'airport'; }
+                // Section 4a: Applicant Details
+                else if (y > 230 && y <= 252 && x < 360) { valToSet = data.name; key = 'name'; }
+                else if (y > 230 && y <= 252 && x >= 360) { valToSet = data.aadhaar; key = 'aadhaar'; }
+                else if (y > 212 && y <= 230 && x < 360) { valToSet = data.father; key = 'father'; }
+                else if (y > 212 && y <= 230 && x >= 360) { valToSet = data.mother; key = 'mother'; }
+                else if (y > 195 && y <= 212 && x < 360) { valToSet = data.dob; key = 'dob'; }
+                else if (y > 195 && y <= 212 && x >= 360) { valToSet = data.blood; key = 'blood'; }
+                else if (y > 178 && y <= 195 && x < 360) { valToSet = data.mobile; key = 'mobile'; }
+                else if (y > 178 && y <= 195 && x >= 360) { valToSet = data.gender; key = 'gender'; }
+                else if (y > 160 && y <= 178 && x < 360) { valToSet = data.kin; key = 'kin'; }
+                else if (y > 160 && y <= 178 && x >= 360) { valToSet = data.email; key = 'email'; }
+                else if (y > 142 && y <= 160 && x >= 360) { valToSet = data.idType; key = 'idType'; }
+                // Section 4b: Existing AEP
+                else if (y > 118 && y <= 138 && x < 180) { valToSet = "NIL"; key = 'aepNo'; }
+                else if (y > 118 && y <= 138 && x >= 180 && x < 380) { valToSet = "NIL"; key = 'aepValid'; }
+                else if (y > 118 && y <= 138 && x >= 380) { valToSet = "HYD"; key = 'aepPlace'; }
+                // Section 5: Residential Address
+                else if (y > 94 && y <= 112 && x < 360) { valToSet = data.permStreet; key = 'permStreet'; }
+                else if (y > 94 && y <= 112 && x >= 360) { valToSet = data.presStreet; key = 'presStreet'; }
+                else if (y > 78 && y <= 94 && x < 360) { valToSet = data.permDist; key = 'permDist'; }
+                else if (y > 78 && y <= 94 && x >= 360) { valToSet = data.presDist; key = 'presDist'; }
+                else if (y > 62 && y <= 78 && x < 360) { valToSet = data.permState; key = 'permState'; }
+                else if (y > 62 && y <= 78 && x >= 360) { valToSet = data.presState; key = 'presState'; }
+                else if (y > 46 && y <= 62 && x < 360) { valToSet = data.permPin; key = 'permPin'; }
+                else if (y > 46 && y <= 62 && x >= 360) { valToSet = data.presPin; key = 'presPin'; }
+                else if (y > 25 && y <= 46 && x < 380) { valToSet = data.permProof; key = 'permProof'; }
+              } else {
+                // Page 2
+                if (y > 766 && y <= 790 && x < 360) { valToSet = data.org; key = 'org'; }
+                else if (y > 766 && y <= 790 && x >= 360) { valToSet = data.desig; key = 'desig'; }
+                else if (y > 748 && y <= 766 && x < 360) { valToSet = data.empNo; key = 'empNo'; }
+                else if (y > 748 && y <= 766 && x >= 360) { valToSet = data.dutyPlace; key = 'dutyPlace'; }
+                else if (y > 730 && y <= 748 && x < 360) { valToSet = data.nature; key = 'nature'; }
+                else if (y > 730 && y <= 748 && x >= 360) { valToSet = "26/09/2053"; key = 'retirement'; }
+                else if (y > 705 && y <= 730) { valToSet = data.officeAddr; key = 'officeAddr'; }
+                else if (y > 335 && y <= 358 && x < 300) { valToSet = data.avsecDate; key = 'avsecDate'; }
+                else if (y > 335 && y <= 358 && x >= 300) { valToSet = data.avsecLoc; key = 'avsecLoc'; }
+                else if (y > 300 && y <= 325) { valToSet = data.avsecInst; key = 'avsecInst'; }
+                else if (y > 132 && y <= 152 && x < 300) { valToSet = "HYD"; key = 'place'; }
+                else if (y > 132 && y <= 152 && x >= 300) { valToSet = data.org; key = 'signName'; }
+                else if (y > 110 && y <= 132 && x < 300) { valToSet = "04/11/2026"; key = 'date'; }
+                else if (y > 110 && y <= 132 && x >= 300) { valToSet = "SECURITY DEPT"; key = 'signDesig'; }
               }
             }
 
@@ -629,90 +642,168 @@
               try {
                 field.setText(String(valToSet));
                 if (key) filledKeys.add(key);
-              } catch (e) {
-                console.warn("Could not set field text:", name, e);
-              }
+              } catch (e) {}
             }
           }
         }
       }
 
-      // ==============================================================
-      // STAGE 2: FALLBACK STAMPING FOR ANY BOX NOT IN PDFESCAPE
-      // ==============================================================
+      // Stage 2: Precision Direct Fill inside every bordered box
       const pages = pdfDoc.getPages();
       const page1 = pages[0];
       const page2 = pages[1] || page1;
 
-      // Page 1 Precision Fallbacks
-      if (!filledKeys.has('refId')) page1.drawText(data.refId, { x: 218, y: 693, size: 8.5, font });
-      if (!filledKeys.has('airport')) page1.drawText(data.airport, { x: 280, y: 494, size: 7.8, font });
+      // --- PAGE 1 EXACT BOX FILL ---
+      // 1. Reference ID
+      if (!filledKeys.has('refId')) {
+        drawFittedText(page1, data.refId, 218, 693, 200, 8.5, font);
+      }
+      // 2d. Airport
+      if (!filledKeys.has('airport')) {
+        drawFittedText(page1, data.airport, 280, 494, 90, 7.8, font);
+      }
 
-      if (!filledKeys.has('name')) page1.drawText(data.name, { x: 154, y: 337, size: 7.5, font });
-      if (!filledKeys.has('aadhaar')) page1.drawText(data.aadhaar, { x: 424, y: 337, size: 7.5, font });
-      if (!filledKeys.has('father')) page1.drawText(data.father, { x: 154, y: 319, size: 7.5, font });
-      if (!filledKeys.has('mother')) page1.drawText(data.mother, { x: 424, y: 319, size: 7.5, font });
-      if (!filledKeys.has('dob')) page1.drawText(data.dob, { x: 154, y: 301, size: 7.5, font });
-      if (!filledKeys.has('blood')) page1.drawText(data.blood, { x: 424, y: 301, size: 7.5, font });
-      if (!filledKeys.has('mobile')) page1.drawText(data.mobile, { x: 154, y: 283, size: 7.5, font });
-      if (!filledKeys.has('gender')) page1.drawText(data.gender, { x: 424, y: 283, size: 7.5, font });
-      if (!filledKeys.has('kin')) page1.drawText(data.kin, { x: 154, y: 265, size: 7.5, font });
-      if (!filledKeys.has('email')) page1.drawText(data.email, { x: 424, y: 265, size: 6.8, font });
-      if (!filledKeys.has('idType')) page1.drawText(data.idType, { x: 424, y: 247, size: 7.2, font });
+      // 4a. Applicant Details Table (Verified inside cell boxes)
+      if (!filledKeys.has('name')) {
+        drawFittedText(page1, data.name, 146, 242, 200, 7.5, font);
+      }
+      if (!filledKeys.has('aadhaar')) {
+        drawFittedText(page1, data.aadhaar, 418, 242, 150, 7.5, font);
+      }
+      if (!filledKeys.has('father')) {
+        drawFittedText(page1, data.father, 146, 224, 200, 7.5, font);
+      }
+      if (!filledKeys.has('mother')) {
+        drawFittedText(page1, data.mother, 418, 224, 150, 7.5, font);
+      }
+      if (!filledKeys.has('dob')) {
+        drawFittedText(page1, data.dob, 146, 206, 120, 7.5, font);
+      }
+      if (!filledKeys.has('blood')) {
+        drawFittedText(page1, data.blood, 418, 206, 150, 7.5, font);
+      }
+      if (!filledKeys.has('mobile')) {
+        drawFittedText(page1, data.mobile, 146, 188, 120, 7.5, font);
+      }
+      if (!filledKeys.has('gender')) {
+        drawFittedText(page1, data.gender, 418, 188, 150, 7.5, font);
+      }
+      if (!filledKeys.has('kin')) {
+        drawFittedText(page1, data.kin, 146, 170, 120, 7.5, font);
+      }
+      if (!filledKeys.has('email')) {
+        drawFittedText(page1, data.email, 418, 170, 150, 6.8, font);
+      }
+      if (!filledKeys.has('idType')) {
+        drawFittedText(page1, data.idType, 418, 152, 150, 7.2, font);
+      }
 
-      if (!filledKeys.has('aepNo')) page1.drawText("NIL", { x: 75, y: 224, size: 7.5, font: fontNorm });
-      if (!filledKeys.has('aepValid')) page1.drawText("NIL", { x: 270, y: 224, size: 7.5, font: fontNorm });
-      if (!filledKeys.has('aepPlace')) page1.drawText("HYD", { x: 490, y: 224, size: 7.5, font: fontNorm });
+      // 4b. Existing AEP Details
+      if (!filledKeys.has('aepNo')) {
+        drawFittedText(page1, "NIL", 76, 128, 110, 7.5, fontNorm);
+      }
+      if (!filledKeys.has('aepValid')) {
+        drawFittedText(page1, "NIL", 272, 128, 110, 7.5, fontNorm);
+      }
+      if (!filledKeys.has('aepPlace')) {
+        drawFittedText(page1, "HYD", 492, 128, 75, 7.5, fontNorm);
+      }
 
-      if (!filledKeys.has('permStreet')) page1.drawText(data.permStreet, { x: 154, y: 177, size: 6.8, font: fontNorm });
-      if (!filledKeys.has('permDist')) page1.drawText(data.permDist, { x: 154, y: 157, size: 6.8, font: fontNorm });
-      if (!filledKeys.has('permState')) page1.drawText(data.permState, { x: 154, y: 137, size: 6.8, font: fontNorm });
-      if (!filledKeys.has('permPin')) page1.drawText(data.permPin, { x: 154, y: 117, size: 6.8, font: fontNorm });
-      if (!filledKeys.has('permProof')) page1.drawText(data.permProof, { x: 185, y: 92, size: 7.0, font });
+      // 5. Residential Address: Permanent (Left) & Present (Right)
+      if (!filledKeys.has('permStreet')) {
+        drawFittedText(page1, data.permStreet, 146, 102, 160, 6.8, fontNorm);
+      }
+      if (!filledKeys.has('permDist')) {
+        drawFittedText(page1, data.permDist, 146, 86, 160, 6.8, fontNorm);
+      }
+      if (!filledKeys.has('permState')) {
+        drawFittedText(page1, data.permState, 146, 70, 160, 6.8, fontNorm);
+      }
+      if (!filledKeys.has('permPin')) {
+        drawFittedText(page1, data.permPin, 146, 54, 160, 6.8, fontNorm);
+      }
+      if (!filledKeys.has('permProof')) {
+        drawFittedText(page1, data.permProof, 184, 35, 160, 7.0, font);
+      }
 
-      if (!filledKeys.has('presStreet')) page1.drawText(data.presStreet, { x: 424, y: 177, size: 6.8, font: fontNorm });
-      if (!filledKeys.has('presDist')) page1.drawText(data.presDist, { x: 424, y: 157, size: 6.8, font: fontNorm });
-      if (!filledKeys.has('presState')) page1.drawText(data.presState, { x: 424, y: 137, size: 6.8, font: fontNorm });
-      if (!filledKeys.has('presPin')) page1.drawText(data.presPin, { x: 424, y: 117, size: 6.8, font: fontNorm });
+      if (!filledKeys.has('presStreet')) {
+        drawFittedText(page1, data.presStreet, 422, 102, 150, 6.8, fontNorm);
+      }
+      if (!filledKeys.has('presDist')) {
+        drawFittedText(page1, data.presDist, 422, 86, 150, 6.8, fontNorm);
+      }
+      if (!filledKeys.has('presState')) {
+        drawFittedText(page1, data.presState, 422, 70, 150, 6.8, fontNorm);
+      }
+      if (!filledKeys.has('presPin')) {
+        drawFittedText(page1, data.presPin, 422, 54, 150, 6.8, fontNorm);
+      }
 
-      // Page 2 Precision Fallbacks
-      if (!filledKeys.has('org')) page2.drawText(data.org, { x: 154, y: 787, size: 7.6, font });
-      if (!filledKeys.has('desig')) page2.drawText(data.desig, { x: 432, y: 787, size: 7.6, font });
-      if (!filledKeys.has('empNo')) page2.drawText(data.empNo, { x: 154, y: 767, size: 7.8, font });
-      if (!filledKeys.has('dutyPlace')) page2.drawText(data.dutyPlace, { x: 432, y: 767, size: 7.6, font });
-      if (!filledKeys.has('nature')) page2.drawText(data.nature, { x: 154, y: 747, size: 7.6, font });
-      if (!filledKeys.has('retirement')) page2.drawText("26/09/2053", { x: 432, y: 747, size: 7.6, font });
-      if (!filledKeys.has('officeAddr')) page2.drawText(data.officeAddr, { x: 154, y: 724, size: 6.4, font: fontNorm });
+      // --- PAGE 2 EXACT BOX FILL ---
+      // 6. Employment Details
+      if (!filledKeys.has('org')) {
+        drawFittedText(page2, data.org, 146, 776, 165, 7.6, font);
+      }
+      if (!filledKeys.has('desig')) {
+        drawFittedText(page2, data.desig, 422, 776, 150, 7.6, font);
+      }
+      if (!filledKeys.has('empNo')) {
+        drawFittedText(page2, data.empNo, 146, 758, 165, 7.8, font);
+      }
+      if (!filledKeys.has('dutyPlace')) {
+        drawFittedText(page2, data.dutyPlace, 422, 758, 150, 7.6, font);
+      }
+      if (!filledKeys.has('nature')) {
+        drawFittedText(page2, data.nature, 146, 740, 165, 7.6, font);
+      }
+      if (!filledKeys.has('retirement')) {
+        drawFittedText(page2, "26/09/2053", 422, 740, 150, 7.6, font);
+      }
+      if (!filledKeys.has('officeAddr')) {
+        drawFittedText(page2, data.officeAddr, 146, 718, 425, 6.2, fontNorm);
+      }
 
-      page2.drawText("INDIAN NATIONAL (NOT APPLICABLE)", { x: 160, y: 468, size: 7.2, font });
+      // 10. Non-Indian Nationals
+      drawFittedText(page2, "INDIAN NATIONAL (NOT APPLICABLE)", 160, 468, 300, 7.2, font);
 
-      if (!filledKeys.has('avsecDate')) page2.drawText(data.avsecDate, { x: 154, y: 362, size: 7.8, font });
-      if (!filledKeys.has('avsecLoc')) page2.drawText(data.avsecLoc, { x: 400, y: 362, size: 7.8, font });
-      if (!filledKeys.has('avsecInst')) page2.drawText(data.avsecInst, { x: 265, y: 325, size: 7.2, font });
+      // 11. AVSEC Training
+      if (!filledKeys.has('avsecDate')) {
+        drawFittedText(page2, data.avsecDate, 146, 345, 100, 7.8, font);
+      }
+      if (!filledKeys.has('avsecLoc')) {
+        drawFittedText(page2, data.avsecLoc, 395, 345, 160, 7.8, font);
+      }
+      if (!filledKeys.has('avsecInst')) {
+        drawFittedText(page2, data.avsecInst, 265, 312, 290, 7.2, font);
+      }
 
-      page2.drawText(`Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, { x: 160, y: 295, size: 7.2, font });
+      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 280, 400, 7.2, font);
 
-      if (!filledKeys.has('place')) page2.drawText("HYD", { x: 110, y: 166, size: 8, font });
-      if (!filledKeys.has('date')) page2.drawText("04/11/2026", { x: 110, y: 144, size: 7.5, font });
-      if (!filledKeys.has('signName')) page2.drawText(data.org, { x: 400, y: 166, size: 7.2, font });
-      if (!filledKeys.has('signDesig')) page2.drawText("SECURITY DEPT", { x: 430, y: 144, size: 7.2, font });
+      // Signatures
+      if (!filledKeys.has('place')) {
+        drawFittedText(page2, "HYD", 110, 142, 130, 8, font);
+      }
+      if (!filledKeys.has('date')) {
+        drawFittedText(page2, "04/11/2026", 110, 120, 130, 7.5, font);
+      }
+      if (!filledKeys.has('signName')) {
+        drawFittedText(page2, data.org, 390, 142, 180, 7.2, font);
+      }
+      if (!filledKeys.has('signDesig')) {
+        drawFittedText(page2, "SECURITY DEPT", 420, 120, 150, 7.2, font);
+      }
 
-      // Embed Photograph
+      // Passport Photograph
       if (photoBytes) {
         try {
           const img = await pdfDoc.embedJpg(photoBytes).catch(async () => await pdfDoc.embedPng(photoBytes));
           page1.drawImage(img, { x: 478, y: 688, width: 94, height: 120 });
-        } catch (e) {
-          console.warn("Photo stamp issue:", e);
-        }
+        } catch (e) {}
       }
 
-      // Flatten interactive fields to burn text permanently into the visual layer
       try {
         form.flatten();
-      } catch (e) {
-        console.warn("Flatten note:", e);
-      }
+      } catch (e) {}
 
       const stampedBytes = await pdfDoc.save();
       return new Blob([stampedBytes], { type: "application/pdf" });
@@ -793,7 +884,7 @@
     function handleFormSubmit(e) {
       e.preventDefault();
       refreshPdfPreview();
-      alert("✅ Form data successfully populated into PDF boxes.");
+      alert("✅ Form data synchronized with official PDF.");
     }
 
     document.addEventListener("DOMContentLoaded", () => {
