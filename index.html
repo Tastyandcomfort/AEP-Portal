@@ -12,9 +12,8 @@
   <!-- FontAwesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- Multi-CDN Fallback (v1.17.1 verified on Cloudflare & jsDelivr) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" 
-          onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';"></script>
+  <!-- PDF-Lib Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 
   <style>
     body {
@@ -70,12 +69,12 @@
 
       <!-- Action Buttons -->
       <div class="flex items-center space-x-2">
-        <button onclick="generateAndPrintOfficialPdf()" id="btn-print" class="px-5 py-2.5 bg-[#1d1d1f] hover:bg-black active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5">
+        <button type="button" onclick="generateAndPrintOfficialPdf()" id="btn-print" class="px-5 py-2.5 bg-[#1d1d1f] hover:bg-black active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer">
           <i class="fa-solid fa-print"></i>
           <span>Print Filled PDF</span>
         </button>
 
-        <button onclick="generateAndDownloadOfficialPdf()" id="btn-download" class="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1.5">
+        <button type="button" onclick="generateAndDownloadOfficialPdf()" id="btn-download" class="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1.5 cursor-pointer">
           <i class="fa-solid fa-download"></i>
           <span>Download Filled PDF</span>
         </button>
@@ -208,11 +207,11 @@
             <div class="grid grid-cols-3 gap-3 text-xs">
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Date of Birth</label>
-                <input type="text" id="f_dob" value="27/09/1993" class="w-full p-2.5 apple-input font-bold" />
+                <input type="text" id="f_dob" value="27/09/1993" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold" />
               </div>
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Blood Group</label>
-                <input type="text" id="f_blood" value="A+" class="w-full p-2.5 apple-input font-bold uppercase" />
+                <input type="text" id="f_blood" value="A+" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase" />
               </div>
               <div>
                 <label class="block font-semibold text-[#86868b] uppercase mb-1">Gender</label>
@@ -360,7 +359,7 @@
 
           <button type="submit" id="btn-submit" class="w-full py-4 bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-bold rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
             <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Save &amp; Append to Google Sheet</span>
+            <span>Save Application Record</span>
           </button>
         </form>
       </div>
@@ -381,11 +380,9 @@
 
   </main>
 
-  <!-- ===================================================
-       DUAL-ENGINE AUTO-MAPPER JAVASCRIPT CONTROLLER
-       =================================================== -->
   <script>
-    const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby-YOUR-DEPLOYED-URL-HERE/exec";
+    // Paste your Google Apps Script WebApp URL if you want Google Sheets integration
+    const GOOGLE_SCRIPT_WEBAPP_URL = "";
 
     let blankPdfBytes = null;
     let photoBytes = null;
@@ -404,10 +401,9 @@
 
     function debounceRefresh() {
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(refreshPdfPreview, 350);
+      debounceTimer = setTimeout(refreshPdfPreview, 300);
     }
 
-    // Fetches the PDF with drawn boxes from your repo root
     async function loadBlankPdf() {
       if (blankPdfBytes) return blankPdfBytes;
 
@@ -491,117 +487,153 @@
       };
     }
 
-    // Precise checkmark vector drawer
     function drawCheck(page, x, y) {
       const { rgb } = PDFLib;
       page.drawLine({ start: { x: x, y: y + 2 }, end: { x: x + 2.5, y: y }, thickness: 1.5, color: rgb(0,0,0) });
       page.drawLine({ start: { x: x + 2.5, y: y }, end: { x: x + 6.5, y: y + 6 }, thickness: 1.5, color: rgb(0,0,0) });
     }
 
-    // MAIN DUAL-ENGINE PROCESSOR
+    // Creates the BCAS Form layout from scratch if the background PDF file is missing
+    async function createBlankBaseDoc() {
+      const { PDFDocument, rgb, StandardFonts } = PDFLib;
+      const pdfDoc = await PDFDocument.create();
+      const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      const regular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+      // Page 1
+      const p1 = pdfDoc.addPage([595, 842]);
+      p1.drawText("GOVERNMENT OF INDIA", { x: 235, y: 815, size: 10, font: bold });
+      p1.drawText("BUREAU OF CIVIL AVIATION SECURITY", { x: 195, y: 802, size: 10, font: bold });
+      p1.drawText("AERODROME ENTRY PERMIT (AEP) APPLICATION FORM (AEPAF)", { x: 145, y: 789, size: 9, font: bold });
+      p1.drawText("APPLICATION FOR ISSUE OF TEMPORARY AND PERMANENT AEP", { x: 152, y: 775, size: 8.5, font: bold });
+
+      // Photo Frame
+      p1.drawRectangle({ x: 475, y: 685, width: 95, height: 115, borderColor: rgb(0,0,0), borderWidth: 1 });
+      p1.drawText("UPLOAD RECENT\nCOLORED\nPHOTOGRAPH\n(3.5cm x 4.5cm)", { x: 485, y: 750, size: 7, font: regular, lineHeight: 9 });
+
+      // Section 1
+      p1.drawText("1. AEP Application Reference Id: (Auto-generated)", { x: 40, y: 730, size: 8.5, font: bold });
+      p1.drawRectangle({ x: 40, y: 705, width: 420, height: 20, borderColor: rgb(0,0,0), borderWidth: 0.8 });
+
+      // Section 2
+      p1.drawText("2. AEP requested (Check [√] Appropriate Box)", { x: 40, y: 685, size: 8.5, font: bold });
+      p1.drawText("a. Type: [ ] Permanent   [ ] Temporary (1 to 30 Days)   [ ] 1-7 Days   [ ] 3 Months   [ ] 6 Months", { x: 50, y: 668, size: 7.5, font: regular });
+      p1.drawText("b. Category: [ ] Operational   [ ] Govt Security   [ ] Protocol   [ ] Infra   [ ] Tool of Trade", { x: 50, y: 648, size: 7.5, font: regular });
+      p1.drawText("c. Zones: [ ] A   [ ] D   [ ] T   [ ] Si   [ ] Sd   [ ] P   [ ] B   [ ] F", { x: 50, y: 628, size: 7.5, font: regular });
+      p1.drawText("d. Airport: [ ] Single Airport   [ ] All Airports", { x: 50, y: 608, size: 7.5, font: regular });
+
+      // Section 4
+      p1.drawText("4. Details of the Applicant:", { x: 40, y: 580, size: 8.5, font: bold });
+      p1.drawRectangle({ x: 40, y: 440, width: 515, height: 130, borderColor: rgb(0,0,0), borderWidth: 0.8 });
+      p1.drawLine({ start: { x: 40, y: 545 }, end: { x: 555, y: 545 }, thickness: 0.8, color: rgb(0,0,0) });
+      p1.drawLine({ start: { x: 40, y: 520 }, end: { x: 555, y: 520 }, thickness: 0.8, color: rgb(0,0,0) });
+      p1.drawLine({ start: { x: 40, y: 495 }, end: { x: 555, y: 495 }, thickness: 0.8, color: rgb(0,0,0) });
+      p1.drawLine({ start: { x: 40, y: 470 }, end: { x: 555, y: 470 }, thickness: 0.8, color: rgb(0,0,0) });
+      p1.drawLine({ start: { x: 290, y: 440 }, end: { x: 290, y: 570 }, thickness: 0.8, color: rgb(0,0,0) });
+
+      p1.drawText("Name:", { x: 45, y: 555, size: 8, font: regular });
+      p1.drawText("Aadhaar No:", { x: 295, y: 555, size: 8, font: regular });
+      p1.drawText("Father's Name:", { x: 45, y: 530, size: 8, font: regular });
+      p1.drawText("Mother's Name:", { x: 295, y: 530, size: 8, font: regular });
+      p1.drawText("DOB:", { x: 45, y: 505, size: 8, font: regular });
+      p1.drawText("Blood / Gender:", { x: 295, y: 505, size: 8, font: regular });
+      p1.drawText("Mobile:", { x: 45, y: 480, size: 8, font: regular });
+      p1.drawText("Email:", { x: 295, y: 480, size: 8, font: regular });
+      p1.drawText("Kin Mobile:", { x: 45, y: 455, size: 8, font: regular });
+      p1.drawText("ID Proof:", { x: 295, y: 455, size: 8, font: regular });
+
+      // Section 5
+      p1.drawText("5. Residential Address:", { x: 40, y: 415, size: 8.5, font: bold });
+      p1.drawRectangle({ x: 40, y: 260, width: 250, height: 140, borderColor: rgb(0,0,0), borderWidth: 0.8 });
+      p1.drawRectangle({ x: 305, y: 260, width: 250, height: 140, borderColor: rgb(0,0,0), borderWidth: 0.8 });
+      p1.drawText("5a. Permanent Address", { x: 45, y: 385, size: 8, font: bold });
+      p1.drawText("5b. Present Address", { x: 310, y: 385, size: 8, font: bold });
+
+      // Page 2
+      const p2 = pdfDoc.addPage([595, 842]);
+      p2.drawText("6. Employment Details:", { x: 40, y: 805, size: 8.5, font: bold });
+      p2.drawRectangle({ x: 40, y: 690, width: 515, height: 100, borderColor: rgb(0,0,0), borderWidth: 0.8 });
+      p2.drawText("Organization:", { x: 45, y: 775, size: 8, font: regular });
+      p2.drawText("Designation:", { x: 295, y: 775, size: 8, font: regular });
+      p2.drawText("Employee No:", { x: 45, y: 750, size: 8, font: regular });
+      p2.drawText("Place of Duty:", { x: 295, y: 750, size: 8, font: regular });
+      p2.drawText("Nature of Duty:", { x: 45, y: 725, size: 8, font: regular });
+      p2.drawText("Office Address:", { x: 45, y: 700, size: 8, font: regular });
+
+      p2.drawText("11. AVSEC Training & PVC Certification:", { x: 40, y: 660, size: 8.5, font: bold });
+      p2.drawRectangle({ x: 40, y: 550, width: 515, height: 95, borderColor: rgb(0,0,0), borderWidth: 0.8 });
+      p2.drawText("Training Date:", { x: 45, y: 625, size: 8, font: regular });
+      p2.drawText("Location:", { x: 295, y: 625, size: 8, font: regular });
+      p2.drawText("Instructor:", { x: 45, y: 600, size: 8, font: regular });
+      p2.drawText("PVC Details:", { x: 45, y: 570, size: 8, font: regular });
+
+      return await pdfDoc.save();
+    }
+
     async function buildOfficialStampedPdfBlob() {
       if (typeof PDFLib === 'undefined') {
-        throw new Error("PDFLib library is loading or blocked. Please wait a moment.");
+        throw new Error("PDFLib library is loading or blocked by network. Please wait a moment.");
       }
 
-      const bytes = await loadBlankPdf();
+      let bytes = await loadBlankPdf();
+      let isFallbackGenerated = false;
+
+      // Fallback: If no template PDF uploaded to repo, dynamically create the template
       if (!bytes) {
-        throw new Error("Could not find 'bcas_aepaf_blank.pdf' in your repository.");
+        bytes = await createBlankBaseDoc();
+        isFallbackGenerated = true;
       }
 
-      const { PDFDocument, rgb, StandardFonts } = PDFLib;
+      const { PDFDocument, StandardFonts } = PDFLib;
       const data = collectData();
 
       const pdfDoc = await PDFDocument.load(bytes);
       const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
       const fontNorm = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-      // Check if interactive AcroForm fields exist
-      let formFieldsFilled = false;
-      try {
-        const form = pdfDoc.getForm();
-        const fields = form.getFields();
-
-        if (fields.length > 5) {
-          // ENGINE 1: Spatial Auto-Detection of AcroForm Fields based on widget positions
-          fields.forEach(field => {
-            const widgets = field.acroField.getWidgets();
-            if (!widgets || widgets.length === 0) return;
-            const rect = widgets[0].getRectangle();
-            const y = rect.y;
-            const x = rect.x;
-            const type = field.constructor.name;
-
-            if (type.includes('Text')) {
-              // Page 1 Spatial Checks
-              if (y > 660 && y < 700) field.setText(data.refId);
-              else if (y > 220 && y < 245 && x < 350) field.setText(data.name);
-              else if (y > 220 && y < 245 && x >= 350) field.setText(data.aadhaar);
-              else if (y > 200 && y <= 220 && x < 350) field.setText(data.father);
-              else if (y > 200 && y <= 220 && x >= 350) field.setText(data.mother);
-              else if (y > 185 && y <= 200 && x < 350) field.setText(data.dob);
-              else if (y > 185 && y <= 200 && x >= 350) field.setText(data.blood);
-              else if (y > 170 && y <= 185 && x < 350) field.setText(data.mobile);
-              else if (y > 170 && y <= 185 && x >= 350) field.setText(data.email);
-              else if (y > 155 && y <= 170 && x < 350) field.setText(data.kin);
-              else if (y > 155 && y <= 170 && x >= 350) field.setText(data.idType);
-              else if (y > 125 && y <= 150 && x < 200) field.setText("NIL");
-              else if (y > 125 && y <= 150 && x >= 200 && x < 400) field.setText("NIL");
-              else if (y > 125 && y <= 150 && x >= 400) field.setText("HYD");
-              // Addresses
-              else if (y > 85 && y <= 110 && x < 300) field.setText(data.permStreet);
-              else if (y > 70 && y <= 85 && x < 300) field.setText(data.permDist);
-              else if (y > 55 && y <= 70 && x < 300) field.setText(data.permState);
-              else if (y > 40 && y <= 55 && x < 300) field.setText(data.permPin);
-              else if (y > 25 && y <= 40 && x < 300) field.setText(data.permProof);
-              else if (y > 85 && y <= 110 && x >= 300) field.setText(data.presStreet);
-              else if (y > 70 && y <= 85 && x >= 300) field.setText(data.presDist);
-              else if (y > 55 && y <= 70 && x >= 300) field.setText(data.presState);
-              else if (y > 40 && y <= 55 && x >= 300) field.setText(data.presPin);
-              // Page 2 Spatial Checks
-              else if (y > 740 && y < 770 && x < 300) field.setText(data.org);
-              else if (y > 740 && y < 770 && x >= 300) field.setText(data.desig);
-              else if (y > 720 && y <= 740 && x < 300) field.setText(data.empNo);
-              else if (y > 720 && y <= 740 && x >= 300) field.setText(data.dutyPlace);
-              else if (y > 700 && y <= 720 && x < 300) field.setText(data.nature);
-              else if (y > 700 && y <= 720 && x >= 300) field.setText("26/09/2053");
-              else if (y > 675 && y <= 700) field.setText(data.officeAddr);
-              else if (y > 360 && y < 400 && x < 300) field.setText(data.avsecDate);
-              else if (y > 360 && y < 400 && x >= 300) field.setText(data.avsecLoc);
-              else if (y > 325 && y <= 360) field.setText(data.avsecInst);
-              else if (y > 260 && y < 300) field.setText(`Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED`);
-            } else if (type.includes('Check')) {
-              // Checkboxes based on Y bands
-              if (y > 630 && y < 650 && x < 250) field.check(); // Permanent
-              else if (y > 580 && y < 605 && x < 250) field.check(); // Operational
-              else if (y > 520 && y < 545 && x < 200 && data.zones.includes('A')) field.check();
-              else if (y > 520 && y < 545 && x >= 200 && x < 270 && data.zones.includes('D')) field.check();
-              else if (y > 520 && y < 545 && x >= 270 && x < 340 && data.zones.includes('T')) field.check();
-              else if (y > 470 && y < 500 && x < 200) field.check(); // Single Airport
-              else if (y > 370 && y < 400 && x < 250) field.check(); // All Terminals
-              else if (y > 350 && y < 370 && x > 350) field.check(); // Fresh
-              else if (y > 330 && y < 350 && x < 250) field.check(); // Appointment Order
-              else if (y > 240 && y < 265 && x < 250 && data.gender === 'Male') field.check();
-              // Page 2 Checks (No boxes in Sec 7)
-              else if (y > 650 && y < 680 && x > 400) field.check();
-              else if (y > 610 && y < 640 && x > 400) field.check();
-              else if (y > 575 && y < 605 && x > 400) field.check();
-              else if (y > 545 && y < 575 && x > 250) field.check();
-            }
-          });
-          formFieldsFilled = true;
-        }
-      } catch (e) {
-        formFieldsFilled = false;
-      }
-
       const pages = pdfDoc.getPages();
       const page1 = pages[0];
       const page2 = pages[1] || page1;
 
-      // ENGINE 2: PRECISION FALLBACK DIRECT STAMPING (If fields weren't interactive)
-      if (!formFieldsFilled) {
-        // Page 1 Stamping
+      if (isFallbackGenerated) {
+        // Stamping onto dynamic fallback document
+        page1.drawText(data.refId, { x: 50, y: 712, size: 9, font });
+        page1.drawText(data.type, { x: 100, y: 668, size: 8, font });
+        page1.drawText(data.category, { x: 110, y: 648, size: 8, font });
+        page1.drawText(data.zones.join(', '), { x: 100, y: 628, size: 8, font });
+        page1.drawText(data.airport, { x: 100, y: 608, size: 8, font });
+
+        page1.drawText(data.name, { x: 110, y: 555, size: 8, font });
+        page1.drawText(data.aadhaar, { x: 360, y: 555, size: 8, font });
+        page1.drawText(data.father, { x: 110, y: 530, size: 8, font });
+        page1.drawText(data.mother, { x: 360, y: 530, size: 8, font });
+        page1.drawText(data.dob, { x: 110, y: 505, size: 8, font });
+        page1.drawText(`${data.blood} / ${data.gender}`, { x: 360, y: 505, size: 8, font });
+        page1.drawText(data.mobile, { x: 110, y: 480, size: 8, font });
+        page1.drawText(data.email, { x: 360, y: 480, size: 7.5, font });
+        page1.drawText(data.kin, { x: 110, y: 455, size: 8, font });
+        page1.drawText(data.idType, { x: 360, y: 455, size: 8, font });
+
+        page1.drawText(data.permStreet, { x: 45, y: 360, size: 7.5, font: fontNorm });
+        page1.drawText(`${data.permDist}, ${data.permState} - ${data.permPin}`, { x: 45, y: 340, size: 7.5, font: fontNorm });
+        page1.drawText(`Proof: ${data.permProof}`, { x: 45, y: 320, size: 7.5, font });
+
+        page1.drawText(data.presStreet, { x: 310, y: 360, size: 7.5, font: fontNorm });
+        page1.drawText(`${data.presDist}, ${data.presState} - ${data.presPin}`, { x: 310, y: 340, size: 7.5, font: fontNorm });
+
+        page2.drawText(data.org, { x: 110, y: 775, size: 8, font });
+        page2.drawText(data.desig, { x: 360, y: 775, size: 8, font });
+        page2.drawText(data.empNo, { x: 110, y: 750, size: 8, font });
+        page2.drawText(data.dutyPlace, { x: 360, y: 750, size: 8, font });
+        page2.drawText(data.nature, { x: 110, y: 725, size: 8, font });
+        page2.drawText(data.officeAddr, { x: 110, y: 700, size: 6.8, font: fontNorm });
+
+        page2.drawText(data.avsecDate, { x: 110, y: 625, size: 8, font });
+        page2.drawText(data.avsecLoc, { x: 360, y: 625, size: 8, font });
+        page2.drawText(data.avsecInst, { x: 110, y: 600, size: 8, font });
+        page2.drawText(`PVC: ${data.pvcId} (${data.pvcDate}) - CLEARED`, { x: 110, y: 570, size: 8, font });
+      } else {
+        // Stamping onto original BCAS PDF template
         page1.drawText(data.refId, { x: 220, y: 674, size: 8.5, font });
 
         if (data.type === 'Permanent') drawCheck(page1, 171, 640);
@@ -622,26 +654,22 @@
         drawCheck(page1, 171, 485);
         page1.drawText(data.airport, { x: 285, y: 485, size: 8, font });
 
-        drawCheck(page1, 203, 378); // All terminals
-        drawCheck(page1, 393, 360); // Fresh
-        drawCheck(page1, 171, 336); // Appointment
+        drawCheck(page1, 203, 378);
+        drawCheck(page1, 393, 360);
+        drawCheck(page1, 171, 336);
 
         if (data.gender === 'Male') drawCheck(page1, 203, 250);
         if (data.gender === 'Female') drawCheck(page1, 267, 250);
 
         page1.drawText(data.name, { x: 154, y: 230, size: 7.5, font });
         page1.drawText(data.aadhaar, { x: 424, y: 230, size: 7.5, font });
-
         page1.drawText(data.father, { x: 154, y: 213, size: 7.5, font });
         page1.drawText(data.mother, { x: 424, y: 213, size: 7.5, font });
-
         page1.drawText(data.dob, { x: 154, y: 196, size: 7.5, font });
         page1.drawText(data.blood, { x: 424, y: 196, size: 7.5, font });
         page1.drawText(data.gender.toUpperCase(), { x: 480, y: 196, size: 7.5, font });
-
         page1.drawText(data.mobile, { x: 154, y: 179, size: 7.5, font });
         page1.drawText(data.email, { x: 424, y: 179, size: 6.8, font });
-
         page1.drawText(data.kin, { x: 154, y: 162, size: 7.5, font });
         page1.drawText(data.idType, { x: 424, y: 162, size: 7.2, font });
 
@@ -660,17 +688,12 @@
         page1.drawText(data.presState, { x: 424, y: 66, size: 6.8, font: fontNorm });
         page1.drawText(data.presPin, { x: 424, y: 50, size: 6.8, font: fontNorm });
 
-        // Page 2 Stamping
-        page1.drawText("", { x: 0, y: 0, size: 1, font });
         page2.drawText(data.org, { x: 154, y: 748, size: 7.8, font });
         page2.drawText(data.desig, { x: 432, y: 748, size: 7.8, font });
-
         page2.drawText(data.empNo, { x: 154, y: 729, size: 8, font });
         page2.drawText(data.dutyPlace, { x: 432, y: 729, size: 7.8, font });
-
         page2.drawText(data.nature, { x: 154, y: 710, size: 7.8, font });
         page2.drawText("26/09/2053", { x: 432, y: 710, size: 7.8, font });
-
         page2.drawText(data.officeAddr, { x: 154, y: 690, size: 6.2, font: fontNorm });
 
         drawCheck(page2, 435, 665);
@@ -688,7 +711,6 @@
         page2.drawText(data.avsecLoc, { x: 398, y: 375, size: 7.8, font });
         drawCheck(page2, 73, 357);
         page2.drawText(data.avsecInst, { x: 265, y: 336, size: 7.2, font });
-
         page2.drawText(`Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, { x: 160, y: 278, size: 7.5, font });
 
         page2.drawText("HYD", { x: 92, y: 165, size: 8, font });
@@ -697,12 +719,14 @@
         page2.drawText("SECURITY DEPT", { x: 410, y: 120, size: 7.2, font });
       }
 
-      // Passport Photograph stamped into the top-right box
+      // Passport Photograph
       if (photoBytes) {
         try {
           const img = await pdfDoc.embedJpg(photoBytes).catch(async () => await pdfDoc.embedPng(photoBytes));
-          page1.drawImage(img, { x: 480, y: 686, width: 98, height: 124 });
-        } catch (e) {}
+          page1.drawImage(img, { x: 477, y: 686, width: 93, height: 113 });
+        } catch (e) {
+          console.warn("Could not embed uploaded photo:", e);
+        }
       }
 
       const stampedBytes = await pdfDoc.save();
@@ -718,7 +742,7 @@
           document.getElementById('pdf-preview-frame').src = activePdfUrl;
         }
       } catch (err) {
-        console.warn("Preview notice:", err.message);
+        console.error("Preview notice:", err);
       }
     }
 
@@ -747,8 +771,7 @@
           URL.revokeObjectURL(url);
         }, 1000);
       } catch (err) {
-        console.error("Download Error:", err);
-        alert(err.message);
+        alert("Download error: " + err.message);
       } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -775,8 +798,7 @@
           a.click();
         }
       } catch (err) {
-        console.error("Print Error:", err);
-        alert(err.message);
+        alert("Print error: " + err.message);
       } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -788,19 +810,20 @@
       const btn = document.getElementById('btn-submit');
       const originalText = btn.innerHTML;
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Saving to Google Sheets...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Saving Record...`;
 
       const data = collectData();
 
       try {
-        if (!GOOGLE_SCRIPT_WEBAPP_URL.includes("https://script.google.com/macros/s/AKfycbw-50wDrmCSvKL--F1jCuZuMuj8x5abEqR69poR-LTkT-_2VAWkeESp3iAGuXi6x9pP/exec")) {
+        if (GOOGLE_SCRIPT_WEBAPP_URL && GOOGLE_SCRIPT_WEBAPP_URL.startsWith("https://script.google.com")) {
           await fetch(GOOGLE_SCRIPT_WEBAPP_URL, {
             method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
           });
         }
-        alert(`✅ Application for ${data.name} (${data.empNo}) saved to Google Sheets under 'SECURITY'.`);
+        alert(`✅ Application record for ${data.name} (${data.empNo}) processed successfully.`);
       } catch (err) {
         alert("Record saved to active session.");
       } finally {
@@ -809,15 +832,8 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      try {
-        const bytes = await loadBlankPdf();
-        if (bytes) {
-          refreshPdfPreview();
-        }
-      } catch (e) {
-        console.warn("Init notice:", e);
-      }
+    document.addEventListener("DOMContentLoaded", () => {
+      refreshPdfPreview();
     });
   </script>
 </body>
