@@ -469,10 +469,10 @@
       drawFittedText(page1, data.email, 426, 175, 140, 6.8, font);
       drawFittedText(page1, data.idType, 426, 160, 140, 7.2, font);
 
-      // 4b. Existing AEP: Positioned directly on the line and in the cell
-      drawFittedText(page1, "NIL", 115, 145, 80, 7.5, fontNorm);
-      drawFittedText(page1, "NIL", 335, 145, 80, 7.5, fontNorm);
-      drawFittedText(page1, "HYD", 500, 145, 65, 7.5, fontNorm);
+      // 4b. Existing AEP: Centered on the blank lines and inside Place of Issue box
+      drawFittedText(page1, "NIL", 175, 143, 75, 7.5, fontNorm);
+      drawFittedText(page1, "NIL", 360, 143, 75, 7.5, fontNorm);
+      drawFittedText(page1, "HYD", 500, 143, 65, 7.5, fontNorm);
 
       // 5. Residential Address: Vertically centered in boxes
       drawFittedText(page1, data.permStreet, 154, 96, 185, 6.8, fontNorm);
@@ -510,15 +510,15 @@
       // 10. Non-Indian Nationals (Inside cell)
       drawFittedText(page2, "INDIAN NATIONAL (NOT APPLICABLE)", 160, 458, 300, 7.2, font);
 
-      // 11. AVSEC Training (Centered inside designated cells)
-      drawFittedText(page2, data.avsecDate, 154, 350, 100, 7.8, font);
-      drawFittedText(page2, data.avsecLoc, 400, 350, 160, 7.8, font);
-      drawFittedText(page2, data.avsecInst, 265, 312, 290, 7.2, font);
+      // 11. AVSEC Training (Centered precisely in cell boxes)
+      drawFittedText(page2, data.avsecDate, 154, 348, 100, 7.8, font);
+      drawFittedText(page2, data.avsecLoc, 400, 348, 160, 7.8, font);
+      drawFittedText(page2, data.avsecInst, 265, 310, 290, 7.2, font);
       drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 282, 400, 7.2, font);
 
-      // Signatures
-      drawFittedText(page2, "HYD", 180, 132, 80, 8, font);
-      drawFittedText(page2, "04/11/2026", 180, 107, 80, 7.5, font);
+      // Signatures (Inside Place and Date boxes on left, on signature lines on right)
+      drawFittedText(page2, "HYD", 135, 133, 75, 8, font);
+      drawFittedText(page2, "04/11/2026", 135, 108, 75, 7.5, font);
       drawFittedText(page2, data.org, 405, 140, 180, 7.2, font);
       drawFittedText(page2, "SECURITY DEPT", 440, 118, 150, 7.2, font);
 
