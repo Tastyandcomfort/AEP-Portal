@@ -62,7 +62,7 @@
         </div>
         <div>
           <span class="text-sm md:text-base font-semibold tracking-tight block leading-tight">BCAS AEP Form Engine</span>
-          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">100% Calibrated Precision Mapper</span>
+          <span class="text-[10px] text-[#86868b] tracking-wider uppercase font-semibold">Clean Text Form Stamping Engine</span>
         </div>
       </div>
 
@@ -90,11 +90,11 @@
       <div class="xl:col-span-5 space-y-4">
         <form id="aepDataForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
 
-          <!-- SECTION 1, 2, 3 -->
+          <!-- SECTION 1 & 2d -->
           <div class="apple-card p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-[#f5f5f7] pb-3">
-              <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Sections 1, 2 &amp; 3</span>
-              <span class="text-xs font-semibold text-[#86868b]">Permit Type &amp; Zones</span>
+              <span class="text-xs font-bold text-[#0071e3] uppercase tracking-wider">Permit Credentials</span>
+              <span class="text-xs font-semibold text-[#86868b]">Section 1 &amp; 2d</span>
             </div>
 
             <div>
@@ -102,81 +102,9 @@
               <input type="text" id="f_refId" required value="HYD/2026/AEP/72835" oninput="debounceRefresh()" class="w-full p-2.5 apple-input text-xs font-bold uppercase" />
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">2a. Type</label>
-                <select id="f_type" onchange="debounceRefresh()" class="w-full p-2.5 apple-input font-medium">
-                  <option value="Permanent" selected>Permanent</option>
-                  <option value="Temporary">Temporary (1 to 30 Days)</option>
-                  <option value="1Day">1 Day</option>
-                  <option value="1-7Days">1 - 7 Days</option>
-                  <option value="3Months">3 Months</option>
-                  <option value="6Months">6 Months</option>
-                </select>
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">2b. Category</label>
-                <select id="f_category" onchange="debounceRefresh()" class="w-full p-2.5 apple-input font-medium">
-                  <option value="Operational" selected>Operational</option>
-                  <option value="Protocol">Protocol</option>
-                  <option value="ForeignNational">Foreign National</option>
-                  <option value="GovtSecurity">Government Security Agencies</option>
-                  <option value="Infra">Infra</option>
-                  <option value="ToolOfTrade">Tool of Trade</option>
-                </select>
-              </div>
-            </div>
-
             <div>
-              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1.5">2c. Operational Zones</label>
-              <div class="grid grid-cols-4 gap-2 text-xs font-bold">
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_A" checked onchange="debounceRefresh()" class="rounded text-[#0071e3]" />
-                  <span>A (Apron)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_D" checked onchange="debounceRefresh()" class="rounded text-[#0071e3]" />
-                  <span>D (Domestic)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_T" checked onchange="debounceRefresh()" class="rounded text-[#0071e3]" />
-                  <span>T (Terminal)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_Si" onchange="debounceRefresh()" class="rounded text-[#0071e3]" />
-                  <span>Si (Sec Intl)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_Sd" onchange="debounceRefresh()" class="rounded text-[#0071e3]" />
-                  <span>Sd (Sec Dom)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_P" onchange="debounceRefresh()" class="rounded text-[#0071e3]" />
-                  <span>P (Perimeter)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_B" onchange="debounceRefresh()" class="rounded text-[#0071e3]" />
-                  <span>B (Baggage)</span>
-                </label>
-                <label class="flex items-center space-x-1.5 p-2 bg-[#f5f5f7] rounded-lg cursor-pointer">
-                  <input type="checkbox" id="zone_F" onchange="debounceRefresh()" class="rounded text-[#0071e3]" />
-                  <span>F (Freight)</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 text-xs">
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">2d. Airport Requested</label>
-                <input type="text" id="f_airport" value="RGIA - HYD" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#86868b] uppercase mb-1">3. Issue Category</label>
-                <select id="f_issueCat" onchange="debounceRefresh()" class="w-full p-2.5 apple-input font-medium">
-                  <option value="Fresh" selected>Fresh (Appointment Order)</option>
-                  <option value="Re-Issue">Re-Issue (Expired / Promotion)</option>
-                </select>
-              </div>
+              <label class="block text-xs font-semibold text-[#86868b] uppercase mb-1">2d. Airport Requested</label>
+              <input type="text" id="f_airport" value="RGIA - HYD" oninput="debounceRefresh()" class="w-full p-2.5 apple-input font-bold uppercase" />
             </div>
           </div>
 
@@ -390,11 +318,6 @@
       return el ? el.value.trim() : '';
     }
 
-    function isChecked(id) {
-      const el = document.getElementById(id);
-      return el ? el.checked : false;
-    }
-
     function debounceRefresh() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(refreshPdfPreview, 250);
@@ -437,18 +360,9 @@
     }
 
     function collectData() {
-      const zones = [];
-      ['A', 'D', 'T', 'Si', 'Sd', 'P', 'B', 'F', 'Ft', 'Cs', 'I', 'AnyOtherZone'].forEach(z => {
-        if (isChecked(`zone_${z}`)) zones.push(z);
-      });
-
       return {
         refId: getVal('f_refId'),
-        type: getVal('f_type'),
-        category: getVal('f_category'),
-        zones: zones,
         airport: getVal('f_airport').toUpperCase(),
-        issueCat: getVal('f_issueCat'),
         name: getVal('f_name').toUpperCase(),
         father: getVal('f_father').toUpperCase(),
         mother: getVal('f_mother').toUpperCase(),
@@ -500,23 +414,6 @@
         str += '...';
       }
       page.drawText(str, { x, y, size, font });
-    }
-
-    // Precision Vector Checkmark centered in square boxes
-    function drawCheck(page, x, y) {
-      const { rgb } = PDFLib;
-      page.drawLine({
-        start: { x: x + 1.2, y: y + 3.2 },
-        end: { x: x + 3.0, y: y + 1.2 },
-        thickness: 1.5,
-        color: rgb(0, 0, 0)
-      });
-      page.drawLine({
-        start: { x: x + 3.0, y: y + 1.2 },
-        end: { x: x + 6.8, y: y + 6.2 },
-        thickness: 1.5,
-        color: rgb(0, 0, 0)
-      });
     }
 
     async function buildOfficialStampedPdfBlob() {
@@ -573,9 +470,9 @@
       drawFittedText(page1, data.idType, 426, 160, 140, 7.2, font);
 
       // 4b. Existing AEP: Positioned directly on the line and in the cell
-      drawFittedText(page1, "NIL", 115, 144, 80, 7.5, fontNorm);
-      drawFittedText(page1, "NIL", 335, 144, 80, 7.5, fontNorm);
-      drawFittedText(page1, "HYD", 498, 143, 65, 7.5, fontNorm);
+      drawFittedText(page1, "NIL", 115, 145, 80, 7.5, fontNorm);
+      drawFittedText(page1, "NIL", 335, 145, 80, 7.5, fontNorm);
+      drawFittedText(page1, "HYD", 500, 145, 65, 7.5, fontNorm);
 
       // 5. Residential Address: Vertically centered in boxes
       drawFittedText(page1, data.permStreet, 154, 96, 185, 6.8, fontNorm);
@@ -589,63 +486,6 @@
       drawFittedText(page1, data.presState, 426, 60, 140, 6.8, fontNorm);
       drawFittedText(page1, data.presPin, 426, 42, 140, 6.8, fontNorm);
 
-      // ==========================================================
-      // PAGE 1: VECTOR CHECKMARKS (PRECISE INSIDE [ ] BRACKETS)
-      // Left Axis: X = 171 | Right Axis: X = 395
-      // ==========================================================
-
-      // 2a. Type
-      if (data.type === 'Permanent') drawCheck(page1, 171, 630);
-      if (data.type === 'Temporary') drawCheck(page1, 395, 630);
-      if (data.type === '1Day') drawCheck(page1, 171, 611);
-      if (data.type === '1-7Days') drawCheck(page1, 244, 611);
-      if (data.type === '3Months') drawCheck(page1, 320, 611);
-      if (data.type === '6Months') drawCheck(page1, 395, 611);
-
-      // 2b. Category
-      if (data.category === 'Operational') drawCheck(page1, 171, 584);
-      if (data.category === 'GovtSecurity') drawCheck(page1, 395, 584);
-      if (data.category === 'Protocol') drawCheck(page1, 171, 566);
-      if (data.category === 'Infra') drawCheck(page1, 395, 566);
-      if (data.category === 'ForeignNational') drawCheck(page1, 171, 548);
-      if (data.category === 'ToolOfTrade') drawCheck(page1, 395, 548);
-
-      // 2c. Operational Zones (Calibrated: 171, 226, 296, 366, 436, 491)
-      if (data.zones.includes('A')) drawCheck(page1, 171, 523);
-      if (data.zones.includes('D')) drawCheck(page1, 226, 523);
-      if (data.zones.includes('T')) drawCheck(page1, 296, 523);
-      if (data.zones.includes('Si')) drawCheck(page1, 366, 523);
-      if (data.zones.includes('Sd')) drawCheck(page1, 436, 523);
-      if (data.zones.includes('P')) drawCheck(page1, 491, 523);
-
-      if (data.zones.includes('B')) drawCheck(page1, 171, 505);
-      if (data.zones.includes('F')) drawCheck(page1, 226, 505);
-      if (data.zones.includes('Ft')) drawCheck(page1, 296, 505);
-      if (data.zones.includes('Cs')) drawCheck(page1, 366, 505);
-      if (data.zones.includes('I')) drawCheck(page1, 436, 505);
-      if (data.zones.includes('AnyOtherZone')) drawCheck(page1, 491, 505);
-
-      // 2d. Airport
-      drawCheck(page1, 171, 480); // Single Airport
-      if (data.airportOpt === 'AllAirports') drawCheck(page1, 395, 480);
-      if (data.airportOpt === 'AllDomestic') drawCheck(page1, 171, 462);
-      if (data.airportOpt === 'AllIntl') drawCheck(page1, 395, 462);
-
-      // 2e. Terminal
-      drawCheck(page1, 171, 381); // All Terminals
-
-      // 3. Issue Category
-      if (data.issueCat === 'Fresh') {
-        drawCheck(page1, 395, 356); // Fresh
-        drawCheck(page1, 171, 336); // Appointment Order
-      } else {
-        drawCheck(page1, 490, 356); // Re-Issue
-      }
-
-      // 4a. Gender Box
-      if (data.gender === 'MALE') drawCheck(page1, 171, 250);
-      if (data.gender === 'FEMALE') drawCheck(page1, 235, 250);
-
       // Passport Photograph
       if (photoBytes) {
         try {
@@ -655,7 +495,7 @@
       }
 
       // ==========================================
-      // PAGE 2: TEXT FIELDS & CHECKMARKS
+      // PAGE 2: TEXT FIELDS (NO CHECKMARKS)
       // ==========================================
 
       // 6. Employment Details (Centered in cells)
@@ -667,24 +507,14 @@
       drawFittedText(page2, "26/09/2053", 426, 738, 140, 7.6, font);
       drawFittedText(page2, data.officeAddr, 154, 718, 415, 6.2, fontNorm);
 
-      // 7. Security Declarations (No Checkboxes at X = 438)
-      drawCheck(page2, 438, 677); // Case pending: No
-      drawCheck(page2, 438, 641); // Arrested: No
-      drawCheck(page2, 438, 605); // Punished: No
-
-      // 8. Previous Rejections: No is at X = 292
-      drawCheck(page2, 292, 573); // Application rejected: No
-      drawCheck(page2, 292, 555); // Whether Issued: No
-
       // 10. Non-Indian Nationals (Inside cell)
       drawFittedText(page2, "INDIAN NATIONAL (NOT APPLICABLE)", 160, 458, 300, 7.2, font);
 
-      // 11. AVSEC Training (Centered in cells)
-      drawFittedText(page2, data.avsecDate, 154, 322, 100, 7.8, font);
-      drawFittedText(page2, data.avsecLoc, 400, 322, 160, 7.8, font);
-      drawCheck(page2, 73, 315); // Initial Training Checked
-      drawFittedText(page2, data.avsecInst, 265, 292, 290, 7.2, font);
-      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 268, 400, 7.2, font);
+      // 11. AVSEC Training (Centered inside designated cells)
+      drawFittedText(page2, data.avsecDate, 154, 350, 100, 7.8, font);
+      drawFittedText(page2, data.avsecLoc, 400, 350, 160, 7.8, font);
+      drawFittedText(page2, data.avsecInst, 265, 312, 290, 7.2, font);
+      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 282, 400, 7.2, font);
 
       // Signatures
       drawFittedText(page2, "HYD", 180, 132, 80, 8, font);
