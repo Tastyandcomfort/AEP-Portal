@@ -502,19 +502,19 @@
       page.drawText(str, { x, y, size, font });
     }
 
-    // Vector tick/checkmark drawer
+    // Precision Vector Checkmark centered in 9x9 square boxes
     function drawCheck(page, x, y) {
       const { rgb } = PDFLib;
       page.drawLine({
-        start: { x: x + 1.2, y: y + 3.8 },
-        end: { x: x + 3.8, y: y + 1.2 },
-        thickness: 1.6,
+        start: { x: x + 1.5, y: y + 4.2 },
+        end: { x: x + 4.0, y: y + 1.5 },
+        thickness: 1.8,
         color: rgb(0, 0, 0)
       });
       page.drawLine({
-        start: { x: x + 3.8, y: y + 1.2 },
-        end: { x: x + 8.2, y: y + 7.8 },
-        thickness: 1.6,
+        start: { x: x + 4.0, y: y + 1.5 },
+        end: { x: x + 8.5, y: y + 8.2 },
+        thickness: 1.8,
         color: rgb(0, 0, 0)
       });
     }
@@ -572,65 +572,65 @@
       drawFittedText(page1, data.email, 426, 180, 140, 6.8, font);
       drawFittedText(page1, data.idType, 426, 165, 140, 7.2, font);
 
-      // 4b. Existing AEP (Shifted inside input cells)
-      drawFittedText(page1, "NIL", 105, 140, 90, 7.5, fontNorm);
-      drawFittedText(page1, "NIL", 310, 140, 90, 7.5, fontNorm);
-      drawFittedText(page1, "HYD", 492, 140, 75, 7.5, fontNorm);
+      // 4b. Existing AEP (Shifted onto blank line fields)
+      drawFittedText(page1, "NIL", 130, 135, 90, 7.5, fontNorm);
+      drawFittedText(page1, "NIL", 340, 135, 90, 7.5, fontNorm);
+      drawFittedText(page1, "HYD", 505, 132, 75, 7.5, fontNorm);
 
-      // 5. Residential Address: Centered inside table cells
-      drawFittedText(page1, data.permStreet, 154, 100, 185, 6.8, fontNorm);
-      drawFittedText(page1, data.permDist, 154, 82, 185, 6.8, fontNorm);
-      drawFittedText(page1, data.permState, 154, 64, 185, 6.8, fontNorm);
-      drawFittedText(page1, data.permPin, 154, 46, 185, 6.8, fontNorm);
-      drawFittedText(page1, data.permProof, 180, 28, 160, 7.0, font);
+      // 5. Residential Address: Vertically centered inside table cells
+      drawFittedText(page1, data.permStreet, 154, 96, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permDist, 154, 78, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permState, 154, 60, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permPin, 154, 42, 185, 6.8, fontNorm);
+      drawFittedText(page1, data.permProof, 180, 30, 160, 7.0, font);
 
-      drawFittedText(page1, data.presStreet, 426, 100, 140, 6.8, fontNorm);
-      drawFittedText(page1, data.presDist, 426, 82, 140, 6.8, fontNorm);
-      drawFittedText(page1, data.presState, 426, 64, 140, 6.8, fontNorm);
-      drawFittedText(page1, data.presPin, 426, 46, 140, 6.8, fontNorm);
+      drawFittedText(page1, data.presStreet, 426, 96, 140, 6.8, fontNorm);
+      drawFittedText(page1, data.presDist, 426, 78, 140, 6.8, fontNorm);
+      drawFittedText(page1, data.presState, 426, 60, 140, 6.8, fontNorm);
+      drawFittedText(page1, data.presPin, 426, 42, 140, 6.8, fontNorm);
 
       // ==========================================
       // PAGE 1: VECTOR CHECKMARKS
       // ==========================================
 
       // 2a. Type
-      if (data.type === 'Permanent') drawCheck(page1, 203, 627);
-      if (data.type === 'Temporary') drawCheck(page1, 425, 627);
-      if (data.type === '1Day') drawCheck(page1, 171, 609);
-      if (data.type === '1-7Days') drawCheck(page1, 246, 609);
-      if (data.type === '3Months') drawCheck(page1, 318, 609);
-      if (data.type === '6Months') drawCheck(page1, 393, 609);
+      if (data.type === 'Permanent') drawCheck(page1, 187, 627);
+      if (data.type === 'Temporary') drawCheck(page1, 405, 627);
+      if (data.type === '1Day') drawCheck(page1, 142, 609);
+      if (data.type === '1-7Days') drawCheck(page1, 217, 609);
+      if (data.type === '3Months') drawCheck(page1, 290, 609);
+      if (data.type === '6Months') drawCheck(page1, 365, 609);
 
-      // 2b. Category (Box column at X = 203)
-      if (data.category === 'Operational') drawCheck(page1, 203, 582);
-      if (data.category === 'GovtSecurity') drawCheck(page1, 425, 582);
-      if (data.category === 'Protocol') drawCheck(page1, 203, 564);
-      if (data.category === 'Infra') drawCheck(page1, 425, 564);
-      if (data.category === 'ForeignNational') drawCheck(page1, 203, 546);
-      if (data.category === 'ToolOfTrade') drawCheck(page1, 425, 546);
+      // 2b. Category (Boxes column at X = 187)
+      if (data.category === 'Operational') drawCheck(page1, 187, 582);
+      if (data.category === 'GovtSecurity') drawCheck(page1, 405, 582);
+      if (data.category === 'Protocol') drawCheck(page1, 187, 564);
+      if (data.category === 'Infra') drawCheck(page1, 405, 564);
+      if (data.category === 'ForeignNational') drawCheck(page1, 187, 546);
+      if (data.category === 'ToolOfTrade') drawCheck(page1, 405, 546);
 
       // 2c. Operational Zones
-      if (data.zones.includes('A')) drawCheck(page1, 203, 521);
-      if (data.zones.includes('D')) drawCheck(page1, 258, 521);
-      if (data.zones.includes('T')) drawCheck(page1, 328, 521);
-      if (data.zones.includes('Si')) drawCheck(page1, 398, 521);
-      if (data.zones.includes('Sd')) drawCheck(page1, 472, 521);
-      if (data.zones.includes('P')) drawCheck(page1, 526, 521);
-      if (data.zones.includes('B')) drawCheck(page1, 203, 503);
-      if (data.zones.includes('F')) drawCheck(page1, 258, 503);
+      if (data.zones.includes('A')) drawCheck(page1, 187, 521);
+      if (data.zones.includes('D')) drawCheck(page1, 242, 521);
+      if (data.zones.includes('T')) drawCheck(page1, 312, 521);
+      if (data.zones.includes('Si')) drawCheck(page1, 382, 521);
+      if (data.zones.includes('Sd')) drawCheck(page1, 455, 521);
+      if (data.zones.includes('P')) drawCheck(page1, 512, 521);
+      if (data.zones.includes('B')) drawCheck(page1, 187, 503);
+      if (data.zones.includes('F')) drawCheck(page1, 242, 503);
 
       // 2d. Airport
-      drawCheck(page1, 203, 478); // Single Airport
+      drawCheck(page1, 187, 478); // Single Airport
 
       // 2e. Terminal
       drawCheck(page1, 203, 381); // All Terminals
 
       // 3. Issue Category
       if (data.issueCat === 'Fresh') {
-        drawCheck(page1, 425, 356); // Fresh
+        drawCheck(page1, 405, 356); // Fresh
         drawCheck(page1, 171, 336); // Appointment Order
       } else {
-        drawCheck(page1, 520, 356); // Re-Issue
+        drawCheck(page1, 485, 356); // Re-Issue
       }
 
       // 4a. Gender Box
@@ -658,7 +658,7 @@
       drawFittedText(page2, "26/09/2053", 426, 740, 140, 7.6, font);
       drawFittedText(page2, data.officeAddr, 154, 718, 415, 6.2, fontNorm);
 
-      // 7. Security Declarations (No Checkboxes inside box at X = 438)
+      // 7. Security Declarations (Boxes at X = 438)
       drawCheck(page2, 438, 680); // Case pending: No
       drawCheck(page2, 438, 644); // Arrested: No
       drawCheck(page2, 438, 608); // Punished: No
@@ -675,7 +675,7 @@
       drawFittedText(page2, data.avsecLoc, 400, 332, 160, 7.8, font);
       drawCheck(page2, 73, 315); // Initial Training Checked
       drawFittedText(page2, data.avsecInst, 265, 298, 290, 7.2, font);
-      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 274, 400, 7.2, font);
+      drawFittedText(page2, `Certificate No: ${data.pvcId} | Date: ${data.pvcDate} | Status: CLEARED & APPROVED`, 160, 265, 400, 7.2, font);
 
       // Signatures
       drawFittedText(page2, "HYD", 180, 132, 80, 8, font);
@@ -693,7 +693,7 @@
         if (blob) {
           if (activePdfUrl) URL.revokeObjectURL(activePdfUrl);
           activePdfUrl = URL.createObjectURL(blob);
-          document.getElementById('pdf-preview-frame').src = activePdfUrl + "#view=FitH";
+          document.getElementById('pdf-preview-frame').src = activePdfUrl + "#toolbar=0&navpanes=0&view=FitH";
         }
       } catch (err) {
         console.warn("Preview notice:", err.message);
