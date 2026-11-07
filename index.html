@@ -506,14 +506,14 @@
     function drawCheck(page, x, y) {
       const { rgb } = PDFLib;
       page.drawLine({
-        start: { x: x + 1.2, y: y + 3.5 },
-        end: { x: x + 3.2, y: y + 1.5 },
+        start: { x: x + 1.2, y: y + 2.5 },
+        end: { x: x + 3.2, y: y + 0.5 },
         thickness: 1.5,
         color: rgb(0, 0, 0)
       });
       page.drawLine({
         start: { x: x + 3.2, y: y + 1.5 },
-        end: { x: x + 7.5, y: y + 7.0 },
+        end: { x: x + 7.5, y: y + 6.5 },
         thickness: 1.5,
         color: rgb(0, 0, 0)
       });
